@@ -1,7 +1,7 @@
 # AI_edu
 Orchestrator and specialist AI agents platform for educational technology startup.
 
-#Overall Project Structure (Root)
+# Overall Project Structure (Root)
 ```
 edu_video_ai/
 ├── backend/                      # Python FastAPI + Agents
@@ -16,7 +16,7 @@ edu_video_ai/
 └── README.md
 ```
 
-#backand structure 
+# backand structure 
 ```
 backend/
 ├── main.py                       # FastAPI entry point
