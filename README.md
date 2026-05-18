@@ -116,8 +116,6 @@ frontend/
 │   │   │   │       └── loading.tsx       # Loading skeleton saat load project
 │   │   │   ├── layout.tsx                # Layout studio (sidebar, header)
 │   │   │   └── error.tsx                 # Error boundary untuk studio
-│   │   ├── api/                      # Route handlers (Next.js API routes)
-│   │   │   └── ws/
 │   │   │
 │   │   ├── favicon.ico
 │   │   ├── globals.css               # Tailwind + CSS variables
