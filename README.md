@@ -196,5 +196,4 @@ frontend/
 ├── package.json
 ├── postcss.config.js
 ├── tailwind.config.js
-├── tsconfig.json
-└── README.md
+└── tsconfig.json
