@@ -14,7 +14,7 @@ edu_video_ai/
 ├── pyproject.toml
 ├── docker-compose.yml
 └── README.md
-
+```
 
 #backand structure 
 ```
@@ -100,3 +100,4 @@ backend/
     ├── logging.py
     ├── monitoring.py
     └── cache.py
+
