@@ -21,6 +21,7 @@ edu_video_ai/
 backend/
 ├── main.py                       # FastAPI entry point
 ├── core/                         # Config, DB, Utils
+│   ├── __init__.py
 │   ├── config.py
 │   ├── database.py               # PostgreSQL + Redis
 │   ├── qdrant.py
