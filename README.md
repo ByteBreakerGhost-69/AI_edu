@@ -107,90 +107,136 @@ backend/
 frontend/
 ├── src/
 │   ├── app/                          # Next.js App Router
-│   │   ├── (landing)/                # Group landing pages (tanpa layout studio)
-│   │   │   ├── page.tsx                  # Landing page / Dashboard project
-│   │   │   └── layout.tsx                # Layout khusus landing (navbar hero)
-│   │   ├── (studio)/                 # Group studio editor (dengan layout studio)
+│   │   ├── (landing)/                # Landing pages & dashboard
+│   │   │   ├── page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── (studio)/                 # Studio Editor (protected route)
 │   │   │   ├── studio/
 │   │   │   │   └── [project_id]/
-│   │   │   │       ├── page.tsx          # Main editor studio
-│   │   │   │       └── loading.tsx       # Loading skeleton saat load project
-│   │   │   ├── layout.tsx                # Layout studio (sidebar, header)
-│   │   │   └── error.tsx                 # Error boundary untuk studio
-│   │   │
+│   │   │   │       ├── page.tsx          # Main Studio Editor
+│   │   │   │       └── loading.tsx
+│   │   │   ├── layout.tsx                # Studio Layout (sidebar + header)
+│   │   │   └── error.tsx
 │   │   ├── favicon.ico
-│   │   ├── globals.css               # Tailwind + CSS variables
-│   │   └── layout.tsx                # Root layout (provider wrapper)
+│   │   ├── globals.css
+│   │   └── layout.tsx                    # Root layout (providers)
 │   │
-│   ├── components/                   # Komponen reusable
-│   │   ├── studio/                   # Komponen khusus studio editor
-│   │   │   ├── canvas-player.tsx         # Canvas player + quiz overlay
-│   │   │   ├── timeline.tsx              # Timeline tracks & playhead
-│   │   │   ├── script-sidebar.tsx        # Script editor (Markdown + prompt)
-│   │   │   ├── asset-panel.tsx           # Visual bible adjustments
-│   │   │   ├── scene-thumbnails.tsx      # Thumbnail strip untuk navigasi cepat
-│   │   │   ├── export-modal.tsx          # Modal export video / render ulang
-│   │   │   └── render-progress.tsx       # Progress bar render realtime
-│   │   ├── ui/                       # Base UI (Shadcn/ui)
+│   ├── features/                         # ← NEW: Feature Slicing (Paling penting)
+│   │   └── studio/
+│   │       ├── player/
+│   │       │   ├── video-player.tsx
+│   │       │   ├── quiz-overlay.tsx
+│   │       │   └── index.ts
+│   │       ├── timeline/
+│   │       │   ├── timeline.tsx
+│   │       │   ├── track.tsx
+│   │       │   ├── playhead.tsx
+│   │       │   └── hooks/
+│   │       ├── script-editor/
+│   │       │   ├── script-sidebar.tsx
+│   │       │   └── script-editor.tsx
+│   │       ├── asset-manager/
+│   │       │   ├── asset-panel.tsx
+│   │       │   └── visual-bible.tsx
+│   │       ├── scene-inspector/
+│   │       │   └── scene-inspector.tsx
+│   │       ├── thumbnails/
+│   │       │   └── scene-thumbnails.tsx
+│   │       ├── feedback/
+│   │       │   ├── feedback-modal.tsx
+│   │       │   └── feedback-form.tsx
+│   │       └── export/
+│   │           └── export-modal.tsx
+│   │
+│   ├── components/
+│   │   ├── ui/                           # Shadcn/ui components
 │   │   │   ├── button.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── slider.tsx
 │   │   │   ├── dialog.tsx
 │   │   │   ├── dropdown-menu.tsx
-│   │   │   └── ... (komponen shadcn lainnya)
-│   │   ├── layout/                   # Layout wrapper
-│   │   │   ├── sidebar.tsx               # Sidebar navigasi studio
-│   │   │   ├── header.tsx                # Top bar (project title, save, share)
-│   │   │   └── provider.tsx              # Gabungan semua provider (Theme, Zustand, WS)
-│   │   └── common/                   # Komponen umum
-│   │       ├── loading-spinner.tsx
-│   │       ├── error-toast.tsx
-│   │       └── confirm-dialog.tsx
+│   │   │   ├── slider.tsx
+│   │   │   └── ... 
+│   │   ├── common/                       # Generic components
+│   │   │   ├── loading-spinner.tsx
+│   │   │   ├── error-toast.tsx
+│   │   │   └── confirm-dialog.tsx
+│   │   └── layout/                       # Layout components
+│   │       ├── sidebar.tsx
+│   │       ├── header.tsx
+│   │       └── studio-layout.tsx
 │   │
-│   ├── hooks/                        # Custom React Hooks
-│   │   ├── use-websocket.ts              # WebSocket connection (status render, scene update)
-│   │   ├── use-video-player.ts           # Play, pause, seek, gapless antar scene
-│   │   ├── use-project-data.ts           # Fetch project & subscribe ke store
-│   │   ├── use-auto-save.ts              # Auto save script / visual bible ke backend
-│   │   └── use-hotkeys.ts                # Shortcuts keyboard (space, arrow keys)
+│   ├── providers/                        # ← NEW
+│   │   ├── studio-provider.tsx
+│   │   ├── query-provider.tsx            # TanStack Query
+│   │   ├── websocket-provider.tsx
+│   │   ├── theme-provider.tsx
+│   │   └── index.tsx                     # Export semua providers
 │   │
-│   ├── store/                        # Zustand stores (state management)
-│   │   ├── use-studio-store.ts           # State global studio (current timestamp, selected scene, playhead)
-│   │   ├── use-project-store.ts          # Project metadata, script, visual bible, scenes
-│   │   ├── use-render-store.ts           # Render status, progress, error, output URL   
+│   ├── hooks/                            # Custom Hooks
+│   │   ├── use-websocket.ts
+│   │   ├── use-video-player.ts
+│   │   ├── use-project-data.ts
+│   │   ├── use-auto-save.ts
+│   │   ├── use-hotkeys.ts
+│   │   ├── use-tanstack.ts               # Custom query hooks
+│   │   └── use-render-progress.ts
 │   │
-│   ├── services/                     # Layer komunikasi dengan backend
-│   │   ├── api-client.ts                 # Axios instance dengan interceptor (auth, refresh)
-│   │   ├── project-service.ts            # CRUD project, upload input, get scenes
-│   │   ├── render-service.ts             # Trigger render, get status, cancel render
-│   │   └── feedback-service.ts           # Submit feedback, partial regen request
+│   ├── store/                            # Zustand Stores (diperkecil)
+│   │   ├── use-studio-store.ts
+│   │   ├── use-project-store.ts
+│   │   ├── use-render-store.ts
+│   │   └── index.ts
 │   │
-│   ├── types/                        # TypeScript interfaces (cocok dengan Pydantic backend)
-│   │   ├── project.ts                    # Project, Scene, Script, VisualAsset
-│   │   ├── feedback.ts                   # Feedback, RegenerationRequest
-│   │   ├── render.ts                     # RenderJob, RenderStatus, OutputVideo
-│   │   └── index.ts                      # Export semua
+│   ├── services/                         # High-level service
+│   │   ├── project-service.ts
+│   │   ├── render-service.ts
+│   │   └── feedback-service.ts
 │   │
-│   ├── lib/                          # Utility & konfigurasi
-│   │   ├── utils.ts                     # cn(), formatTime, debounce, dll
-│   │   ├── constants.ts                 # API_BASE_URL, WS_URL, DEFAULT_SCENE_COUNT
-│   │   └── markdown.ts                  # Markdown parser untuk script sidebar
+│   ├── lib/                              # Utilities & Config
+│   │   ├── api/                          # ← NEW
+│   │   │   ├── client.ts                 # Axios instance
+│   │   │   ├── project-api.ts
+│   │   │   ├── render-api.ts
+│   │   │   └── feedback-api.ts
+│   │   ├── video/                        # ← NEW
+│   │   │   ├── timecode.ts
+│   │   │   ├── hls-utils.ts
+│   │   │   └── subtitle-utils.ts
+│   │   ├── validators/                   # ← NEW
+│   │   │   └── index.ts                  # Zod schemas
+│   │   ├── utils.ts                      # cn(), debounce, formatTime, etc.
+│   │   ├── constants.ts
+│   │   └── markdown.ts
 │   │
-│   ├── styles/                       # Styling tambahan
-│   │   └── timeline.css                  # Custom styling untuk timeline (jika perlu override)
+│   ├── types/                            # TypeScript Definitions
+│   │   ├── project.ts
+│   │   ├── scene.ts
+│   │   ├── render.ts
+│   │   ├── feedback.ts
+│   │   └── index.ts
 │   │
-│   └── middleware.ts                 # Next.js middleware (auth, redirect, logging)
+│   ├── contexts/                         # ← NEW (jika diperlukan)
+│   │
+│   ├── __tests__/                        # ← NEW: Testing
+│   │   ├── features/
+│   │   ├── components/
+│   │   └── hooks/
+│   │
+│   ├── middleware/                       # ← NEW (dipisah)
+│   │   └── auth.ts
+│   │
+│   └── styles/                           # Custom CSS
+│       └── timeline.css
 │
-├── public/                           # Static assets
+├── public/                               # Static files
 │   ├── fonts/
 │   ├── icons/
 │   ├── placeholders/
-│   └── videos/                       # (optional) video contoh
+│   └── videos/
 │
-├── .env.local                        # Environment variables lokal (NEXT_PUBLIC_API_URL, NEXT_PUBLIC_WS_URL)
+├── .env.local
 ├── .eslintrc.json
 ├── .prettierrc
-├── components.json                   # Konfigurasi Shadcn/ui
+├── components.json
 ├── next.config.js
 ├── package.json
 ├── postcss.config.js
