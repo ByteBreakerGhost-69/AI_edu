@@ -1,351 +1,179 @@
+# products/edu_video/backend/core/llm.py
 """
-core/llm.py
-LLM factory — unified async interface for Claude (Anthropic), OpenAI, and Grok.
-Provider selection and credentials are driven by core.config.settings.
+LLM factory with Claude (primary) and Grok (fallback) providers.
+Includes per-job token usage tracking via Redis.
 """
 
-from __future__ import annotations
+import json
+from typing import Any
+from uuid import uuid4
 
-import logging
-from collections.abc import AsyncGenerator
-from typing import Any, Union
+import structlog
+from langchain_anthropic import ChatAnthropic
+from langchain_core.callbacks import BaseCallbackHandler
+from langchain_core.language_models import BaseChatModel
+from langchain_core.outputs import LLMResult
+from langchain_groq import ChatGroq
+from langchain_openai import OpenAIEmbeddings
+from redis.asyncio import Redis
 
-import anthropic
-import openai
-import tiktoken
-from anthropic import AsyncAnthropic
-from openai import AsyncOpenAI
+from core.config import get_settings
 
-from core.config import LLMProvider, settings
+__all__ = [
+    "LLMFactory",
+    "TokenUsageCallback",
+    "llm_factory",
+]
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
+settings = get_settings()
 
-# ---------------------------------------------------------------------------
-# Type alias for unified client
-# ---------------------------------------------------------------------------
-
-LLMClient = Union[AsyncAnthropic, AsyncOpenAI]
-
-# ---------------------------------------------------------------------------
-# Module-level singleton cache
-# ---------------------------------------------------------------------------
-
-_llm_client: LLMClient | None = None
-
-
-# ---------------------------------------------------------------------------
-# Client factory
-# ---------------------------------------------------------------------------
+# Approximate cost per 1K tokens (USD) — update as pricing changes
+_COST_PER_1K: dict[str, dict[str, float]] = {
+    "claude": {"input": 0.003, "output": 0.015},   # claude-opus-4-5
+    "grok":   {"input": 0.0005, "output": 0.0008}, # llama3-70b
+}
 
 
-def get_llm_client() -> LLMClient:
+class TokenUsageCallback(BaseCallbackHandler):
     """
-    Return a cached async LLM client for the configured provider.
-
-    Initialises on first call; subsequent calls return the same instance.
-    Thread-safe for read (asyncio single-threaded event loop).
+    LangChain callback that records prompt/completion tokens and estimated
+    cost to Redis under key cost:{job_id}:llm_usage with TTL=86400s.
     """
-    global _llm_client  # noqa: PLW0603
 
-    if _llm_client is not None:
-        return _llm_client
+    def __init__(self, job_id: str, provider: str, redis_client: Redis) -> None:
+        super().__init__()
+        self.job_id = job_id
+        self.provider = provider
+        self.redis = redis_client
+        self.prompt_tokens: int = 0
+        self.completion_tokens: int = 0
+        self.total_tokens: int = 0
+        self.cost_usd: float = 0.0
 
-    provider = settings.LLM_PROVIDER
+    def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
+        """Extract token usage from LLM response and persist to Redis."""
+        usage = {}
+        if response.llm_output:
+            usage = response.llm_output.get("usage", {}) or response.llm_output.get(
+                "token_usage", {}
+            )
 
-    if provider == LLMProvider.CLAUDE:
-        if not settings.ANTHROPIC_API_KEY:
-            raise RuntimeError("ANTHROPIC_API_KEY is not configured.")
-        _llm_client = AsyncAnthropic(
-            api_key=settings.ANTHROPIC_API_KEY.get_secret_value(),
+        self.prompt_tokens = usage.get("input_tokens", usage.get("prompt_tokens", 0))
+        self.completion_tokens = usage.get(
+            "output_tokens", usage.get("completion_tokens", 0)
         )
-        logger.info("LLM client initialised: Anthropic Claude (%s)", settings.ANTHROPIC_DEFAULT_MODEL)
+        self.total_tokens = self.prompt_tokens + self.completion_tokens
 
-    elif provider in (LLMProvider.OPENAI, LLMProvider.GROK):
-        if not settings.OPENAI_API_KEY:
-            raise RuntimeError("OPENAI_API_KEY is not configured.")
-        _llm_client = AsyncOpenAI(
-            api_key=settings.OPENAI_API_KEY.get_secret_value(),
-            base_url=settings.OPENAI_BASE_URL or None,  # None = official OpenAI endpoint
+        rates = _COST_PER_1K.get(self.provider, _COST_PER_1K["claude"])
+        self.cost_usd = (self.prompt_tokens / 1000 * rates["input"]) + (
+            self.completion_tokens / 1000 * rates["output"]
         )
-        label = "Grok (xAI)" if provider == LLMProvider.GROK else "OpenAI"
-        logger.info("LLM client initialised: %s (%s)", label, settings.OPENAI_DEFAULT_MODEL)
 
-    else:
-        raise RuntimeError(f"Unsupported LLM_PROVIDER: {provider}")
+        import asyncio
 
-    return _llm_client
+        asyncio.create_task(self._persist())
 
-
-def reset_llm_client() -> None:
-    """Reset the singleton (useful in tests or after config changes)."""
-    global _llm_client  # noqa: PLW0603
-    _llm_client = None
-    logger.debug("LLM client singleton reset.")
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-
-def get_default_model() -> str:
-    """Return the default model name for the active provider."""
-    if settings.LLM_PROVIDER == LLMProvider.CLAUDE:
-        return settings.ANTHROPIC_DEFAULT_MODEL
-    return settings.OPENAI_DEFAULT_MODEL
-
-
-def get_default_max_tokens() -> int:
-    """Return the default max_tokens for the active provider."""
-    if settings.LLM_PROVIDER == LLMProvider.CLAUDE:
-        return settings.ANTHROPIC_MAX_TOKENS
-    return 4096
+    async def _persist(self) -> None:
+        """Write usage record to Redis asynchronously."""
+        key = f"cost:{self.job_id}:llm_usage"
+        payload = json.dumps(
+            {
+                "provider": self.provider,
+                "prompt_tokens": self.prompt_tokens,
+                "completion_tokens": self.completion_tokens,
+                "total_tokens": self.total_tokens,
+                "cost_usd": self.cost_usd,
+            }
+        )
+        try:
+            await self.redis.set(key, payload, ex=86400)
+            logger.info(
+                "llm.usage_recorded",
+                job_id=self.job_id,
+                provider=self.provider,
+                total_tokens=self.total_tokens,
+                cost_usd=self.cost_usd,
+            )
+        except Exception as exc:
+            logger.error("llm.usage_persist_failed", job_id=self.job_id, error=str(exc))
 
 
-def _extract_system_and_messages(
-    messages: list[dict[str, str]],
-) -> tuple[str | None, list[dict[str, str]]]:
+class LLMFactory:
     """
-    Anthropic requires system messages to be passed separately.
-    Extract the first system message (if any) and return the rest.
+    Factory for instantiating LLM clients.
+    Manages provider selection, fallback chains, and embedding model.
     """
-    system: str | None = None
-    chat_messages: list[dict[str, str]] = []
 
-    for msg in messages:
-        if msg.get("role") == "system" and system is None:
-            system = msg["content"]
+    def get_llm(self, provider: str | None = None) -> BaseChatModel:
+        """
+        Return a configured LLM for the given provider.
+        Falls back to settings.DEFAULT_LLM_PROVIDER if provider is None.
+        """
+        resolved = provider or settings.DEFAULT_LLM_PROVIDER
+
+        if resolved == "claude":
+            return ChatAnthropic(
+                model="claude-opus-4-5",
+                api_key=settings.ANTHROPIC_API_KEY,
+                max_tokens=4096,
+                temperature=0.3,
+            )
+        elif resolved == "grok":
+            return ChatGroq(
+                model="llama3-70b-8192",
+                api_key=settings.GROQ_API_KEY,
+                temperature=0.3,
+            )
         else:
-            chat_messages.append(msg)
+            raise ValueError(f"Unknown LLM provider: {resolved!r}")
 
-    return system, chat_messages
+    def get_embedding_model(self) -> OpenAIEmbeddings:
+        """
+        Return embedding model instance.
+        Uses OpenAI text-embedding-3-small (1536-dim).
 
+        ⚠️  COST NOTE: Embeddings are charged per token. Batch your ingestion
+        calls and cache embeddings in Qdrant — don't re-embed on every request.
+        """
+        return OpenAIEmbeddings(model="text-embedding-3-small")
 
-def count_tokens(text: str, model: str | None = None) -> int:
-    """
-    Estimate token count for a string using tiktoken.
+    def with_fallback(
+        self,
+        primary_provider: str = "claude",
+        fallback_provider: str = "grok",
+    ) -> BaseChatModel:
+        """
+        Return primary LLM with automatic fallback to secondary on failure.
+        Uses LangChain's native .with_fallbacks() mechanism.
+        """
+        primary = self.get_llm(primary_provider)
+        fallback = self.get_llm(fallback_provider)
+        logger.info(
+            "llm.fallback_chain_built",
+            primary=primary_provider,
+            fallback=fallback_provider,
+        )
+        return primary.with_fallbacks([fallback])
 
-    Falls back to cl100k_base encoding when the model is not recognised
-    (which also gives a reasonable approximation for Claude).
-
-    Args:
-        text:  Input string to tokenise.
-        model: Optional model name for encoding selection.
-
-    Returns:
-        Integer token count.
-    """
-    target_model = model or get_default_model()
-    try:
-        enc = tiktoken.encoding_for_model(target_model)
-    except KeyError:
-        enc = tiktoken.get_encoding("cl100k_base")
-    return len(enc.encode(text))
-
-
-# ---------------------------------------------------------------------------
-# Core completion — non-streaming
-# ---------------------------------------------------------------------------
-
-
-async def get_llm_response(
-    messages: list[dict[str, str]],
-    model: str | None = None,
-    temperature: float = 0.7,
-    max_tokens: int | None = None,
-    **kwargs: Any,
-) -> str:
-    """
-    Send a chat completion request and return the assistant's reply as a string.
-
-    Args:
-        messages:    Conversation history as list of {"role": ..., "content": ...} dicts.
-                     Roles: "system", "user", "assistant".
-        model:       Model override. Defaults to provider's default model from config.
-        temperature: Sampling temperature (0.0–1.0 for deterministic→creative).
-        max_tokens:  Token limit for the response. Defaults to provider default.
-        **kwargs:    Additional provider-specific parameters forwarded to the API.
-
-    Returns:
-        Assistant reply text (stripped).
-
-    Raises:
-        RuntimeError: On provider misconfiguration.
-        anthropic.APIError / openai.APIError: Propagated after logging.
-    """
-    resolved_model = model or get_default_model()
-    resolved_max_tokens = max_tokens or get_default_max_tokens()
-    provider = settings.LLM_PROVIDER
-    client = get_llm_client()
-
-    logger.debug(
-        "LLM request | provider=%s model=%s temperature=%s max_tokens=%d msgs=%d",
-        provider.value,
-        resolved_model,
-        temperature,
-        resolved_max_tokens,
-        len(messages),
-    )
-
-    try:
-        if provider == LLMProvider.CLAUDE:
-            assert isinstance(client, AsyncAnthropic)
-            system, chat_messages = _extract_system_and_messages(messages)
-
-            create_kwargs: dict[str, Any] = dict(
-                model=resolved_model,
-                max_tokens=resolved_max_tokens,
-                temperature=temperature,
-                messages=chat_messages,
-                **kwargs,
-            )
-            if system:
-                create_kwargs["system"] = system
-
-            response = await client.messages.create(**create_kwargs)
-            content = response.content[0]
-            if content.type != "text":
-                raise RuntimeError(f"Unexpected Claude response block type: {content.type}")
-            return content.text.strip()
-
-        else:  # OPENAI or GROK
-            assert isinstance(client, AsyncOpenAI)
-            response = await client.chat.completions.create(
-                model=resolved_model,
-                messages=messages,  # type: ignore[arg-type]
-                temperature=temperature,
-                max_tokens=resolved_max_tokens,
-                **kwargs,
-            )
-            text = response.choices[0].message.content or ""
-            return text.strip()
-
-    except anthropic.RateLimitError as exc:
-        logger.error("Anthropic rate limit exceeded: %s", exc)
-        raise
-    except anthropic.APIStatusError as exc:
-        logger.error("Anthropic API error (status=%s): %s", exc.status_code, exc.message)
-        raise
-    except anthropic.APIConnectionError as exc:
-        logger.error("Anthropic connection error: %s", exc)
-        raise
-    except openai.RateLimitError as exc:
-        logger.error("OpenAI/Grok rate limit exceeded: %s", exc)
-        raise
-    except openai.APIStatusError as exc:
-        logger.error("OpenAI/Grok API error (status=%s): %s", exc.status_code, exc.message)
-        raise
-    except openai.APIConnectionError as exc:
-        logger.error("OpenAI/Grok connection error: %s", exc)
-        raise
-    except Exception as exc:
-        logger.error("Unexpected LLM error [%s]: %s", type(exc).__name__, exc)
-        raise
+    def get_llm_with_tracking(
+        self,
+        job_id: str,
+        redis_client: Redis,
+        provider: str | None = None,
+    ) -> tuple[BaseChatModel, TokenUsageCallback]:
+        """
+        Return an LLM + attached TokenUsageCallback for cost tracking.
+        Pass the callback in the LLM invoke call's config dict.
+        """
+        resolved = provider or settings.DEFAULT_LLM_PROVIDER
+        callback = TokenUsageCallback(
+            job_id=job_id,
+            provider=resolved,
+            redis_client=redis_client,
+        )
+        llm = self.get_llm(resolved)
+        return llm, callback
 
 
-# ---------------------------------------------------------------------------
-# Streaming completion
-# ---------------------------------------------------------------------------
-
-
-async def get_llm_response_stream(
-    messages: list[dict[str, str]],
-    model: str | None = None,
-    temperature: float = 0.7,
-    max_tokens: int | None = None,
-    **kwargs: Any,
-) -> AsyncGenerator[str, None]:
-    """
-    Stream the assistant's reply token-by-token.
-
-    Yields incremental text chunks as they arrive from the provider.
-
-    Args:
-        messages:    Same format as get_llm_response.
-        model:       Model override.
-        temperature: Sampling temperature.
-        max_tokens:  Token cap for the response.
-        **kwargs:    Additional provider-specific parameters.
-
-    Yields:
-        str chunks of the assistant response.
-
-    Raises:
-        RuntimeError: On provider misconfiguration or unsupported streaming.
-    """
-    resolved_model = model or get_default_model()
-    resolved_max_tokens = max_tokens or get_default_max_tokens()
-    provider = settings.LLM_PROVIDER
-    client = get_llm_client()
-
-    logger.debug(
-        "LLM stream request | provider=%s model=%s",
-        provider.value,
-        resolved_model,
-    )
-
-    try:
-        if provider == LLMProvider.CLAUDE:
-            assert isinstance(client, AsyncAnthropic)
-            system, chat_messages = _extract_system_and_messages(messages)
-
-            stream_kwargs: dict[str, Any] = dict(
-                model=resolved_model,
-                max_tokens=resolved_max_tokens,
-                temperature=temperature,
-                messages=chat_messages,
-                **kwargs,
-            )
-            if system:
-                stream_kwargs["system"] = system
-
-            async with client.messages.stream(**stream_kwargs) as stream:
-                async for text_chunk in stream.text_stream:
-                    yield text_chunk
-
-        else:  # OPENAI or GROK
-            assert isinstance(client, AsyncOpenAI)
-            stream = await client.chat.completions.create(
-                model=resolved_model,
-                messages=messages,  # type: ignore[arg-type]
-                temperature=temperature,
-                max_tokens=resolved_max_tokens,
-                stream=True,
-                **kwargs,
-            )
-            async for chunk in stream:
-                delta = chunk.choices[0].delta.content
-                if delta:
-                    yield delta
-
-    except anthropic.RateLimitError as exc:
-        logger.error("Anthropic rate limit (stream): %s", exc)
-        raise
-    except anthropic.APIStatusError as exc:
-        logger.error("Anthropic API error (stream, status=%s): %s", exc.status_code, exc.message)
-        raise
-    except openai.RateLimitError as exc:
-        logger.error("OpenAI/Grok rate limit (stream): %s", exc)
-        raise
-    except openai.APIStatusError as exc:
-        logger.error("OpenAI/Grok API error (stream, status=%s): %s", exc.status_code, exc.message)
-        raise
-    except Exception as exc:
-        logger.error("Unexpected LLM stream error [%s]: %s", type(exc).__name__, exc)
-        raise
-
-
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
-
-__all__: list[str] = [
-    "get_llm_client",
-    "reset_llm_client",
-    "get_default_model",
-    "get_default_max_tokens",
-    "count_tokens",
-    "get_llm_response",
-    "get_llm_response_stream",
-      ]
-      
+llm_factory = LLMFactory()
