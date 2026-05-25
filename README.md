@@ -62,7 +62,8 @@ AI_Edu_Video_Co/
 │       │   │           ├── economics_profile.py             # renderer: grafik, validator: data ekonomi
 │       │   │           ├── literature_profile.py            # renderer: text-heavy, validator: grammar
 │       │   │           ├── computer_science_profile.py      # renderer: code, validator: logic
-│       │   │           └── language_profile.py              # renderer: dialog, validator: grammar
+│       │   │           ├── language_profile.py              # renderer: dialog, validator: grammar
+│       │   │           └── init.py
 │       │   │
 │       │   ├── layer3_rag/
 │       │   │   ├── rag_service.py
