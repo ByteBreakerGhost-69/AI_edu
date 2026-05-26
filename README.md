@@ -51,6 +51,7 @@ AI_Edu_Video_Co/
 │       │   │       ├── visual_asset_agent.py
 │       │   │       ├── animation_router.py
 │       │   │       ├── subject_router.py                    # ← BARU: routing berdasarkan mapel
+│       │   │       ├── __init__.py
 │       │   │       └── subject_profiles/                    # ← BARU: profil per mapel
 │       │   │           ├── base_profile.py
 │       │   │           ├── mathematics_profile.py           # renderer: Manim, validator: equation
