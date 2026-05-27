@@ -72,17 +72,20 @@ AI_Edu_Video_Co/
 │       │   │   ├── retriever.py                             # Hybrid Qdrant
 │       │   │   ├── reranker.py
 │       │   │   ├── curriculum_filter.py                     # ← BARU: filter RAG per kurikulum
+│       │   │   ├── __init__.py
 │       │   │   ├── validators/                              # ← BARU: validator per domain
 │       │   │   │   ├── base_validator.py
 │       │   │   │   ├── math_validator.py                    # cek rumus, dimensi matriks, sintaks
 │       │   │   │   ├── science_validator.py                 # cek formula kimia/fisika
 │       │   │   │   ├── fact_validator.py                    # cross-check knowledge base
 │       │   │   │   ├── curriculum_validator.py              # sesuai silabus IB/Cambridge/AP
-│       │   │   │   └── language_validator.py                # grammar, vocabulary level
+│       │   │   │   ├── language_validator.py                # grammar, vocabulary level
+│       │   │   │   └── __init__.py
 │       │   │   └── ingestion/
 │       │   │       ├── pipeline.py
 │       │   │       ├── chunker.py
-│       │   │       └── curriculum_ingestion.py              # ← BARU: ingest dokumen kurikulum resmi
+│       │   │       ├── curriculum_ingestion.py              # ← BARU: ingest dokumen kurikulum resmi
+│       │   │       └── __init__.py
 │       │   │
 │       │   ├── layer4_script_visual/
 │       │   │   ├── script_generator.py
