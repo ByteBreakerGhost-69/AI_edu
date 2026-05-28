@@ -1,7 +1,7 @@
 # AI_edu
 Orchestrator and specialist AI agents platform for educational technology startup.
 
-# structure startup nanti 
+# structure project 
 
 ```
 AI_Edu_Video_Co/
