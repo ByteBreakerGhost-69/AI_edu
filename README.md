@@ -114,7 +114,8 @@ AI_Edu_Video_Co/
 │       │   │       ├── timeline_renderer.py                 # ← BARU: untuk sejarah/kronologi
 │       │   │       ├── diagram_renderer.py                  # ← BARU: flowchart, struktur, siklus
 │       │   │       ├── graph_renderer.py                    # ← BARU: grafik ekonomi, statistik
-│       │   │       └── code_renderer.py                     # ← BARU: syntax highlight untuk CS
+│       │   │       ├── code_renderer.py                     # ← BARU: syntax highlight untuk CS
+│       │   │       └── __init__.py
 │       │   │
 │       │   ├── layer6_delivery/
 │       │   │   ├── cdn_service.py
