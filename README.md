@@ -103,7 +103,8 @@ AI_Edu_Video_Co/
 │       │   │   ├── quality_check/                           # ← BARU: validasi output video
 │       │   │   │   ├── audio_validator.py                   # cek TTS tidak cutoff, volume normal
 │       │   │   │   ├── timing_validator.py                  # narasi sync dengan visual
-│       │   │   │   └── content_completeness.py              # semua scene ter-render
+│       │   │   │   ├── content_completeness.py              # semua scene ter-render
+│       │   │   │   └── __init__.py
 │       │   │   └── renderers/
 │       │   │       ├── base_renderer.py
 │       │   │       ├── manim_renderer.py                    # matematika, fisika
