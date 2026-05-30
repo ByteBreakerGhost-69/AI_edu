@@ -466,4 +466,6 @@ AI_Edu_Video_Co/
 ├── Makefile
 ├── .env
 ├── .gitignore
+├── CLAUDE.md
+├── ARCHITECTURE.md
 └── README.md          
