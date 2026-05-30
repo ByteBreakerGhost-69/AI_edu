@@ -122,10 +122,12 @@ AI_Edu_Video_Co/
 │       │   │   ├── feedback_service.py
 │       │   │   ├── partial_regen.py
 │       │   │   ├── analytics.py
+│       │   │   ├── __init__.py 
 │       │   │   └── review/                                  # ← BARU: human review pipeline
 │       │   │       ├── review_queue.py                      # antrian video butuh review manual
 │       │   │       ├── approval_service.py                  # approve/reject sebelum publish
-│       │   │       └── correction_log.py                    # track kesalahan yang pernah lolos
+│       │   │       ├── correction_log.py                    # track kesalahan yang pernah lolos
+│       │   │       └── __init__.py
 │       │   │
 │       │   ├── billing/                                     # ← BARU: backend billing lengkap
 │       │   │   ├── subscription_service.py                  # free vs premium logic
