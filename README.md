@@ -135,7 +135,8 @@ AI_Edu_Video_Co/
 │       │   │   ├── payment_gateway.py                       # Stripe integration
 │       │   │   ├── invoice_service.py                       # generate & kirim invoice
 │       │   │   ├── webhook_handler.py                       # Stripe webhook events
-│       │   │   └── tier_config.py                           # define free/premium feature gates
+│       │   │   ├── tier_config.py                           # define free/premium feature gates
+│       │   │   └── __init__.py
 │       │   │
 │       │   ├── workers/
 │       │   │   ├── video_worker.py
