@@ -1,0 +1,615 @@
+meta:
+  curriculum: "AP"
+  full_name: "Advanced Placement Program"
+  version: "2023-2025 course and exam descriptions"
+  assessment_body: "College Board"
+  exam_session: "May (annual)"
+  grading_scale: "1–5 (5 = highest; 3+ typically qualifies for college credit)"
+  loaded_by:
+    - "curriculum_agent"
+    - "fact_checker_agent"
+    - "script_generator"
+
+system_prompt: |
+  You are an expert AP (Advanced Placement) curriculum specialist with deep knowledge
+  of the College Board's 2023–2025 AP Course and Exam Descriptions (CEDs) across all
+  subjects. When generating educational content, you must:
+
+  1. Reference AP content using College Board's official framework:
+     - Big Ideas (BI): overarching conceptual themes (e.g., "CHA: Change")
+     - Enduring Understandings (EU): lasting ideas within Big Ideas
+     - Learning Objectives (LO): specific skills students must demonstrate
+     - Essential Knowledge (EK): specific content statements
+  2. Distinguish clearly between:
+     - AP course content (what students learn)
+     - AP exam format (how content is assessed — FRQ vs MCQ)
+     - College Board Science Practices (SP) or Historical Thinking Skills (HTS)
+  3. Use AP Science Practices for STEM subjects:
+     - SP 1: Concepts and Representations
+     - SP 2: Visual Representations
+     - SP 3: Questions and Methods
+     - SP 4: Model Analysis
+     - SP 5: Mathematical Routines
+     - SP 6: Argumentation
+  4. Align content to AP exam question styles:
+     - Multiple Choice Questions (MCQ): stimulus-based, context-driven
+     - Free Response Questions (FRQ): multi-part, show work required
+     - Document-Based Questions (DBQ): for History; evidence integration
+     - Long Essay Questions (LEQ): for History; thesis + analysis
+  5. Reference the AP formula sheets, periodic tables, and equation sheets
+     provided in exams where applicable
+  6. Note the College Board's emphasis on critical thinking over rote memorization
+  7. Connect content to real-world applications — AP exams are context-heavy
+
+standard_code_format: |
+  Format AP standard codes as: [Course Abbreviation] [Big Idea]-[EU]-[LO] or [EK]
+
+  Examples:
+    AP Calc AB  FUN-3.A.1       → AP Calculus AB, Big Idea FUN (Analysis of Functions), EU 3.A, LO 1
+    AP Calc BC  LIM-1.C         → AP Calculus BC, Big Idea LIM (Limits), EU 1.C
+    AP Physics 1  INT-4.A.1     → AP Physics 1, Big Idea INT (Interactions), EU 4.A, LO 1
+    AP Chem  SAP-3.B.1          → AP Chemistry, Big Idea SAP (Structure and Properties), EU 3.B, LO 1
+    AP Bio  EVO-1.C.1           → AP Biology, Big Idea EVO (Evolution), EU 1.C, LO 1
+    AP US History  KC-7.1.I.A   → APUSH, Key Concept 7.1, Theme I, Point A
+    AP World History  KC-6.1.I  → AP World History, Key Concept 6.1, Theme I
+    AP Macro  MOD-2.A.1         → AP Macroeconomics, Big Idea MOD (Economic Models), EU 2.A, LO 1
+    AP Micro  MKT-2.B.3         → AP Microeconomics, Big Idea MKT (Markets), EU 2.B, LO 3
+    AP CS A   CON-1.A.1         → AP Computer Science A, Big Idea CON (Control), EU 1.A, LO 1
+
+assessment_context: |
+  AP Exam Structure — reference when scripting content:
+
+  AP Exam General Format:
+    Section I:  Multiple Choice Questions (MCQ) — 40–75 questions, ~50–60% of score
+                Stimulus-based: chart, passage, data set, or diagram provided
+                No penalty for wrong answers — strategic guessing is appropriate
+    Section II: Free Response Questions (FRQ) — 3–6 questions, ~40–50% of score
+                Show all work — partial credit awarded for method
+                FRQs include: short answer, long essay, lab-based, data analysis
+
+  Subject-specific formats:
+    AP Calculus (AB/BC):
+      MCQ: 45 questions (30 no calculator + 15 calculator) — 1 hour 45 min
+      FRQ: 6 questions (2 calculator-active + 4 non-calculator) — 1 hour 30 min
+
+    AP Physics 1 / 2:
+      MCQ: 50 questions (single-answer + multi-correct) — 1 hour 30 min
+      FRQ: 5 questions (experimental design, argument, mathematical routine) — 1 hour 30 min
+
+    AP Physics C (Mechanics / E&M):
+      MCQ: 35 questions — 45 min
+      FRQ: 3 questions — 45 min; calculus required throughout
+
+    AP Chemistry:
+      MCQ: 60 questions (long and short) — 1 hour 30 min
+      FRQ: 7 questions (3 long, 4 short) — 1 hour 45 min; periodic table provided
+
+    AP Biology:
+      MCQ: 60 questions — 1 hour 30 min
+      FRQ: 6 questions (2 long, 4 short) — 1 hour 30 min; formula sheet provided
+
+    AP History courses (US, World, European, Government):
+      Section I: MCQ (55 questions) + Short Answer Questions (SAQ, 3 questions)
+      Section II: Document-Based Question (DBQ, 1 question) + Long Essay Question (LEQ, 1 question)
+
+    AP Economics (Micro/Macro):
+      MCQ: 60 questions — 1 hour 10 min
+      FRQ: 3 questions (1 long + 2 short) — 1 hour
+
+    AP Computer Science A:
+      MCQ: 40 questions — 1 hour 30 min
+      FRQ: 4 questions (array manipulation, class design, 2D arrays, interface) — 1 hour 30 min
+
+  When scripting: reference exam context naturally:
+  "In an AP FRQ, you would be expected to show this derivation step by step..."
+  "This is a common MCQ stimulus — you might see a graph like this and be asked..."
+  "Remember: partial credit in FRQs requires showing your method, even if your final answer is wrong."
+
+  Score interpretation:
+    5 = Extremely well qualified (equivalent to A in college course)
+    4 = Well qualified (equivalent to A–/B+)
+    3 = Qualified (equivalent to B/B–; most colleges award credit)
+    2 = Possibly qualified
+    1 = No recommendation
+  "This concept is tested heavily on the AP exam — mastering it can push you from a 3 to a 5."
+
+subject_topics:
+  calculus_ab:
+    name: "AP Calculus AB"
+    big_ideas:
+      "CHA": "Change — derivatives represent instantaneous rate of change"
+      "LIM": "Limits and Continuity — foundation of calculus"
+      "FUN": "Analysis of Functions — behavior using derivatives and integrals"
+    units:
+      "1": "Limits and Continuity — squeeze theorem, one-sided limits, IVT"
+      "2": "Differentiation: Definition and Fundamental Properties"
+      "3": "Differentiation: Composite, Implicit, and Inverse Functions"
+      "4": "Contextual Applications of Differentiation — related rates, L'Hôpital"
+      "5": "Analytical Applications of Differentiation — MVT, EVT, curve sketching"
+      "6": "Integration and Accumulation of Change — Riemann sums, FTC"
+      "7": "Differential Equations — slope fields, separable equations"
+      "8": "Applications of Integration — area, accumulation, cross-sections"
+    exam_weight:
+      limits: "10–12%"
+      derivatives: "50–60%"
+      integrals: "17–20%"
+      differential_equations: "6–12%"
+    calculator_note: "TI-84 or equivalent required; 4 permitted calculator uses: roots, derivatives, integrals, graphs"
+
+  calculus_bc:
+    name: "AP Calculus BC"
+    note: "Includes all AP Calculus AB content plus BC-only units"
+    bc_only_units:
+      "9":  "Parametric Equations, Polar Coordinates, and Vector-Valued Functions"
+      "10": "Infinite Sequences and Series — convergence tests, power series, Taylor/Maclaurin"
+    convergence_tests:
+      - "nth-term divergence test"
+      - "Integral test"
+      - "p-series"
+      - "Comparison test and limit comparison test"
+      - "Ratio test"
+      - "Alternating series test and error bound"
+    bc_only_integration:
+      - "Integration by parts"
+      - "Partial fractions (linear non-repeating)"
+      - "Improper integrals"
+    exam_bc_additional_weight:
+      series: "17–18%"
+      polar_parametric: "11–12%"
+
+  physics_1:
+    name: "AP Physics 1: Algebra-Based"
+    big_ideas:
+      "INT": "Interactions between systems can result in changes in those systems"
+      "FRC": "Fields predict and describe interactions"
+      "CHA": "The universe and its constituents are always changing"
+      "CON": "Conservation laws constrain how systems can change"
+      "INF": "Systems can be described at multiple scales"
+    units:
+      "1": "Kinematics — 1D and 2D motion; projectile; relative motion"
+      "2": "Forces and Newton's Laws — free body diagrams; net force; friction"
+      "3": "Circular Motion and Gravitation — centripetal acceleration; Newton's law of gravitation"
+      "4": "Energy — work-energy theorem; potential and kinetic energy; conservation"
+      "5": "Momentum — impulse-momentum theorem; conservation in collisions"
+      "6": "Simple Harmonic Motion — springs and pendulums; energy in SHM"
+      "7": "Torque and Rotational Motion — moment of inertia; angular kinematics"
+      "8": "Electric Charge and Electric Force — Coulomb's law; charge conservation"
+      "9": "DC Circuits — Ohm's law; Kirchhoff's laws; series and parallel"
+      "10": "Mechanical Waves and Sound — wave properties; interference; Doppler"
+    science_practices: ["SP1 (Concepts)", "SP2 (Representations)", "SP3 (Questions)", "SP4 (Model)", "SP5 (Math)", "SP6 (Argument)"]
+    no_calculus: true
+    calculator: "Scientific or graphing calculator permitted throughout"
+
+  physics_c_mechanics:
+    name: "AP Physics C: Mechanics"
+    note: "Calculus-based; intended for students concurrently taking or who have taken calculus"
+    units:
+      "1": "Kinematics — derivatives of position; integration for velocity and displacement"
+      "2": "Newton's Laws — variable forces; differential equations of motion"
+      "3": "Work, Energy and Power — work integral; conservative forces; potential energy"
+      "4": "Systems of Particles — center of mass; conservation laws"
+      "5": "Rotation — torque; angular momentum; rotational kinematics and dynamics"
+      "6": "Oscillations — SHM differential equation; damping; resonance"
+      "7": "Gravitation — gravitational potential energy; orbital mechanics; escape velocity"
+    calculus_required:
+      - "Derivatives for velocity and acceleration from position functions"
+      - "Integrals for displacement, work, and impulse from variable functions"
+      - "Differential equations for SHM and rotational motion"
+    exam_weight:
+      kinematics_and_dynamics: "36–44%"
+      work_energy_power: "14–17%"
+      rotation: "18–22%"
+      oscillations: "6–14%"
+      gravitation: "6–14%"
+
+  chemistry:
+    name: "AP Chemistry"
+    big_ideas:
+      "SAP": "Structure and Properties — atomic structure, bonding, and intermolecular forces"
+      "SPQ": "Scale, Proportion, and Quantity — stoichiometry and quantitative reasoning"
+      "TRA": "Transformations — chemical reactions and their driving forces"
+      "ENE": "Energy — thermodynamics and electrochemistry"
+    units:
+      "1": "Atomic Structure and Properties — Bohr model, quantum numbers, electron configuration, periodic trends"
+      "2": "Molecular and Ionic Compound Structure — ionic/covalent/metallic bonding; VSEPR; hybridisation"
+      "3": "Intermolecular Forces and Properties — IMF types; solutions; colligative properties"
+      "4": "Chemical Reactions — types; balancing; net ionic; oxidation states"
+      "5": "Kinetics — rate laws; integrated rate laws; Arrhenius; mechanisms and rate-determining step"
+      "6": "Thermodynamics — ΔH, ΔS, ΔG; Hess's law; calorimetry; spontaneity"
+      "7": "Equilibrium — Kc, Kp, Q, ICE tables; Le Chatelier's principle"
+      "8": "Acids and Bases — Ka, Kb, Kw; pH calculations; buffers; titration curves"
+      "9": "Applications of Thermodynamics — ΔG = ΔH – TΔS; electrochemistry; Nernst equation"
+    exam_weight:
+      structure_and_properties: "15–18%"
+      reactions: "35–40%"
+      kinetics_and_equilibrium: "35–40%"
+      thermodynamics: "10–15%"
+    periodic_table: "Full periodic table and formula sheet provided during exam"
+    note_on_labs: "25% of course is laboratory — AP Chem Science Practices emphasise lab skills"
+
+  biology:
+    name: "AP Biology"
+    big_ideas:
+      "EVO": "Evolution — natural selection drives evolution"
+      "ENE": "Energetics — living systems capture, store, and use free energy"
+      "IST": "Information Storage and Transmission — genetic information flows"
+      "SYI": "Systems Interactions — living systems are interconnected"
+    units:
+      "1": "Chemistry of Life — water properties; macromolecules; enzymes"
+      "2": "Cell Structure and Function — organelles; membranes; transport; cell signaling"
+      "3": "Cellular Energetics — photosynthesis (light reactions + Calvin cycle); cellular respiration"
+      "4": "Cell Communication and Cell Cycle — signal transduction; mitosis; cancer"
+      "5": "Heredity — Mendelian genetics; meiosis; sex-linkage; non-Mendelian patterns"
+      "6": "Gene Expression and Regulation — DNA replication; transcription; translation; gene regulation"
+      "7": "Natural Selection — Hardy-Weinberg; types of selection; speciation; phylogenetics"
+      "8": "Ecology — population ecology (logistic/exponential growth); community interactions; energy flow"
+    science_practices: ["SP1-SP6 as above, plus Modeling (SP4) heavily emphasised"]
+    exam_weight:
+      cell_and_molecular: "44–46%"
+      genetics_and_evolution: "25–27%"
+      ecology: "12–14%"
+      energetics: "12–16%"
+    lab_component: "13 required AP Biology lab activities; evidence of each required"
+    formula_sheet: "Provided during exam: AP Biology Equations and Formulas reference sheet"
+
+  us_history:
+    name: "AP United States History (APUSH)"
+    historical_thinking_skills:
+      "Argumentation": "Develop and support a historically defensible argument"
+      "Causation": "Explain causes and effects of historical events"
+      "Comparison": "Explain similarities and differences across time periods and regions"
+      "Contextualization": "Connect historical events to broader context"
+      "Continuity and Change over Time": "Explain patterns of continuity and change"
+      "Periodization": "Categorize history into meaningful time periods"
+    periods:
+      "Period 1": "1491–1607 — Pre-Columbian; colonization begins"
+      "Period 2": "1607–1754 — Colonial period; Atlantic world"
+      "Period 3": "1754–1800 — Revolution; new nation"
+      "Period 4": "1800–1848 — Market revolution; expansion; reform"
+      "Period 5": "1844–1877 — Civil War and Reconstruction"
+      "Period 6": "1865–1898 — Industrialization; Gilded Age; imperialism"
+      "Period 7": "1890–1945 — Progressive Era; WWI; Depression; WWII"
+      "Period 8": "1945–1980 — Cold War; civil rights; Vietnam; social change"
+      "Period 9": "1980–present — Conservative resurgence; post-Cold War; 21st century"
+    key_themes:
+      "ARC": "American and National Identity"
+      "WXT": "Work, Exchange, and Technology"
+      "GEO": "Geography and the Environment"
+      "MIG": "Migration and Settlement"
+      "POL": "Politics and Power"
+      "APS": "America in the World"
+      "CUL": "Culture and Society"
+      "SOC": "Social Structures"
+    exam_format:
+      section1a: "55 MCQ — 55 min (40% of score)"
+      section1b: "3 SAQ (Short Answer Questions) — 40 min (20% of score)"
+      section2: "1 DBQ + 1 LEQ — 100 min (25% + 15% of score)"
+    dbq_skills:
+      thesis: "Historically defensible claim with line of reasoning"
+      contextualization: "Describe a broader historical context meaningfully"
+      evidence: "Use at least 3 documents as evidence; explain point of view/purpose for 3"
+      complexity: "Demonstrate a complex understanding (compare, qualify, or connect to another period)"
+
+  world_history:
+    name: "AP World History: Modern"
+    period_coverage: "c. 1200 CE to present"
+    units:
+      "1": "The Global Tapestry (c. 1200–1450) — empires, trade, Mongols, religion"
+      "2": "Networks of Exchange (c. 1200–1450) — Silk Roads, Indian Ocean, trans-Saharan trade"
+      "3": "Land-Based Empires (c. 1450–1750) — Gunpowder Empires (Ottomans, Safavids, Mughals, China)"
+      "4": "Transoceanic Interconnections (c. 1450–1750) — Columbian Exchange; Atlantic slave trade; silver trade"
+      "5": "Revolutions (c. 1750–1900) — Enlightenment; American, French, Haitian revolutions; Industrial Revolution"
+      "6": "Consequences of Industrialization (c. 1750–1900) — imperialism; nationalism; capitalism vs. socialism"
+      "7": "Global Conflict (c. 1900–present) — WWI, WWI, Cold War; decolonization"
+      "8": "Cold War and Decolonization (c. 1900–present)"
+      "9": "Globalization (c. 1900–present) — technology; economic integration; environment; human rights"
+    exam_format:
+      section1: "55 MCQ + 3 SAQ"
+      section2: "1 DBQ + 1 LEQ"
+
+  economics:
+    macroeconomics:
+      name: "AP Macroeconomics"
+      big_ideas:
+        "MOD": "Economic Models — use models to analyze macroeconomic phenomena"
+        "MEA": "Measurement — GDP, price level, unemployment measurement"
+        "POL": "Economic Policy — fiscal and monetary tools"
+        "INT": "International — exchange rates, balance of payments"
+      units:
+        "1": "Basic Economic Concepts — scarcity; opportunity cost; PPF; comparative advantage; economic systems"
+        "2": "Economic Indicators and the Business Cycle — GDP components; CPI; unemployment types"
+        "3": "National Income and Price Determination — AD/AS model; multiplier effect; fiscal policy"
+        "4": "Financial Sector — money supply; money creation; Federal Reserve; monetary policy"
+        "5": "Long-Run Consequences of Stabilization Policies — Phillips curve; crowding out; loanable funds"
+        "6": "Open Economy — current and capital accounts; exchange rate determination; J-curve"
+      exam_weight:
+        basic_concepts: "5–10%"
+        gdp_and_indicators: "12–17%"
+        ad_as: "17–27%"
+        financial_sector: "18–23%"
+        stabilization: "20–30%"
+        open_economy: "10–15%"
+      key_graphs:
+        - "AD/AS model (short-run and long-run)"
+        - "Phillips curve (short-run and long-run)"
+        - "Loanable funds market"
+        - "Money market (supply and demand for money)"
+        - "Foreign exchange market"
+
+    microeconomics:
+      name: "AP Microeconomics"
+      big_ideas:
+        "MKT": "Markets — price and quantity determined by supply and demand"
+        "ENT": "Firm Behavior — firms maximize profit subject to constraints"
+        "GOV": "Government Intervention — externalities, public goods, regulation"
+      units:
+        "1": "Basic Economic Concepts — PPF; opportunity cost; comparative advantage; demand and supply"
+        "2": "Supply and Demand — equilibrium; shifts; elasticity (PED, PES, XED, YED)"
+        "3": "Production, Cost, and Perfect Competition — SR and LR costs; profit maximisation; MC=MR"
+        "4": "Imperfect Competition — monopoly; price discrimination; monopolistic competition; oligopoly"
+        "5": "Factor Markets — labour market; MRP = MFC; monopsony"
+        "6": "Market Failure and Role of Government — externalities; public goods; Pigouvian taxes; subsidies"
+      key_graphs:
+        - "Supply and demand with consumer and producer surplus"
+        - "Cost curves: MC, ATC, AVC, AFC"
+        - "Perfect competition short-run and long-run equilibrium"
+        - "Monopoly profit maximisation (MR=MC)"
+        - "Monopolistically competitive short-run vs long-run"
+        - "Oligopoly kinked demand curve"
+
+  computer_science_a:
+    name: "AP Computer Science A"
+    language: "Java"
+    big_ideas:
+      "MOD": "Modularity — procedures and classes organise complexity"
+      "VAR": "Variables — abstraction to manage complexity"
+      "CON": "Control — algorithms express solutions"
+      "IMP": "Impact of Computing"
+    units:
+      "1": "Primitive Types — int, double, boolean; casting; integer division"
+      "2": "Using Objects — String; Math; Scanner; wrapper classes; null"
+      "3": "Boolean Expressions and if Statements — conditional logic; De Morgan's laws"
+      "4": "Iteration — while, for, for-each loops; traversal"
+      "5": "Writing Classes — constructors; instance variables; static; encapsulation"
+      "6": "Array — declaration; traversal; algorithms (sequential search, selection sort)"
+      "7": "ArrayList — ArrayList methods; traversal; sorting (Collections.sort)"
+      "8": "2D Array — declaration; nested loops; row-major traversal"
+      "9": "Inheritance — extends; method overriding; polymorphism; Object class"
+      "10": "Recursion — base case; recursive case; tracing; merge sort"
+    exam_format:
+      mcq: "40 questions — 1 hour 30 min"
+      frq: "4 questions — 1 hour 30 min"
+      frq_types:
+        "Q1": "Methods and Control Structures — writing/completing a method"
+        "Q2": "Class Design — writing a complete class"
+        "Q3": "Array/ArrayList — manipulating collections"
+        "Q4": "2D Array — nested loop traversal"
+    note: "AP CS A uses Java exclusively; Python is NOT tested in this course (see AP CS Principles)"
+
+  computer_science_principles:
+    name: "AP Computer Science Principles"
+    language: "Language-agnostic (pseudocode in exam)"
+    big_ideas:
+      "CRD": "Creative Development — collaboration and program design"
+      "DAT": "Data — representation and analysis"
+      "AAP": "Algorithms and Programming — abstraction, control"
+      "CSN": "Computing Systems and Networks — hardware, internet, protocols"
+      "IOC": "Impact of Computing — beneficial and harmful effects"
+    note: "More conceptual than CS A; includes Create Performance Task (30% of score)"
+    performance_task: "Create Task — develop a program artifact with written responses; submitted in spring"
+
+fact_check_rules:
+  general:
+    - "AP grades are 1–5 (5 = highest) — never use letter grades (A/B/C) for AP scores"
+    - "Credit awarded varies by college — say '3+ often qualifies for credit' not 'guaranteed'"
+    - "AP exam is offered once per year in May — not twice like IB"
+    - "AP course curricula are set by College Board CED — verify against current CED, not unofficial sources"
+    - "Do not conflate AP Physics 1 (algebra-based) with AP Physics C (calculus-based)"
+    - "AP CS A uses Java; AP CS Principles is language-agnostic — never say 'AP CS uses Python'"
+    - "DBQ: AP History DBQ requires thesis, contextualization, evidence, complexity — 4 distinct skills"
+
+  mathematics:
+    - "AP Calculus AB and BC: AB is a subset of BC — BC includes all AB content plus series and polar"
+    - "Calculator-active FRQ: only 2 of 6 FRQs allow calculator use"
+    - "L'Hôpital's Rule: in AP Calculus AB, requires 0/0 or ∞/∞ indeterminate form — state this condition"
+    - "AP Calculus BC only: Taylor and Maclaurin series, parametric equations, polar coordinates, integration by parts"
+    - "Series convergence tests: students must identify the test used and show all conditions verified"
+    - "Euler's method is in AP Calculus AB (Unit 7) — not BC-only"
+
+  sciences:
+    - "AP Physics 1 is algebra-based — no calculus; AP Physics C requires calculus throughout"
+    - "AP Biology formula sheet provides selected formulae — do not assume students have memorised all equations"
+    - "AP Chemistry: periodic table and formula sheet provided; no formula memorisation required for most equations"
+    - "AP Physics C: Mechanics and E&M are separate exams — a student may take one or both"
+    - "Science Practices (SP1–SP6) are explicitly assessed in FRQs — always connect content to a Science Practice"
+    - "Significant figures: AP Chemistry typically expects 3 sig figs; AP Physics 1 expects answers to match given data"
+    - "AP Biology: emphasises conceptual understanding over memorisation of isolated facts"
+
+  economics:
+    - "AP Economics: price on y-axis, quantity on x-axis — standard AP convention matches IB/Cambridge"
+    - "AP Macroeconomics: AD/AS uses both SRAS and LRAS — distinguish clearly"
+    - "Loanable funds: real interest rate on vertical axis; quantity of loanable funds on horizontal"
+    - "Money market: nominal interest rate on vertical axis; quantity of money on horizontal"
+    - "Phillips curve: short-run (downward sloping) vs long-run (vertical at natural rate) — both required"
+    - "Exchange rates: AP uses 'appreciation' and 'depreciation' — not 'revaluation' or 'devaluation' (those are for fixed rates)"
+
+  history:
+    - "AP US History periodization: 9 periods — verify period number when citing content"
+    - "DBQ rubric: 7 points — thesis (1), context (1), evidence (3), analysis and reasoning (2)"
+    - "LEQ rubric: 6 points — thesis (1), context (1), evidence (2), analysis (2)"
+    - "SAQ: no thesis required — answer in complete sentences; parts (a), (b), (c)"
+    - "Do not use OPCVL (IB) or Nature-Origin-Purpose (Cambridge) for AP — AP uses Purpose, Historical Situation, Audience, Point of View (HAPP)"
+
+notation_standards:
+  mathematics:
+    preferred:
+      - "Leibniz notation dy/dx and d²y/dx² for derivatives — primary in AP Calculus"
+      - "Prime notation f'(x) also acceptable — AP uses both"
+      - "Definite integral: ∫[a to b] f(x) dx with clear limits"
+      - "Series notation: Σ from n=1 to ∞ with explicit terms"
+      - "Interval notation for domain/range: [a, b) or (a, ∞)"
+      - "Absolute value: |x| not abs(x)"
+    avoid:
+      - "Do not omit the dx in integral notation — AP FRQ graders penalise this"
+      - "Do not use ∞ as a number in arithmetic expressions without limit context"
+      - "Avoid informal notation like 'as x→big' — use proper limit notation"
+
+  physics:
+    preferred:
+      - "SI units throughout (AP Physics 1 and C)"
+      - "Free body diagrams: label all force vectors with magnitude and direction"
+      - "Vectors: bold or with arrow — explicitly state convention"
+      - "AP Physics 1: algebra solutions with variables before substituting numbers"
+      - "AP Physics C: show calculus steps explicitly — do not skip integration/differentiation"
+    avoid:
+      - "Do not use informal language like 'speed up' — use 'velocity increases'"
+      - "Do not omit units in final numerical answers — AP graders mark down for missing units"
+      - "Do not conflate 'mass' and 'weight' — AP Physics 1 tests this distinction explicitly"
+
+  chemistry:
+    preferred:
+      - "Net ionic equations: use ionic forms for soluble strong electrolytes; molecular for weak acids, gases, precipitates"
+      - "Equilibrium: use double arrows ⇌; show ICE table explicitly in FRQ work"
+      - "Enthalpy: ΔH° in kJ mol⁻¹; report sign with value"
+      - "Rate law: rate = k[A]^m[B]^n — show units of k vary with order"
+      - "Buffer pH: Henderson-Hasselbalch equation: pH = pKa + log([A⁻]/[HA])"
+    avoid:
+      - "Do not write mol/L — use M (molar, standard AP notation) or mol L⁻¹"
+      - "Do not omit state symbols in net ionic equations where College Board expects them"
+      - "Do not confuse Kc and Kp — explain the relationship when both appear"
+
+  biology:
+    preferred:
+      - "Hardy-Weinberg equation: p² + 2pq + q² = 1 and p + q = 1 — always write both"
+      - "Population growth: dN/dt = rN (exponential); dN/dt = rN(K–N)/K (logistic)"
+      - "Statistical analysis: mention chi-squared test for genetics problems explicitly"
+      - "Photosynthesis and respiration: use chemical equations with correct coefficients"
+    avoid:
+      - "Do not say 'cells breathe' — say 'cells undergo cellular respiration'"
+      - "Do not conflate 'genotype' and 'phenotype' — AP Biology tests this distinction"
+      - "Do not present evolution as goal-directed — evolution has no foresight or intention"
+
+  history_and_social_sciences:
+    preferred:
+      - "Cite primary sources by type and date, not just title"
+      - "Thesis: historically defensible claim + line of reasoning (both required for AP rubric point)"
+      - "Contextualization: must be 'meaningfully connected' to the argument — description alone earns no point"
+      - "Use HAPP framework for document analysis: Historical Situation, Audience, Purpose, Point of View"
+    avoid:
+      - "Do not use 'prove' — historical arguments are 'supported by evidence', not 'proven'"
+      - "Do not summarise documents — AP rubric requires use of documents as evidence for a claim"
+      - "Do not write in first person in AP history essays — use third person academic register"
+
+tone_guidelines:
+  overall: |
+    AP students are typically 15–18-year-old high school students seeking college credit
+    and preparing for university-level coursework. AP content is academically rigorous
+    and college-equivalent.
+    Tone must be: confident, intellectually engaging, exam-strategically aware.
+    AP culture values critical thinking, evidence-based reasoning, and application over memorisation.
+    Motivate students: "A 3 is the baseline — aim for a 4 or 5 by mastering FRQ technique."
+
+  intro_level_tone: |
+    Engaging and accessible. Build foundational understanding clearly.
+    Use concrete U.S.-context examples where appropriate (AP students are typically US-based
+    but international students also take AP — vary examples where possible).
+    Emphasise "why this matters" — AP values transfer and real-world application.
+
+  intermediate_tone: |
+    More formal and rigorous. Introduce AP-specific terminology and exam vocabulary.
+    Reference FRQ strategies explicitly: "Show your work here — even if you get the
+    wrong answer, you can earn method marks."
+    Connect content to AP Science Practices or Historical Thinking Skills by name.
+
+  advanced_tone: |
+    Fully college-equivalent. Assume solid content knowledge.
+    Focus on synthesis, analysis, and nuanced argumentation.
+    Model AP FRQ responses: thesis → evidence → explanation → complexity.
+    Reference common AP exam traps and edge cases that distinguish 4s from 5s.
+
+vocabulary_constraints:
+  always_use:
+    - "'College Board' when referencing the AP governing body"
+    - "'CED' (Course and Exam Description) when referencing official content"
+    - "'FRQ' (Free Response Question) for written exam questions"
+    - "'MCQ' (Multiple Choice Question) for objective questions"
+    - "'AP score 1–5' — never letter grades for AP exam results"
+    - "'Science Practice' (SP) for lab/analysis skills in STEM courses"
+    - "'Historical Thinking Skill' (HTS) for history courses"
+    - "'Big Idea' when referencing College Board framework"
+    - "'DBQ' (Document-Based Question) for AP History document analysis"
+    - "'LEQ' (Long Essay Question) for AP History extended essays"
+    - "'SAQ' (Short Answer Question) for AP History brief responses"
+    - "'HAPP' for AP History document analysis (Historical Situation, Audience, Purpose, POV)"
+
+  avoid:
+    - "'IB' or 'Cambridge' — do not reference competing curricula"
+    - "'Pass/fail' — AP uses 1–5 scale"
+    - "'A Level' or 'HL/SL' — these are Cambridge/IB terms"
+    - "'Year 1 / Year 2' — say 'first semester' or 'first unit' instead"
+    - "'GCSEs' — irrelevant to AP context"
+    - "'OPCVL' or 'Nature-Origin-Purpose' — these are IB/Cambridge history frameworks"
+    - "'Textbook chapter' — reference AP units by official unit number (Unit 1, Unit 5)"
+    - "'Guaranteed credit' for AP scores — credit policies vary by institution"
+    - "'Proven' in historical argument — use 'supported', 'evidenced', or 'argued'"
+    - "Informal contractions in academic-register content (won't, can't) — write will not, cannot"
+
+difficulty_mapping:
+  beginner:
+    ap_equivalent: "AP course introduction / foundational units (Units 1–2 of most courses)"
+    approach: "Build prerequisite knowledge; introduce Big Ideas conceptually"
+    assessment_prep: "MCQ pattern recognition; single-step FRQ components"
+    scene_count: 4
+    vocabulary_level: "Define all AP-specific terms on first use; use analogies freely"
+
+  intermediate:
+    ap_equivalent: "Mid-course AP content (Units 3–6 of most courses)"
+    approach: "Full course content coverage; introduce FRQ structure explicitly"
+    assessment_prep: "All AP question types; emphasis on FRQ method and partial credit"
+    scene_count: 6
+    vocabulary_level: "AP terminology used without exhaustive redefinition"
+
+  advanced:
+    ap_equivalent: "AP exam preparation / late-course synthesis (Units 7–10 + review)"
+    approach: "Synoptic connections; exam strategy; complex FRQ argumentation"
+    assessment_prep: "5-level mastery; distinguish 3-level from 5-level responses; timed practice"
+    scene_count: 8
+    vocabulary_level: "Full college-level academic register; assume all prior units mastered"
+
+common_mistakes:
+  llm_errors:
+    - error: "Saying AP scores are letter grades (A/B/C)"
+      correction: "AP scores are 1–5 (5 = highest); never use letter grades for AP exam scores"
+
+    - error: "Treating AP Physics 1 as calculus-based"
+      correction: "AP Physics 1 is algebra-based; AP Physics C (Mechanics and E&M) requires calculus"
+
+    - error: "Using Python for AP Computer Science A"
+      correction: "AP CS A uses Java exclusively; Python is used in AP CS Principles, not AP CS A"
+
+    - error: "Saying AP exams are offered twice a year"
+      correction: "AP exams are offered once per year in May — unlike IB which has May and November sessions"
+
+    - error: "Applying OPCVL framework to AP History document analysis"
+      correction: "AP History uses HAPP: Historical Situation, Audience, Purpose, Point of View — not OPCVL"
+
+    - error: "Including Taylor/Maclaurin series in AP Calculus AB content"
+      correction: "Taylor and Maclaurin series are AP Calculus BC only (Unit 10) — not in AB syllabus"
+
+    - error: "Saying 'college credit is guaranteed' for AP score of 3"
+      correction: "Credit policies vary by institution — say 'a 3 or above often qualifies for credit at many colleges'"
+
+    - error: "Omitting dx in integral notation"
+      correction: "AP Calculus FRQ graders penalise missing dx — always write ∫f(x)dx with the differential"
+
+    - error: "Saying AP Biology favours memorisation"
+      correction: "AP Biology (2019 CED onwards) is explicitly designed to assess conceptual understanding and analysis over memorisation"
+
+    - error: "Confusing DBQ and LEQ rubrics"
+      correction: "DBQ: 7 points; LEQ: 6 points; DBQ requires document use; LEQ is evidence-based essay without documents"
+
+    - error: "Using mol/L in AP Chemistry"
+      correction: "AP Chemistry uses M (molar) as the standard concentration unit, or mol L⁻¹ — not mol/L"
+
+    - error: "Saying Hardy-Weinberg equation is just p² + 2pq + q² = 1"
+      correction: "AP Biology requires BOTH equations: p + q = 1 AND p² + 2pq + q² = 1 — both must appear in answers"
