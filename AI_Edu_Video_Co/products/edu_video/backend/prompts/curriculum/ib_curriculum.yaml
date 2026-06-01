@@ -1,0 +1,456 @@
+meta:
+  curriculum: "IB"
+  full_name: "International Baccalaureate Diploma Programme"
+  version: "2023-2025 syllabus"
+  assessment_body: "International Baccalaureate Organization (IBO)"
+  exam_session: "May and November"
+  grading_scale: "1-7 (7 = highest)"
+  loaded_by:
+    - "curriculum_agent"
+    - "fact_checker_agent"
+    - "script_generator"
+
+system_prompt: |
+  You are an expert IB Diploma Programme curriculum specialist with deep knowledge
+  of the 2023-2025 IB syllabi across all subjects. When generating educational
+  content, you must:
+
+  1. Reference IB syllabus topics using official topic numbering (e.g., "Topic 2.1",
+     "AHL Topic 12", "Option D").
+  2. Distinguish between SL (Standard Level) and HL (Higher Level) content explicitly.
+  3. Align all examples and applications to IBO's "Approaches to Learning" (ATL) skills:
+     Thinking, Communication, Social, Self-management, Research.
+  4. Frame content within IB's "Theory of Knowledge" (TOK) connections where relevant
+     (e.g., "How do we know this? What are the knowledge claims here?").
+  5. Use the IB Command Terms precisely:
+     - "State"    = give a specific name, value, or fact (no explanation required)
+     - "Describe" = give a detailed account of features
+     - "Explain"  = give a detailed account including reasons or causes
+     - "Analyse"  = break down to bring out the essential elements
+     - "Evaluate" = make an appraisal by weighing up strengths and limitations
+     - "Discuss"  = offer a considered and balanced review of a topic
+  6. Reference the IB Data Booklet (for Math, Physics, Chemistry) where applicable.
+  7. Connect content to IB's global contexts and international-mindedness.
+  8. Use the updated 2023-2025 syllabus structure — NOT the legacy pre-2023 numbering.
+
+standard_code_format: |
+  Format IB standard codes as: [Subject] [Level] [Topic].[Subtopic]
+
+  Examples:
+    Math AA HL 1.2   → Mathematics: Analysis and Approaches HL, Topic 1 (Number and Algebra), Subtopic 2
+    Math AI SL 4.3   → Mathematics: Applications and Interpretation SL, Topic 4 (Statistics), Subtopic 3
+    Physics HL A.3   → Physics HL, Strand A (Space, Time and Motion), Section 3
+    Chemistry SL S1  → Chemistry SL, Strand S1 (Models of the Particulate Nature of Matter)
+    Biology HL A.1   → Biology HL, Strand A (Unity and Diversity), Section 1
+    Economics HL 2.1 → Economics HL, Section 2 (Microeconomics), Subsection 1
+    History HL       → History HL (topic varies by Prescribed Subject chosen)
+    Geography SL 1.2 → Geography SL, Topic 1 (Population and Economic Development), Section 2
+    CS HL 4.3        → Computer Science HL, Topic 4 (Computational Thinking), Subtopic 3
+    Language B HL    → Language B HL (language-specific units)
+
+assessment_context: |
+  IB Assessment Structure — inject when relevant to content:
+
+  Paper 1 (no calculator for Math AA; multiple-choice for most sciences at SL):
+    - Short answer and structured response
+    - Tests recall and basic procedural application
+    - Script content should prepare students for timed, concise written responses
+
+  Paper 2 (calculator allowed; data-based for sciences):
+    - Data analysis, graph interpretation, extended investigation
+    - Emphasise evaluation of evidence and discussion of uncertainty
+
+  Paper 3 (HL only — options-based or research paper):
+    - In-depth study of optional topics (Sciences, Economics, History)
+    - Develop analytical depth, independent application of knowledge
+
+  Internal Assessment (IA):
+    - Mathematics:  Mathematical Exploration, 2000–2200 words, personal engagement required
+    - Sciences:     Individual Investigation, 6–12 pages, includes raw data and conclusion
+    - Economics:    Commentary on a current event (three commentaries for SL, three for HL)
+    - CS:           Solution — design, develop, and test a working software product
+    - History:      Historical Investigation, 2200 words max
+
+  Extended Essay (EE):
+    - 4000-word independent research essay, graded separately
+    - Students must demonstrate research skills and academic rigour
+
+  When scripting content, naturally reference assessment context:
+  "This concept commonly appears in Paper 2 data-response questions..."
+  "In your IA, you might choose to investigate..."
+
+subject_topics:
+  mathematics_aa:
+    name: "Mathematics: Analysis and Approaches"
+    levels: ["SL", "HL"]
+    hl_only_note: "AHL content marked explicitly — never include in SL narration without flag"
+    topics:
+      "1":
+        name: "Number and Algebra"
+        subtopics:
+          "1.1": "Sequences and series — arithmetic and geometric; sigma notation"
+          "1.2": "Exponents and logarithms; laws of logarithms"
+          "1.3": "Binomial theorem; Pascal's triangle; binomial coefficient"
+          "1.4": "AHL — Proof: direct, contradiction, induction; counter-example"
+          "1.5": "AHL — Complex numbers; Cartesian and polar form; Argand diagram"
+          "1.6": "AHL — Partial fractions; decomposition"
+          "1.7": "AHL — De Moivre's theorem; nth roots of complex numbers"
+          "1.8": "AHL — Systems of equations; row reduction; matrix method"
+          "1.9": "AHL — Eigenvalues and eigenvectors; characteristic polynomial"
+      "2":
+        name: "Functions"
+        subtopics:
+          "2.1": "Functions: domain, range, inverse, composite; f ∘ g notation"
+          "2.2": "Graphs: key features, symmetry, transformations (translations, dilations)"
+          "2.3": "Rational functions; asymptotes; oblique asymptotes"
+          "2.4": "Exponential and logarithmic functions; natural exponential e^x"
+          "2.5": "Odd and even functions; symmetry properties"
+          "2.6": "AHL — Modulus functions and inequalities"
+          "2.7": "AHL — Polynomial functions; factor and remainder theorems"
+          "2.8": "AHL — Sum and product of roots (Vieta's formulas)"
+      "3":
+        name: "Geometry and Trigonometry"
+        subtopics:
+          "3.1": "3D geometry: distance, midpoints, volumes and surface areas"
+          "3.2": "Trig ratios; unit circle; Pythagorean and quotient identities"
+          "3.3": "Trig equations and general solutions"
+          "3.4": "AHL — Compound angle identities"
+          "3.5": "AHL — Double angle identities"
+          "3.6": "AHL — Reciprocal trig functions: sec, csc, cot"
+          "3.7": "AHL — Inverse trig functions: arcsin, arccos, arctan"
+          "3.8": "Vectors in 2D and 3D; dot product; angle between vectors"
+          "3.9": "AHL — Vector equations of lines and planes"
+          "3.10": "AHL — Intersections and distances between planes"
+          "3.11": "AHL — Cross product (vector product); applications"
+      "4":
+        name: "Statistics and Probability"
+        subtopics:
+          "4.1": "Concepts of population, random sample, data types; reliability vs validity"
+          "4.2": "Statistical measures: mean, median, mode; IQR, standard deviation"
+          "4.3": "Frequency distributions; histograms; cumulative frequency; box plots"
+          "4.4": "Linear correlation; Pearson's r; least-squares regression"
+          "4.5": "Sample space; mutually exclusive; combined events; tree diagrams"
+          "4.6": "Conditional probability; independence; Bayes' theorem"
+          "4.7": "Discrete random variables; E(X), Var(X)"
+          "4.8": "Binomial distribution B(n, p)"
+          "4.9": "Normal distribution; standardising with z-scores"
+          "4.10": "AHL — Hypothesis testing: null/alternative hypothesis, p-value, Type I/II errors"
+          "4.11": "AHL — Poisson distribution"
+          "4.12": "AHL — Continuous random variables; probability density functions"
+          "4.13": "AHL — t-distribution; chi-squared goodness-of-fit and independence tests"
+      "5":
+        name: "Calculus"
+        subtopics:
+          "5.1": "Limits; derivative from first principles; differentiability"
+          "5.2": "Derivative rules: product, quotient, chain rule"
+          "5.3": "Derivatives of trig, exponential, and logarithmic functions"
+          "5.4": "Tangent and normal lines; increasing/decreasing functions"
+          "5.5": "Optimisation; local and global extrema; second derivative test"
+          "5.6": "Indefinite integration; antiderivatives; integration as reverse differentiation"
+          "5.7": "Definite integrals; area between curves; Fundamental Theorem of Calculus"
+          "5.8": "AHL — Volumes of revolution (x-axis)"
+          "5.9": "AHL — Integration by substitution (u-substitution)"
+          "5.10": "AHL — Integration by parts"
+          "5.11": "AHL — Separable differential equations"
+          "5.12": "AHL — Slope fields; Euler's method for numerical solutions"
+          "5.13": "AHL — Maclaurin series; series for e^x, sin x, cos x, ln(1+x)"
+
+  mathematics_ai:
+    name: "Mathematics: Applications and Interpretation"
+    levels: ["SL", "HL"]
+    note: "Emphasises modelling and technology; calculators always allowed"
+    topics:
+      "1": "Number and Algebra — including financial mathematics, logarithmic models"
+      "2": "Functions — linear, quadratic, exponential, logistic models"
+      "3": "Geometry and Trigonometry — including non-right-angle, Voronoi diagrams"
+      "4": "Statistics and Probability — including chi-squared tests, regression models"
+      "5": "Calculus — including numerical methods, kinematics, optimisation"
+    hl_only:
+      - "Transition matrices and Markov chains"
+      - "Adjacency matrices and graph theory"
+      - "AHL Calculus: integration techniques, differential equations"
+
+  physics:
+    name: "IB Physics (2023 syllabus)"
+    levels: ["SL", "HL"]
+    strands:
+      "A": "Space, Time and Motion"
+      "B": "The Particulate Nature of Matter"
+      "C": "Wave Behaviour"
+      "D": "Fields"
+      "E": "Nuclear and Quantum Physics"
+    ahl_extensions:
+      "A.4": "Rigid Body Mechanics (HL) — torque, moment of inertia"
+      "B.5": "Current and Circuits — HL quantitative treatment"
+      "C.3": "Wave Phenomena — Doppler effect, diffraction, resolution (HL)"
+      "D.3": "Motion in Electromagnetic Fields (HL)"
+      "E.3": "Radioactive Decay — mathematical treatment, half-life (HL)"
+    data_booklet_constants:
+      speed_of_light: "c = 3.00 × 10⁸ m s⁻¹"
+      gravitational_constant: "G = 6.67 × 10⁻¹¹ N m² kg⁻²"
+      planck_constant: "h = 6.63 × 10⁻³⁴ J s"
+      elementary_charge: "e = 1.60 × 10⁻¹⁹ C"
+      electron_mass: "mₑ = 9.11 × 10⁻³¹ kg"
+      avogadro_number: "Nₐ = 6.02 × 10²³ mol⁻¹"
+      boltzmann_constant: "k_B = 1.38 × 10⁻²³ J K⁻¹"
+      stefan_boltzmann: "σ = 5.67 × 10⁻⁸ W m⁻² K⁻⁴"
+      gas_constant: "R = 8.31 J K⁻¹ mol⁻¹"
+
+  chemistry:
+    name: "IB Chemistry (2023 syllabus)"
+    levels: ["SL", "HL"]
+    strands:
+      "S1": "Models of the Particulate Nature of Matter"
+      "S2": "Models of Bonding and Structure"
+      "S3": "Classification of Matter"
+      "R1": "What drives chemical reactions? (thermodynamics, entropy)"
+      "R2": "How much, how fast, how far? (stoichiometry, kinetics, equilibrium)"
+      "R3": "What are the mechanisms of chemical change? (organic, redox)"
+    ahl_note: "AHL content is embedded within each strand — identified by AHL tag in syllabus"
+    practical_scheme:
+      individual_investigation: "10 hours minimum laboratory work"
+      practical_skills_assessed: "Data collection, processing, analysis, evaluation"
+    data_booklet_constants:
+      avogadro: "Nₐ = 6.02 × 10²³ mol⁻¹"
+      gas_constant: "R = 8.31 J K⁻¹ mol⁻¹"
+      standard_conditions: "298 K and 100 kPa"
+      faraday: "F = 96 500 C mol⁻¹"
+
+  biology:
+    name: "IB Biology (2023 syllabus)"
+    levels: ["SL", "HL"]
+    strands:
+      "A": "Unity and Diversity — cells, classification, evolution"
+      "B": "Form and Function — membranes, organelles, molecules"
+      "C": "Interaction and Interdependence — ecosystems, homeostasis, immunity"
+      "D": "Continuity and Change — genetics, reproduction, gene expression"
+    tools_and_skills:
+      "Tool 1": "Experimental techniques and safety protocols"
+      "Tool 2": "Technology — databases, models, ICT"
+      "Tool 3": "Mathematics — statistical analysis, data presentation"
+      "Inquiry": "Exploration, investigation design, peer review, conclusion"
+    nature_of_science: "Embedded in all strands — epistemological reflection required"
+
+  economics:
+    name: "IB Economics"
+    levels: ["SL", "HL"]
+    sections:
+      "1": "Introduction to Economics — scarcity, choice, PPF, economic systems"
+      "2": "Microeconomics — demand, supply, elasticity, market failure, government intervention"
+      "3": "Macroeconomics — GDP, unemployment, inflation, economic growth, AD/AS"
+      "4": "The Global Economy — international trade, exchange rates, development"
+    hl_extension: "Quantitative techniques required throughout; HL Paper 3 policy response"
+    assessment:
+      sl_paper1: "Extended response — one from Part A (micro), one from Part B (macro)"
+      sl_paper2: "Data response — structured questions on stimulus material"
+      hl_paper3: "Policy paper — real-world economic problem requiring policy recommendation"
+      ia: "Three commentaries on news articles (800 words each); each uses different concept"
+
+  history:
+    name: "IB History"
+    levels: ["SL", "HL"]
+    prescribed_subjects:
+      - "Military Leaders"
+      - "Conquest and its Impact"
+      - "The Move to Global War"
+      - "Rights and Protest"
+      - "Conflict and Intervention"
+    world_history_topics:
+      "10": "Authoritarian States (20th century)"
+      "11": "Causes and Effects of 20th-century Wars"
+      "12": "The Cold War: Superpower Tensions and Rivalries"
+    hl_depth_study: "Regional option — Americas, Asia-Pacific, Europe, Africa/Middle East"
+    historical_investigation: "Internal Assessment: 2200-word source analysis and historical investigation"
+    skills: ["Source evaluation (OPCVL)", "Historiography", "Essay writing under exam conditions"]
+
+  computer_science:
+    name: "IB Computer Science"
+    levels: ["SL", "HL"]
+    topics:
+      "1": "System Fundamentals — hardware, software, system design"
+      "2": "Computer Organisation — architecture, memory, binary, logic gates"
+      "3": "Networks — topology, protocols, security"
+      "4": "Computational Thinking, Problem-Solving and Programming"
+      "5": "AHL — Abstract Data Structures: linked lists, stacks, queues, trees, graphs"
+      "6": "AHL — Resource Management: OS concepts, concurrency"
+      "7": "AHL — Control: robotics, autonomous systems"
+    options: ["A: Databases", "B: Modelling and Simulation", "C: Web Science", "D: Object-Oriented Programming"]
+    ia: "Computational solution — design document, product, video, criterion-based assessment"
+    pseudocode: "IB-specific pseudocode conventions must be used in all algorithm questions"
+
+fact_check_rules:
+  general:
+    - "Verify all topic codes against the 2023-2025 IB syllabus — NOT the legacy pre-2023 numbering (Physics changed from Topics 1-12 to Strands A-E)"
+    - "SL content must never include AHL-only material without an explicit HL-only marker"
+    - "IB Command Terms have IBO-defined meanings — 'Evaluate' does NOT mean 'calculate'"
+    - "Grade descriptors: 7 is highest, 1 is lowest — never invert or conflate with percentages"
+    - "IA criteria and word limits must match current syllabus — they change between syllabus cycles"
+    - "TOK is a required component — never describe it as optional"
+
+  mathematics:
+    - "Math AA (Analysis and Approaches) and Math AI (Applications and Interpretation) are distinct courses — never merge content"
+    - "Paper 1 is no-calculator for Math AA; ALL papers allow graphical calculator for Math AI"
+    - "Maclaurin series (Math AA 5.13) is HL only — never present to SL students"
+    - "Proof by mathematical induction (Math AA 1.4) is HL only"
+    - "Normal distribution in IB uses z-scores from z-table or GDC — t-distribution is not in IB AA or AI syllabus"
+    - "Poisson distribution (4.11) is HL only — verify before including"
+
+  sciences:
+    - "Always specify whether a Data Booklet formula is being used"
+    - "Use negative-exponent unit notation: ms⁻¹ not m/s; mol dm⁻³ not mol/L; J kg⁻¹ K⁻¹ not J/kg/K"
+    - "IB expects answers to 3 significant figures unless otherwise stated"
+    - "Physics strand letters (A–E) must use 2023 syllabus labelling — not old Topic 1–12 labels"
+    - "Chemistry strands use S1, S2, S3, R1, R2, R3 — NOT Topics 1-11 from pre-2023 syllabus"
+
+  economics:
+    - "IB Economics uses PPF (Production Possibilities Frontier) — NOT PPC"
+    - "Diagrams must follow IB conventions: price on y-axis, quantity on x-axis for supply/demand"
+    - "AD/AS: use Keynesian AD/AS model as primary (not classical long-run only)"
+    - "HL Paper 3 requires theory-backed policy recommendation — not unsupported opinion"
+
+  history:
+    - "Historiographical perspectives must be attributed to named historians, not vague 'historians argue'"
+    - "OPCVL (Origin, Purpose, Content, Value, Limitation) is the IB source evaluation framework"
+    - "Do not conflate SL (2 prescribed subjects + World History) with HL (+ regional depth study)"
+
+notation_standards:
+  mathematics:
+    preferred:
+      - "f'(x) for first derivative; f''(x) for second derivative (prime notation primary)"
+      - "dy/dx acceptable alongside prime notation in calculus contexts"
+      - "Use ∈ for set membership: x ∈ ℝ"
+      - "Set notation: ℕ (naturals), ℤ (integers), ℚ (rationals), ℝ (reals), ℂ (complex)"
+      - "Vectors: bold lowercase **a** or overhead arrow →a — state convention used"
+      - "Matrices: bold uppercase **A**"
+      - "IB GDC notation for statistical tests: use GDC steps where calculator is relevant"
+    avoid:
+      - "Do not use 'ln' without defining it as 'log base e' for beginner-level content"
+      - "Do not write ÷ — use fraction notation or /"
+      - "Avoid mixing prime and Leibniz notation without explanation"
+
+  physics:
+    preferred:
+      - "SI units using negative exponents: ms⁻¹, ms⁻², Jkg⁻¹K⁻¹"
+      - "Scientific notation: 3.00 × 10⁸ (never 3e8)"
+      - "Use Δ prefix for changes: Δt, Δx, ΔE, Δp"
+      - "IB Data Booklet formula references: e.g., 'Using F = ma from the Data Booklet'"
+    avoid:
+      - "Do not use 'g' for both gravitational acceleration and grams in the same context"
+      - "Do not abbreviate units not in the IB Data Booklet without definition"
+      - "Do not use m/s — always ms⁻¹"
+
+  chemistry:
+    preferred:
+      - "IUPAC systematic names as primary; common names in parentheses on first use"
+      - "State symbols mandatory in all equations: (s), (l), (g), (aq)"
+      - "Equilibrium arrow: ⇌; one-way reaction: →"
+      - "Concentration notation: [X] meaning mol dm⁻³"
+      - "Enthalpy: ΔH° with units kJ mol⁻¹"
+    avoid:
+      - "Do not write equations without state symbols"
+      - "Do not use mol/L — use mol dm⁻³"
+      - "Do not use 'c' as concentration symbol — use [X]"
+
+  biology:
+    preferred:
+      - "Binomial nomenclature: italicised, Genus capitalised, species lowercase (Homo sapiens)"
+      - "Use systematic names for biomolecules (deoxyribonucleic acid first, then DNA)"
+      - "Statistical tests: name and justify (e.g., t-test for comparing means of normally distributed data)"
+    avoid:
+      - "Do not use 'Lamarckian' evolution language"
+      - "Do not describe DNA as a 'blueprint' — use 'template' or 'genetic information store'"
+
+tone_guidelines:
+  overall: |
+    IB students are high-achieving, internationally-minded learners aged 16–19 preparing
+    for high-stakes examinations and university admission.
+    Tone must be: rigorous, precise, intellectually engaging, and globally inclusive.
+    Avoid condescension — IB students handle complexity and nuance well.
+    Avoid Western-centric examples; draw on international contexts (IB values this explicitly).
+
+  sl_tone: |
+    Accessible but never simplistic. Assume a solid secondary school foundation.
+    Use real-world contexts from diverse global regions.
+    Connect theory to application — IB assesses transfer of knowledge.
+    Define subject-specific terminology on first use, then use consistently.
+
+  hl_tone: |
+    Formally academic. Assume fluency with all SL content — do not re-explain basics.
+    Introduce mathematical proof and rigour where appropriate.
+    Reference historical development of ideas and scientific uncertainty.
+    Encourage critical evaluation of evidence and acknowledgment of limitations.
+    HL students are expected to engage with nuance — present multiple perspectives.
+
+vocabulary_constraints:
+  always_use:
+    - "'syllabus' (not 'curriculum') when referring to IB course content"
+    - "'IA' for Internal Assessment — never 'project' or 'assignment'"
+    - "'command term' when discussing assessment language"
+    - "'TOK' for Theory of Knowledge connection"
+    - "'ATL skills' for Approaches to Learning"
+    - "'Paper 1', 'Paper 2', 'Paper 3' for assessment components"
+    - "'GDC' or 'graphical display calculator' — not 'calculator' alone"
+
+  avoid:
+    - "'test' — use 'assessment' or 'paper'"
+    - "'chapter' — use 'topic' (IB uses official topic/strand numbering)"
+    - "'textbook' — IB is resource-neutral; use 'resource' or 'syllabus guide'"
+    - "'AP' or 'Cambridge' — do not reference competing curricula"
+    - "'grade' alone — specify 'IB grade (1–7)' and clarify scale on first mention"
+    - "'pass/fail' — IB uses 1–7 achievement levels, not pass/fail"
+    - "'percent correct' — IB results are not reported as percentages"
+    - "'lesson' — use 'topic' or 'concept'"
+
+difficulty_mapping:
+  beginner:
+    ib_equivalent: "MYP Level 4–5 or early IB DP SL introduction"
+    approach: "Build conceptual understanding; no AHL content; minimal formal proof"
+    assessment_prep: "Focus on 'State' and 'Describe' command terms"
+    scene_count: 4
+    vocabulary_level: "Define all subject-specific terms; use analogies freely"
+
+  intermediate:
+    ib_equivalent: "IB DP SL full course coverage"
+    approach: "Complete SL syllabus; introduce Paper 2 data-analysis skills"
+    assessment_prep: "All SL command terms including 'Analyse' and 'Evaluate'"
+    scene_count: 6
+    vocabulary_level: "Use subject terminology without exhaustive definition"
+
+  advanced:
+    ib_equivalent: "IB DP HL full course including all AHL extensions"
+    approach: "Full HL content; proof; mathematical rigour; option topic depth"
+    assessment_prep: "All command terms; Paper 3-style depth; EE-level critical analysis"
+    scene_count: 8
+    vocabulary_level: "Full academic register; assume subject fluency"
+
+common_mistakes:
+  llm_errors:
+    - error: "Using pre-2023 IB Physics topic numbers (1–12)"
+      correction: "Use 2023 strand letters A–E: e.g., 'Strand A: Space, Time and Motion' not 'Topic 1: Mechanics'"
+
+    - error: "Including AHL content in SL explanations without flagging"
+      correction: "Add explicit marker: [HL Only] before any AHL content; never embed silently in SL narration"
+
+    - error: "Conflating Math AA and Math AI"
+      correction: "State the course explicitly at the start of every math video; they differ in paper structure, content, and calculator policy"
+
+    - error: "Using mol/L for concentration"
+      correction: "IB Chemistry uses mol dm⁻³ exclusively — never mol/L or M (molar)"
+
+    - error: "Referring to 'the IB textbook'"
+      correction: "IB is resource-neutral; reference 'the IB syllabus guide' or 'the IB Data Booklet' — never a specific textbook"
+
+    - error: "Saying IB grades go from 0–100 or use letter grades"
+      correction: "IB Diploma grades are 1–7 (7 = highest); always clarify this scale explicitly"
+
+    - error: "Writing 'm/s' instead of 'ms⁻¹'"
+      correction: "IB Physics uses negative-exponent unit notation throughout the Data Booklet and mark schemes"
+
+    - error: "Applying t-distribution where z-distribution is required"
+      correction: "IB Mathematics (AA and AI) uses z-scores for the Normal distribution; t-distribution problems are not in the standard IB syllabus"
+
+    - error: "Using OPCVL incorrectly — treating it as just summarising a source"
+      correction: "OPCVL requires explicit evaluation: Value and Limitation must be specific to the purpose of the investigation, not generic"
+
+    - error: "Using 'PPF' and 'PPC' interchangeably"
+      correction: "IB Economics uses PPF (Production Possibilities Frontier) — do not use PPC (Production Possibilities Curve)"
