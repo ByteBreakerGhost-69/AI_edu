@@ -1,0 +1,525 @@
+meta:
+  curriculum: "Cambridge"
+  full_name: "Cambridge Assessment International Education (CAIE)"
+  version: "2023-2025 syllabus"
+  assessment_body: "Cambridge Assessment International Education"
+  qualifications:
+    - "Cambridge IGCSE (International General Certificate of Secondary Education)"
+    - "Cambridge O Level"
+    - "Cambridge AS Level"
+    - "Cambridge A Level"
+  exam_session: "May/June and October/November"
+  grading_scale:
+    a_level: "A* A B C D E U (A* = highest; U = ungraded)"
+    igcse: "9 8 7 6 5 4 3 2 1 U (9 = highest)"
+    o_level: "A1 A2 B3 B4 C5 C6 D7 E8 U"
+  loaded_by:
+    - "curriculum_agent"
+    - "fact_checker_agent"
+    - "script_generator"
+
+system_prompt: |
+  You are an expert Cambridge CAIE curriculum specialist with deep knowledge of
+  Cambridge IGCSE, AS Level, and A Level syllabi for the 2023–2025 exam series.
+  When generating educational content, you must:
+
+  1. Reference syllabus content using official Cambridge syllabus codes and section numbers
+     (e.g., "9702/21 Physics Paper 2", "Mathematics 9709 Section 5: Probability")
+  2. Distinguish clearly between:
+     - IGCSE/O Level (ages 14–16, Core vs Extended for IGCSE)
+     - AS Level (Year 1 of A Level, or standalone qualification)
+     - A Level (full two-year qualification, AS + A2 content)
+  3. Align content to Cambridge Assessment Objectives:
+     - AO1: Knowledge and understanding
+     - AO2: Handling information and solving problems
+     - AO3: Experimental skills and investigations (sciences)
+  4. Use Cambridge command words precisely:
+     - "State"      = express in clear terms with no explanation
+     - "Define"     = give a precise meaning
+     - "Describe"   = state the points of a topic (what, not why)
+     - "Explain"    = state reasons for or causes of (why)
+     - "Calculate"  = use numbers to work out an answer
+     - "Determine"  = find the only possible answer
+     - "Suggest"    = apply knowledge to a novel situation
+     - "Discuss"    = present information, perspectives, and analyse
+     - "Evaluate"   = judge based on criteria with supported conclusion
+  5. Reference Cambridge data booklets, formula sheets, and past papers where relevant
+  6. For sciences: emphasise the Cambridge Practical Assessment — skills P, A, M, U
+  7. Note which content is examinable in which paper component
+
+standard_code_format: |
+  Format Cambridge standard codes as: [Syllabus Code]/[Paper] [Section].[Point]
+
+  Examples:
+    9709/01 Pure Mathematics 1 → A Level Mathematics Pure 1 (syllabus 9709, Paper 1)
+    9709 Section 1.3           → A Level Math — Topic 1 Algebra, Point 3
+    9702/21 Physics Paper 2    → A Level Physics (9702), Component 21 (AS Paper 2)
+    0580/42 IGCSE Math         → IGCSE Mathematics (0580), Extended Paper 4 variant 2
+    9701/33 Chemistry Paper 3  → A Level Chemistry (9701), Advanced Practical (Paper 3 variant 3)
+    0620/42 IGCSE Chemistry    → IGCSE Chemistry (0620), Extended Theory Paper 4 variant 2
+    0610/62 IGCSE Biology      → IGCSE Biology (0610), Alternative to Practical Paper 6 variant 2
+    9389/13 History Paper 1    → A Level History (9389), Paper 1 variant 3
+    9708/22 Economics Paper 2  → A Level Economics (9708), Paper 2 variant 2
+
+assessment_context: |
+  Cambridge Assessment Structure — reference naturally in content:
+
+  IGCSE (ages 14–16):
+    Core tier:     Grades 1–5 available; simpler questions, subset of syllabus
+    Extended tier: Grades 1–9 available; full syllabus coverage; required for A*–C
+    Paper types:   Multiple choice (Paper 1), Short/structured (Paper 2/3), Extended response (Paper 4)
+    Practical:     Papers 5 (written) and 6 (practical) for sciences; can substitute Alternative to Practical
+
+  AS Level (ages 16–17):
+    Standalone qualification or first year of A Level
+    Papers:   Paper 1 (multiple choice or short answer), Paper 2 (structured), Paper 3 (practical for sciences)
+    Grading:  A B C D E U
+    Note:     AS content is a subset of A Level; around 40% of total A Level marks
+
+  A Level (ages 16–18):
+    Full qualification = AS + A2 components
+    Papers:   Paper 1 (AS material revisited), Paper 2 (A2 material), Paper 3 (practical/advanced)
+    Some subjects: Paper 4 (statistics/optional topics) or coursework component
+    Grading:  A* A B C D E U
+    A*:       Requires A overall + 90% in A2 components (not AS)
+
+  Practical Assessment (sciences):
+    Cambridge Practical Assessment skills: P (Planning), A (Analysis), M (Methods), U (Using equipment)
+    Assessed via: Practical paper (Paper 3/Paper 5) OR Alternative to Practical (Paper 6)
+    Content should include: reading instruments correctly, uncertainty, significant figures, graph drawing
+
+  When scripting: reference naturally:
+  "This is a common Paper 2 question type where you must..."
+  "In the Practical paper, you would be asked to plan an investigation to..."
+
+subject_topics:
+  mathematics:
+    name: "Cambridge A Level Mathematics (9709)"
+    qualification: "AS and A Level"
+    papers:
+      "Paper 1": "Pure Mathematics 1 (P1) — core algebra, functions, calculus"
+      "Paper 2": "Pure Mathematics 2 (P2) — AS Level only; logarithms, trig, differentiation"
+      "Paper 3": "Pure Mathematics 3 (P3) — A Level; complex numbers, differential equations, vectors"
+      "Paper 4": "Mechanics (M1) — kinematics, forces, Newton's laws, moments"
+      "Paper 5": "Probability and Statistics 1 (S1) — data, probability, distributions"
+      "Paper 6": "Probability and Statistics 2 (S2) — A Level; inference, hypothesis testing"
+    topics:
+      pure_1:
+        "1": "Quadratics — completing the square, discriminant, graphs"
+        "2": "Functions — domain, range, inverse, composite, transformations"
+        "3": "Coordinate geometry — straight lines, circles, intersection"
+        "4": "Circular measure — radians, arc length, sector area"
+        "5": "Trigonometry — exact values, identities, equations in given range"
+        "6": "Series — binomial expansion (positive integer n); arithmetic/geometric series"
+        "7": "Differentiation — rules, stationary points, tangents, normals"
+        "8": "Integration — indefinite and definite; area under curve"
+      pure_2_3:
+        "1": "Algebra — polynomial division, partial fractions, modulus function"
+        "2": "Logarithmic and exponential functions — ln x, e^x, solving equations"
+        "3": "Trigonometry — double angle, compound angle, R sin(x + α) form"
+        "4": "Differentiation — implicit, parametric, related rates"
+        "5": "Integration — by parts, substitution, partial fractions, numerical"
+        "6": "Numerical solution of equations — iteration, Newton-Raphson (A Level)"
+        "7": "Vectors — Cartesian and component form, lines, planes (A Level)"
+        "8": "Differential equations — forming, separable, integrating factor (A Level)"
+        "9": "Complex numbers — Argand diagram, modulus-argument, De Moivre (A Level)"
+      statistics:
+        "1": "Representation of data — stem-and-leaf, box plots, histograms, cumulative frequency"
+        "2": "Measures of central tendency and spread — mean, variance, interquartile range"
+        "3": "Probability — Venn diagrams, tree diagrams, conditional probability"
+        "4": "Discrete random variables — expectation, variance, probability tables"
+        "5": "Permutations and combinations — nPr, nCr, arranging with restrictions"
+        "6": "Binomial distribution — B(n, p); expectation; tables and GDC"
+        "7": "Normal distribution — N(μ, σ²); standardising; tables; inverse normal"
+        "8": "Hypothesis testing (S2) — null hypothesis, p-value, critical region, Type I/II errors"
+        "9": "Poisson distribution (S2) — Po(λ); approximations"
+      mechanics:
+        "1": "Kinematics — constant acceleration equations (suvat); displacement-time graphs"
+        "2": "Forces and Newton's laws — resultant force, connected particles"
+        "3": "Friction — coefficient of friction, limiting equilibrium"
+        "4": "Momentum — conservation, collisions, impulse-momentum theorem"
+        "5": "Work, energy and power — work-energy theorem, conservation of energy"
+        "6": "Circular motion (A Level) — centripetal acceleration, conical pendulum"
+
+  further_mathematics:
+    name: "Cambridge A Level Further Mathematics (9231)"
+    note: "Taken alongside or after A Level Mathematics 9709"
+    papers:
+      "Paper 1": "Further Pure Mathematics 1 — proof, matrices, complex numbers advanced"
+      "Paper 2": "Further Pure Mathematics 2 — differential equations, polar, hyperbolic"
+      "Paper 3": "Further Mechanics — momentum, circular motion, SHM, rotation"
+      "Paper 4": "Further Statistics — estimation, hypothesis testing, chi-squared"
+
+  physics:
+    name: "Cambridge A Level Physics (9702)"
+    qualification: "AS and A Level"
+    papers:
+      "Paper 1": "Multiple choice — 40 questions (AS topics)"
+      "Paper 2": "AS structured questions — 60 marks"
+      "Paper 3": "Advanced practical — 40 marks; planning and analysis"
+      "Paper 4": "A Level structured questions — 100 marks"
+      "Paper 5": "Planning, analysis and evaluation — 30 marks"
+    topics:
+      as_topics:
+        "1": "Physical quantities and units — SI units, scalars, vectors, uncertainty"
+        "2": "Kinematics — equations of motion, projectile motion, s-t and v-t graphs"
+        "3": "Dynamics — Newton's laws, friction, drag, terminal velocity"
+        "4": "Forces, density and pressure — equilibrium, upthrust, pressure"
+        "5": "Work, energy and power — work-energy theorem, conservation, efficiency"
+        "6": "Deformation of solids — Hooke's law, stress, strain, Young modulus"
+        "7": "Waves — transverse, longitudinal, superposition, stationary waves"
+        "8": "Superposition — diffraction, interference, double slit, diffraction grating"
+        "9": "Electricity — charge, current, Ohm's law, resistivity, EMF, internal resistance"
+        "10": "D.C. circuits — Kirchhoff's laws, potential divider, Wheatstone bridge"
+        "11": "Particle physics — hadrons, leptons, quarks, conservation laws"
+      a2_topics:
+        "12": "Motion in a circle — centripetal acceleration and force"
+        "13": "Gravitational fields — Newton's law, field strength, potential, orbits"
+        "14": "Temperature — thermometers, thermal equilibrium, absolute scale"
+        "15": "Ideal gases — kinetic theory, pV = nRT, Avogadro, Boltzmann"
+        "16": "Thermodynamics — internal energy, first law, specific heat and latent heat"
+        "17": "Oscillations — SHM, damping, resonance, energy"
+        "18": "Electric fields — Coulomb's law, field strength, potential, capacitors"
+        "19": "Capacitance — C = Q/V, parallel plate, energy, charging/discharging"
+        "20": "Magnetic fields — force on conductor, Hall effect, electromagnetic induction"
+        "21": "Alternating currents — RMS, transformers, rectification"
+        "22": "Quantum physics — photoelectric effect, wave-particle duality, energy levels"
+        "23": "Nuclear physics — radioactive decay, half-life, binding energy, fission/fusion"
+        "24": "Medical imaging — X-rays, ultrasound, PET scanner"
+    data_booklet_constants:
+      speed_of_light: "c = 3.00 × 10⁸ m s⁻¹"
+      gravitational_constant: "G = 6.67 × 10⁻¹¹ N m² kg⁻²"
+      planck_constant: "h = 6.63 × 10⁻³⁴ J s"
+      elementary_charge: "e = 1.60 × 10⁻¹⁹ C"
+      electron_rest_mass: "mₑ = 9.11 × 10⁻³¹ kg"
+      proton_rest_mass: "mₚ = 1.673 × 10⁻²⁷ kg"
+      avogadro_number: "Nₐ = 6.02 × 10²³ mol⁻¹"
+      boltzmann_constant: "k = 1.38 × 10⁻²³ J K⁻¹"
+      gas_constant: "R = 8.31 J K⁻¹ mol⁻¹"
+      stefan_boltzmann: "σ = 5.67 × 10⁻⁸ W m⁻² K⁻⁴"
+
+  chemistry:
+    name: "Cambridge A Level Chemistry (9701)"
+    qualification: "AS and A Level"
+    papers:
+      "Paper 1": "Multiple choice (40 marks) — AS topics"
+      "Paper 2": "AS Structured questions (60 marks)"
+      "Paper 3": "Advanced Practical (40 marks)"
+      "Paper 4": "A Level Structured questions (100 marks)"
+      "Paper 5": "Planning, Analysis and Evaluation (30 marks)"
+    topics:
+      as_physical:
+        "1": "Atoms, Molecules and Stoichiometry — moles, empirical/molecular formula, concentration"
+        "2": "Atomic Structure — sub-atomic particles, electron configuration, ionisation energy"
+        "3": "Chemical Bonding — ionic, covalent, metallic; shapes (VSEPR); intermolecular forces"
+        "4": "States of Matter — ideal gas equation, crystalline solids"
+        "5": "Chemical Energetics — Hess's law, bond enthalpies, ΔH standard"
+        "6": "Electrochemistry — electrode potentials, standard hydrogen electrode, E-cell"
+        "7": "Equilibria — Kc, Kp, Le Chatelier's principle, acid-base equilibria, Kw, pH, buffers"
+        "8": "Reaction Kinetics — rate equation, orders, half-life, Arrhenius equation"
+      as_inorganic:
+        "9": "The Periodic Table — trends across periods and down groups"
+        "10": "Group 2 — reactions of alkaline earth metals; thermal stability of carbonates/nitrates"
+        "11": "Group 17 — halogens; halide ions; disproportionation"
+        "12": "Nitrogen and Sulfur — nitrogen cycle, industrial synthesis of ammonia; contact process"
+      as_organic:
+        "13": "Introduction to Organic Chemistry — nomenclature, isomerism, functional groups"
+        "14": "Hydrocarbons — alkanes (substitution); alkenes (addition, Markovnikov, polymerisation)"
+        "15": "Halogenoalkanes — nucleophilic substitution; elimination; bond polarity"
+        "16": "Hydroxy Compounds — alcohols; oxidation; esterification; phenols"
+        "17": "Carbonyl Compounds — aldehydes, ketones; nucleophilic addition; carboxylic acids"
+        "18": "Nitrogen Compounds — amines, amides, amino acids, peptide bond"
+      a2_topics:
+        "19": "Lattice Energy — Born-Haber cycle; enthalpy of hydration and solution"
+        "20": "Electrode Potentials — electrochemical series; predicting reactions"
+        "21": "Further Aspects of Equilibria — Ksp, buffer solutions; acid-base titrations"
+        "22": "Reaction Kinetics — rate-determining step; mechanisms from kinetic data"
+        "23": "Transition Elements — d-electron configurations; complexes; colour; redox"
+        "24": "Benzene and Compounds — delocalisation; electrophilic substitution; directing groups"
+        "25": "Carboxylic Acids and Derivatives — acyl chlorides; esters; polyesters; polyamides"
+        "26": "Organic Synthesis — multi-step synthesis; retrosynthetic analysis"
+        "27": "Analytical Techniques — mass spectrometry; IR; NMR (¹H and ¹³C)"
+
+  biology:
+    name: "Cambridge A Level Biology (9700)"
+    qualification: "AS and A Level"
+    papers:
+      "Paper 1": "Multiple choice (40 marks) — AS topics"
+      "Paper 2": "AS Structured questions (60 marks)"
+      "Paper 3": "Advanced Practical (40 marks)"
+      "Paper 4": "A Level Structured (100 marks)"
+      "Paper 5": "Planning, Analysis and Evaluation (30 marks)"
+    topics:
+      as_topics:
+        "1": "Cell Structure — prokaryotic vs eukaryotic; organelles; magnification calculations"
+        "2": "Biological Molecules — carbohydrates, lipids, proteins, nucleic acids; water"
+        "3": "Enzymes — activation energy; induced fit; inhibition; immobilised enzymes"
+        "4": "Cell Membranes and Transport — fluid mosaic; diffusion; osmosis; active transport"
+        "5": "The Mitotic Cell Cycle — interphase; mitosis stages; cancer; stem cells"
+        "6": "Nucleic Acids and Protein Synthesis — DNA replication; transcription; translation"
+        "7": "Transport in Plants — xylem; phloem; transpiration; translocation (TACT)"
+        "8": "Transport in Mammals — heart; cardiac cycle; blood vessels; haemoglobin"
+        "9": "Gas Exchange — alveoli; gills; tracheal systems; Fick's law"
+        "10": "Infectious Diseases — pathogens; transmission; immune response; antibodies"
+      a2_topics:
+        "11": "Energy and Respiration — glycolysis; Krebs cycle; oxidative phosphorylation; ATP yield"
+        "12": "Photosynthesis — light-dependent reaction; Calvin cycle; C3 and C4 plants"
+        "13": "Homeostasis — thermoregulation; osmoregulation; blood glucose; negative feedback"
+        "14": "Coordination — nervous system; neurotransmission; endocrine; receptors"
+        "15": "Inherited Change — Mendelian genetics; dihybrid crosses; sex-linkage; epistasis"
+        "16": "Selection and Evolution — natural selection; speciation; Hardy-Weinberg"
+        "17": "Biodiversity and Conservation — classification; taxonomy; measures of biodiversity"
+        "18": "Genetic Technology — PCR; gel electrophoresis; gene cloning; CRISPR; GMOs"
+
+  economics:
+    name: "Cambridge A Level Economics (9708)"
+    qualification: "AS and A Level"
+    papers:
+      "Paper 1": "Multiple choice (30 marks) — AS content"
+      "Paper 2": "Data response and essay (AS, 60 marks) — 2 questions from 3"
+      "Paper 3": "Multiple choice (30 marks) — A Level content"
+      "Paper 4": "Data response and essay (A Level, 70 marks)"
+    topics:
+      micro:
+        "1": "Basic Economic Ideas — scarcity, PPF, opportunity cost, economic systems"
+        "2": "The Price System — demand, supply, equilibrium, elasticities (PED, PES, YED, CED)"
+        "3": "Government Intervention — price controls, subsidies, taxes, indirect taxation effects"
+        "4": "Market Failure — externalities, public goods, information asymmetry, merit/demerit goods"
+        "5": "Theory of the Firm — production, costs (SR and LR), revenue, profit maximisation"
+        "6": "Market Structures — perfect competition, monopoly, monopolistic, oligopoly; Kinked demand"
+        "7": "Labour Market — wage determination, trade unions, discrimination, minimum wage"
+        "8": "Capital Market — interest rate determination, investment, savings"
+      macro:
+        "9": "Macroeconomic Objectives — growth, inflation, unemployment, balance of payments"
+        "10": "National Income — circular flow, GDP measurement (expenditure, income, output)"
+        "11": "Aggregate Demand and Supply — Keynesian and monetarist views; LRAS"
+        "12": "Money and Banking — functions of money, quantity theory, monetary policy"
+        "13": "Fiscal Policy — government spending, taxation, budget position, multiplier effect"
+        "14": "Supply-side Policy — privatisation, deregulation, education and training"
+        "15": "Economic Development — indicators (HDI, GNI), poverty, inequality, Lorenz curve"
+        "16": "International Trade — comparative advantage, terms of trade, trading blocs, WTO"
+        "17": "Balance of Payments — current account, capital account, exchange rates, J-curve"
+
+  history:
+    name: "Cambridge A Level History (9389)"
+    qualification: "AS and A Level"
+    papers:
+      "Paper 1": "Depth studies — document/source analysis (AS)"
+      "Paper 2": "Breadth studies — essay (AS)"
+      "Paper 3": "Depth studies — extended essay (A Level)"
+      "Paper 4": "Historical Investigation — 3000-word coursework (A Level)"
+    core_skills:
+      source_analysis: "Reliability, utility, nature, origin, purpose of sources"
+      essay_writing: "Argument, evidence, counter-argument, conclusion"
+      investigation: "Research question, bibliography, footnotes, academic referencing"
+    example_topics:
+      - "The Unification of Germany, 1848–71"
+      - "The Origins of the First World War, 1870–1914"
+      - "Stalin's Russia, 1924–53"
+      - "The Cold War in Asia, 1945–75"
+      - "The Arab-Israeli Conflict, 1945–79"
+
+  computer_science:
+    name: "Cambridge A Level Computer Science (9618)"
+    qualification: "AS and A Level"
+    papers:
+      "Paper 1": "Theory fundamentals — 75 marks (AS)"
+      "Paper 2": "Fundamental problem-solving and programming — 75 marks (AS)"
+      "Paper 3": "Advanced Theory — 75 marks (A Level)"
+      "Paper 4": "Further problem-solving and programming — 75 marks (A Level)"
+      "Practical": "Coursework project — programmed solution with documentation"
+    pseudocode: "Cambridge 9618 pseudocode convention — must follow exactly"
+    topics:
+      "1": "Data Representation — binary, hex, two's complement, floating point, ASCII, Unicode"
+      "2": "Communication and Internet Technologies — protocols, TCP/IP, routing, HTML"
+      "3": "Hardware — logic gates, Boolean algebra, flip-flops, processor architecture (FDE cycle)"
+      "4": "Processor Fundamentals — registers, interrupts, addressing modes, assembly language"
+      "5": "System Software — OS functions, memory management, file management, translation"
+      "6": "Security, Privacy and Ethics — encryption, authentication, malware, data protection"
+      "7": "Algorithm Design and Problem-Solving — abstraction, decomposition, ADT design"
+      "8": "Data Types and Structures — arrays, linked lists, stacks, queues, hash tables, trees"
+      "9": "Programming — procedures, functions, recursion, OOP (A Level)"
+      "10": "Databases — relational model, SQL, normalisation (A Level)"
+      "11": "Algorithm Efficiency — Big-O notation, sorting and searching (A Level)"
+
+fact_check_rules:
+  general:
+    - "Always specify the qualification level: IGCSE, AS Level, or A Level — never merge them"
+    - "Cambridge command words have precise meanings — 'Suggest' means apply knowledge to novel context, not 'guess'"
+    - "Cambridge IGCSE Core vs Extended: Core grades 1–5 only; Extended grades 1–9"
+    - "A* grade: requires overall A plus 90%+ in A2 components — not available at AS Level"
+    - "Practical skills (P, A, M, U) are assessed in Paper 3/5 — mention in science content"
+    - "Syllabus codes are specific: 9702 is Physics A Level; 0625 is IGCSE Physics — never conflate"
+    - "Cambridge does not use the term 'HL/SL' — use 'AS Level' and 'A Level'"
+
+  mathematics:
+    - "9709 (A Level Mathematics) has 6 papers — specify which paper content belongs to"
+    - "Statistics: Cambridge uses normal distribution tables (z-tables) provided in exam; GDC allowed"
+    - "Proof by contradiction and induction: A Level Pure 3 only — not P1 or P2"
+    - "Complex numbers: Pure Mathematics 3 (A Level) only — not AS Level"
+    - "Mechanics and Statistics are optional papers (4+5 or 4+6) — not all candidates sit both"
+
+  sciences:
+    - "Cambridge Physics 9702: AS topics are Papers 1-2; A Level topics are Papers 4-5"
+    - "Practical assessment: Paper 3 (advanced practical) and Paper 5 (planning) must be distinguished"
+    - "Use m s⁻¹ and m s⁻² notation — verify against Cambridge data booklet formatting"
+    - "Significant figures: Cambridge typically expects 3 sig figs; check mark scheme conventions"
+    - "Chemistry 9701: clearly separate AS physical/inorganic/organic from A2 content"
+    - "NMR: both ¹H (proton) and ¹³C (carbon) NMR are in Cambridge A Level Chemistry syllabus"
+
+  economics:
+    - "Cambridge Economics 9708: price on y-axis, quantity on x-axis for all supply/demand diagrams"
+    - "LRAS is vertical in Cambridge model (monetarist); distinguish from Keynesian horizontal AS"
+    - "PPF not PPC — Cambridge uses PPF (Production Possibilities Frontier)"
+    - "Multiplier formula: k = 1 / MPS (not 1/(1-MPC) presentation — though equivalent)"
+    - "Terms of trade formula: (Index of export prices / Index of import prices) × 100"
+
+  history:
+    - "Cambridge history source analysis: focus on Nature, Origin, Purpose — not OPCVL (that is IB)"
+    - "Coursework (Paper 4): 3000 words, internally marked, externally moderated"
+    - "Do not reference IB historiography terminology — Cambridge uses different source skills framework"
+
+notation_standards:
+  mathematics:
+    preferred:
+      - "Cambridge uses both prime notation f'(x) and Leibniz dy/dx — use both where appropriate"
+      - "Vectors: column vector notation preferred (top row / bottom row) alongside component form"
+      - "Set notation: ℝ, ℤ, ℕ — defined as in Cambridge syllabus appendix"
+      - "Interval notation: x ∈ [a, b] and x ∈ (a, b)"
+    avoid:
+      - "Do not use determinant notation without defining it clearly for AS Level students"
+      - "Avoid overuse of ≡ (identically equal) where = suffices"
+
+  physics:
+    preferred:
+      - "Unit notation: ms⁻¹ (negative exponent) throughout"
+      - "Uncertainty: absolute (±0.5 mm) and percentage (±2%) — both required in practicals"
+      - "Significant figures: quote to 3 sig figs for calculated answers unless instructed"
+      - "Graphs: label axes with quantity and unit in format 'Velocity / ms⁻¹'"
+    avoid:
+      - "Do not write m/s — use ms⁻¹"
+      - "Do not omit units from axis labels in graph descriptions"
+      - "Do not confuse e.m.f. and terminal p.d. — Cambridge distinguishes these precisely"
+
+  chemistry:
+    preferred:
+      - "State symbols mandatory: (s), (l), (g), (aq)"
+      - "Concentration: mol dm⁻³ (not mol/L or M)"
+      - "Enthalpy: ΔH° in kJ mol⁻¹; ΔS° in J K⁻¹ mol⁻¹ — note different units"
+      - "Equilibrium arrow: ⇌; use → for one-directional only"
+      - "Bond angle notation: 109.5°, 120°, 107°, 104.5° — specify for named molecules"
+    avoid:
+      - "Do not omit state symbols in any equation"
+      - "Do not use M (molar) — use mol dm⁻³"
+      - "Do not say 'forms a precipitate' without specifying colour (Cambridge mark schemes require colour)"
+
+  biology:
+    preferred:
+      - "Binomial nomenclature: italic; Genus capitalised; species lowercase — Homo sapiens"
+      - "Magnification formula: Magnification = Image size / Actual size (state clearly which)"
+      - "Graph axes: independent variable on x-axis; dependent on y-axis — always"
+      - "Statistical test: state test used, null hypothesis, and conclusion at chosen significance level"
+    avoid:
+      - "Do not call mitosis 'cell splitting' — use 'nuclear division followed by cytokinesis'"
+      - "Do not conflate transcription and translation — Cambridge mark schemes penalise this"
+
+tone_guidelines:
+  overall: |
+    Cambridge A Level and IGCSE students are typically 14–18 years old preparing for
+    internationally recognised qualifications that determine university entrance.
+    Tone must be: precise, methodical, examination-focused, and clear.
+    Cambridge values structured, evidence-based answers — model this in narration.
+    Use British English spelling throughout (colour, behaviour, programme, organise).
+
+  igcse_tone: |
+    Accessible and concrete. Both Core and Extended tiers: use clear examples,
+    visual descriptions, and step-by-step method emphasis.
+    Extended tier: introduce more conceptual depth without sacrificing clarity.
+    Emphasise "method marks" — showing working is valued, even with wrong final answer.
+
+  as_level_tone: |
+    Step up from IGCSE — more formal, more mathematical, more analytical.
+    Introduce subject-specific vocabulary with clear definitions on first use.
+    Reference exam question style: "A typical Paper 2 question might ask you to..."
+    Emphasise precision — Cambridge mark schemes award marks for specific words.
+
+  a_level_tone: |
+    Fully academic. Assume AS content as prerequisite — do not re-explain basics.
+    Introduce synoptic connections across topics.
+    For sciences: emphasise practical methodology and data analysis skills.
+    Cite equations from the data booklet by name and formula.
+    Model the style of extended Paper 3/4 responses.
+
+vocabulary_constraints:
+  always_use:
+    - "British English spelling: colour, behaviour, programme, analyse, organise"
+    - "'command word' when discussing assessment language (not 'question type')"
+    - "'mark scheme' when discussing how answers are graded"
+    - "'syllabus' or 'specification' for course content reference"
+    - "'data booklet' or 'formula sheet' — specify Cambridge-provided materials"
+    - "'Paper 1', 'Paper 2' etc — specific paper references for exam components"
+    - "'A Level', 'AS Level', 'IGCSE' — full qualification name on first mention"
+
+  avoid:
+    - "American English spellings: color, behavior, program (as noun), organize"
+    - "'IB' or 'AP' — do not reference competing curricula"
+    - "'grade' without qualification — specify A* A B C D E U or IGCSE 9–1 scale"
+    - "'HL/SL' — these are IB terms; Cambridge uses 'A Level' and 'AS Level'"
+    - "'test' alone — use 'paper', 'examination', or 'component'"
+    - "'textbook' as authoritative reference — Cambridge is resource-neutral; cite syllabus"
+    - "'percentage' for Cambridge grades — Cambridge uses letter grades (A* to U)"
+    - "'topic' numbers from IB syllabi — use Cambridge section numbers"
+
+difficulty_mapping:
+  beginner:
+    cambridge_equivalent: "Cambridge IGCSE Core tier (Grades 1–5)"
+    approach: "Concrete examples; step-by-step methods; no advanced theory"
+    assessment_prep: "Focus on 'State', 'Define', 'Calculate' command words"
+    scene_count: 4
+    vocabulary_level: "Define all technical terms; use diagrams and analogies freely"
+
+  intermediate:
+    cambridge_equivalent: "Cambridge IGCSE Extended (Grades 1–9) or AS Level"
+    approach: "Full IGCSE Extended syllabus or complete AS Level content"
+    assessment_prep: "All IGCSE/AS command words including 'Explain' and 'Suggest'"
+    scene_count: 6
+    vocabulary_level: "Subject terminology used without exhaustive redefinition"
+
+  advanced:
+    cambridge_equivalent: "Cambridge A Level (A2 content)"
+    approach: "Full A Level including A2 extension topics; Paper 3/4/5 depth"
+    assessment_prep: "All command words including 'Evaluate', 'Discuss'; synoptic questions"
+    scene_count: 8
+    vocabulary_level: "Full academic register; assume AS content prerequisite"
+
+common_mistakes:
+  llm_errors:
+    - error: "Confusing AS Level and A Level content boundaries"
+      correction: "AS content = Papers 1–2 (sciences) or P1 (maths); A Level = all papers including A2 extension"
+
+    - error: "Using IB topic numbering (Topic 1, Topic 2) for Cambridge content"
+      correction: "Cambridge uses section numbers tied to syllabus code: e.g., 9709 Section 1.3, or Physics 9702 Topic 14"
+
+    - error: "Writing m/s instead of ms⁻¹"
+      correction: "Cambridge uses negative-exponent notation in all mark schemes and data booklets"
+
+    - error: "Using American English spelling"
+      correction: "Cambridge requires British English: colour, behaviour, programme, analyse, recognise"
+
+    - error: "Saying Cambridge uses OPCVL for source analysis"
+      correction: "OPCVL is an IB History framework; Cambridge History uses Nature-Origin-Purpose analysis"
+
+    - error: "Omitting state symbols in chemical equations"
+      correction: "Cambridge Chemistry mark schemes explicitly penalise missing state symbols: (s), (l), (g), (aq) are mandatory"
+
+    - error: "Saying A* is available at AS Level"
+      correction: "A* is only awarded at A Level — it requires A overall + 90%+ in A2 components; AS Level only awards A–U"
+
+    - error: "Treating all Cambridge science practicals as the same"
+      correction: "Paper 3 = Advanced Practical (hands-on); Paper 5 = Planning, Analysis and Evaluation (written); Paper 6 = Alternative to Practical"
+
+    - error: "Using mol/L for concentration"
+      correction: "Cambridge Chemistry uses mol dm⁻³ — never mol/L or M (molar)"
+
+    - error: "Not specifying precipitate colour in chemistry"
+      correction: "Cambridge mark schemes require precipitate colour: e.g., 'white precipitate of barium sulfate', 'blue precipitate of copper(II) hydroxide'"
