@@ -1,0 +1,497 @@
+meta:
+  subject_group: "history"
+  covers_subjects: ["history"]
+  loaded_by: ["script_generator", "difficulty_adapter"]
+  design_principle: |
+    History video narration must make the past feel consequential and inhabited —
+    not a sequence of dates and names to memorise, but a record of human decisions
+    made under real pressures, with real stakes.
+    The narrator's role: interpret, not just recount. Explain why events happened,
+    what they meant to the people living through them, and why they matter now.
+    Core rule: every historical claim needs either evidence or explicit qualification.
+    Never present interpretation as fact.
+
+narration_style:
+  voice: "measured, authoritative, interpretive — like a thoughtful documentary narrator"
+  person: "third-person for historical actors; first-person plural for interpretation ('We can see that...', 'Looking back...')"
+  avoid_person: "Avoid 'you' as a surrogate for historical actors — it collapses the distance that historical analysis requires"
+
+  register: |
+    Formal enough to convey scholarly rigour.
+    Vivid enough that the past feels real, not distant.
+    The narrator is a guide: they have a point of view but acknowledge complexity.
+    Do not reduce history to good guys and bad guys.
+    Do not project modern values onto historical actors without acknowledging you're doing so.
+
+  rhythm: |
+    History narration follows: context → event → cause → consequence → significance.
+    Context: who were these people? What pressures were they under?
+    Event: what happened? Narrate with specific detail — dates, names, places.
+    Cause: why did this happen? Distinguish immediate causes from structural ones.
+    Consequence: what changed as a result? For whom?
+    Significance: why does this matter beyond its own time?
+
+  temporal_language: |
+    Dates: say "in [month] of [year]" not just "[year]" — specificity builds credibility.
+    Duration: "Over the following decade..." not "later..."
+    Causation in time: "This [event] was a direct result of [cause], which had been building since [date]."
+    Anachronism avoidance: "What we now call [modern term] was then known as [period term]."
+    Uncertainty markers: "According to contemporary accounts...", "Historians debate whether..."
+
+  historiography_integration: |
+    At intermediate and advanced levels: integrate historiographical perspectives naturally.
+    Not: "Historian X says..." as a detached citation.
+    But: "This interpretation has been challenged — some historians argue [alternative view], pointing to [evidence]."
+    Always: distinguish established fact from contested interpretation.
+
+explanation_patterns:
+  beginner:
+    strategy: "Narrative-first, chronological, people-centred"
+    pattern: |
+      1. Introduce the historical moment with a vivid, specific detail (date, place, person)
+      2. Explain who the main actors were and what they wanted
+      3. Describe what happened in clear, chronological order
+      4. Explain the immediate outcome: "As a result of this, [X] happened"
+      5. State why this matters in one sentence: "This was significant because..."
+      6. Avoid introducing historiographical complexity at this level
+
+    character_introduction: |
+      Always give historical figures human context:
+      "In 1789, Marie Antoinette was 33 years old, had lived in Versailles for most of
+       her adult life, and had no real understanding of how French peasants lived."
+      Humanise without excusing.
+
+    cause_explanation: |
+      Use the language of motivation and pressure:
+      "Louis XVI faced three pressures: an empty treasury, a restless nobility,
+       and a population pushed to the edge by food prices."
+      Concrete, list-able causes — not abstract structural forces at beginner level.
+
+    timeline_narration: |
+      Use transitional anchors: "Six weeks later...", "The following spring...",
+      "While this was happening in Paris, in Versailles..."
+      Students need clear temporal orientation.
+
+  intermediate:
+    strategy: "Causal analysis with evidence and multiple perspectives"
+    pattern: |
+      1. State the historical question: "Why did [event] happen?"
+      2. Acknowledge that historians have offered different explanations
+      3. Present the most supported explanation with specific evidence
+      4. Introduce a significant counter-interpretation
+      5. Evaluate: "The weight of evidence suggests..."
+      6. State significance: not just what happened, but what it changed
+
+    causation_levels: |
+      Distinguish cause types:
+      "Immediate cause: [event X] sparked [event Y].
+       Short-term cause: the structural conditions created by [factor A] and [factor B].
+       Long-term cause: the underlying tension between [force C] and [force D] that had been building since [period]."
+
+    evidence_use: |
+      Specify source types and their limitations:
+      "Contemporary accounts from [source type] suggest [interpretation], though these sources
+       may reflect [bias or limitation]."
+      Never treat primary sources as transparent windows onto truth.
+
+    historiography: |
+      Introduce named historiographical schools at intermediate level:
+      "Traditional accounts emphasised [X]. More recent scholarship, influenced by
+       social history, has shifted focus to [Y]."
+      No need to name individual historians unless they are foundational to the topic.
+
+  advanced:
+    strategy: "Historiographical dialogue and synthetic analysis"
+    pattern: |
+      1. State the interpretive debate with full historiographical context
+      2. Identify the key historians and their arguments
+      3. Examine the primary source evidence each interpretation relies on
+      4. Assess the methodological assumptions underlying each position
+      5. Offer a considered synthetic or evaluative judgement
+      6. Connect to wider historical themes: periodization, comparative context, continuity/change
+
+    source_analysis: |
+      Go beyond what sources say to how they construct meaning:
+      "The Nuremberg rallies were designed to project an image of popular unity —
+       the source is therefore more useful for understanding Nazi propaganda techniques
+       than for gauging actual public support."
+
+    comparative_framework: |
+      Use comparison to sharpen analysis:
+      "Unlike the French Revolution, which generated a competing secular ideology,
+       the English Civil War did not produce a coherent alternative political philosophy —
+       which helps explain why the monarchy was restored within a decade."
+
+    complexity_signals: |
+      Use language that acknowledges genuine historical complexity:
+      "The question is not simply whether [X] caused [Y], but how [X], [A], and [B]
+       interacted to create the conditions in which [Y] became possible."
+      "Historians have periodised this differently — some beginning with [date A],
+       others with [date B] — and the choice of starting point affects the conclusions drawn."
+
+pacing_guide:
+  words_per_minute: 125
+  target_seconds_per_scene:
+    beginner: 50
+    intermediate: 42
+    advanced: 38
+
+  pause_rules: |
+    Pause AFTER:
+      - A pivotal date or event (600ms — let the specificity register)
+      - A historiographical claim needing qualification (500ms — epistemic pause)
+      - A vivid descriptive detail (400ms — allow imagination to work)
+      - A significant causal claim (500ms — analytical weight)
+      - A quote from primary source (700ms — weight of evidence)
+
+    Never pause:
+      - Mid-sentence
+      - Between tightly linked cause-and-effect
+      - During rapid chronological narration where momentum matters
+
+  sentence_length:
+    beginner: "Maximum 14 words. Narrative drive — short, clear, forward-moving."
+    intermediate: "Maximum 22 words. Analytical sentences can carry subordinate clauses."
+    advanced: "Maximum 30 words. Complex argumentative sentences with careful qualification."
+
+  date_narration: |
+    Specific dates: say month and year in full — "In June of nineteen fourteen..."
+    Decade references: "During the nineteen thirties..." (not "in the 30s" at formal level)
+    Century references: "the late eighteenth century" — not "the 1700s" in formal register
+    BC/BCE and AD/CE: state convention on first use; use BCE/CE for international contexts
+
+scene_templates:
+  hook:
+    purpose: "Make the historical moment feel urgent and real"
+    duration_seconds: 30
+    structure: |
+      [Vivid, specific opening detail — person, place, date, sensory image]
+      [Immediate stakes: what was about to change? What was at risk?]
+      [Bridge: why this moment repays careful study today]
+    examples:
+      - "On the morning of 28 June 1914, Archduke Franz Ferdinand and his wife Sophie stepped into an open car in Sarajevo. Within the hour, both were dead — and the world they had known was about to end."
+      - "By the summer of 1942, Nazi Germany controlled most of continental Europe. What had seemed impossible in 1933 had taken less than a decade. How?"
+      - "In 1688, King James II fled London in the middle of the night, dropping the Great Seal of England into the Thames. No one stopped him. His departure would later be called the Glorious Revolution."
+      - "For three hundred years, the Silk Road connected China to the Mediterranean. Merchants, scholars, and diseases moved along it in both directions. Then, in the fourteenth century, it nearly ceased to function. Why?"
+
+  context_scene:
+    purpose: "Establish the world before the event — the conditions that made it possible"
+    duration_seconds: 45
+    structure: |
+      [Political structure: who held power and how?]
+      [Social conditions: what pressures were people under?]
+      [Economic context: what resources, what scarcities?]
+      [Pre-existing tensions or trends that had been building]
+    narration_pattern: |
+      "Before we can understand [event], we need to grasp the world it emerged from.
+       In [period], [place] was [characterisation].
+       Power was concentrated in [actor], while [other group] faced [condition].
+       Three pressures had been building: [A], [B], and [C].
+       It was into this already-strained situation that [event] arrived."
+
+  event_narration:
+    purpose: "Describe what happened with specific, credible detail"
+    duration_seconds: 50
+    structure: |
+      [Anchor with date and place]
+      [Sequence of events — chronological, specific, attributed]
+      [Key human decisions: who chose what, and why]
+      [Immediate reaction: how did contemporaries respond?]
+    narration_pattern: |
+      "In [month, year], [actor] [action].
+       Over the following [period], [sequence of events].
+       The decision to [key choice] was taken by [actor] because [immediate reason].
+       Contemporaries [reaction] — [source type] recorded that [response]."
+
+  causation_analysis:
+    purpose: "Explain why this happened — at multiple levels"
+    duration_seconds: 50
+    structure: |
+      [Immediate trigger: the specific event that set things in motion]
+      [Short-term causes: conditions in the months or years preceding]
+      [Long-term structural causes: deeper forces, decades or centuries old]
+      [Agency: the role of individual decisions vs structural forces]
+    narration_pattern: |
+      "The immediate trigger for [event] was [specific cause].
+       But the conditions that made [event] possible had been forming since [earlier period].
+       Three structural factors were critical: [A], [B], and [C].
+       To what extent was this inevitable? Historians are divided — but the evidence
+       suggests that [agency/structure balance]."
+
+  consequence_analysis:
+    purpose: "Trace what changed as a result — for different groups"
+    duration_seconds: 48
+    structure: |
+      [Immediate consequences: what changed in weeks and months?]
+      [Medium-term consequences: the political and social reshaping]
+      [Different experiences: how did impact vary by group, region, class, gender?]
+      [What was not changed: continuities alongside change]
+    narration_pattern: |
+      "[Event] transformed [sphere] in [timescale].
+       For [group A], [consequence A] — while [group B] experienced [consequence B].
+       In political terms, [political change]. Economically, [economic change].
+       Yet not everything changed: [continuity], which persisted throughout."
+
+  source_analysis:
+    purpose: "Engage with historical evidence critically"
+    duration_seconds: 45
+    structure: |
+      [Identify source: type, author, date, context of production]
+      [State what the source explicitly tells us]
+      [Identify purpose and audience — what was the source trying to do?]
+      [Assess value and limitation for this specific historical question]
+    narration_pattern: |
+      "Consider [source type]: [description of source].
+       Produced in [context], by [author/creator] for [audience].
+       The source tells us explicitly [what it states].
+       For the question of [historical question], this source is valuable because [reason],
+       though we must be cautious about [limitation]."
+
+  historiography_scene:
+    purpose: "Engage with the debate among historians"
+    duration_seconds: 45
+    structure: |
+      [State the interpretive question]
+      [Present the dominant interpretation with supporting evidence]
+      [Present a significant revisionist or alternative interpretation]
+      [Evaluate: what evidence tips the balance? What remains unresolved?]
+    narration_pattern: |
+      "Historians have long debated [question].
+       The traditional interpretation holds that [view A], supported by [evidence A].
+       More recently, [revisionist view] has argued instead that [view B],
+       drawing on [evidence B].
+       The weight of evidence currently favours [assessment], though [unresolved aspect]
+       remains genuinely contested."
+
+  significance_scene:
+    purpose: "Establish why this history matters beyond its own moment"
+    duration_seconds: 35
+    structure: |
+      [Short-term historical significance]
+      [Long-term legacy or consequences]
+      [Connection to patterns that appear again elsewhere in history]
+      [Relevance to historical thinking: what does this tell us about human behaviour, power, change?]
+    narration_pattern: |
+      "[Event/period] matters for several reasons.
+       In the short term, it [immediate historical significance].
+       Its longer legacy was [lasting consequence].
+       It also illustrates a pattern that appears elsewhere in history: [historical pattern].
+       Understanding it sharpens our ability to recognise [theme] when it recurs."
+
+  summary:
+    purpose: "Consolidate the historical argument"
+    duration_seconds: 32
+    structure: |
+      [Restate the key event or period in one sentence]
+      [Summarise the main cause in one sentence]
+      [Summarise the main consequence in one sentence]
+      [The historical lesson or significance]
+    narration_pattern: |
+      "To summarise: [event] happened because [main cause].
+       Its most significant consequence was [consequence].
+       What this episode reveals, most broadly, is [historical insight].
+       In the next section, we move to [next topic], which grew directly from this."
+
+vocabulary_guide:
+  technical_term_introduction:
+    first_use: "Define historical concepts on first use with historical specificity: 'Mercantilism — the economic doctrine, dominant in Europe from roughly 1500 to 1800, that held that...'"
+    subsequent_use: "Use term consistently; note period-specific variants if they exist"
+    historiographical_terms: "Define: 'revisionist', 'orthodox', 'post-colonial historiography', 'social history' — these are part of the analytical vocabulary"
+
+  temporal_precision:
+    prefer:
+      - "In the spring of 1789..." (specific month/season)
+      - "Over the following three decades..." (duration)
+      - "By the time of [event]..." (relative anchor)
+      - "This predates [event] by forty years..." (comparative temporal positioning)
+    avoid:
+      - "Back then..." (too vague)
+      - "A long time ago..." (no precision)
+      - "Recently..." (ambiguous in historical context — specify)
+      - "Soon after..." (give timeframe)
+
+  causation_language:
+    strong_causal: ["directly caused", "precipitated", "triggered", "resulted in"]
+    contributory: ["contributed to", "created the conditions for", "increased the likelihood of"]
+    contested: ["has been argued to have caused", "some historians attribute to"]
+    contingent: ["made possible by", "enabled by", "without which [X] would not have occurred"]
+    avoid: ["led to" overuse — too weak; "was responsible for" — imprecise about agency]
+
+  register_words:
+    formal_preferred:
+      - "historian"
+      - "contemporary accounts"
+      - "primary source"
+      - "historiographical"
+      - "periodise"
+      - "contingency"
+      - "structural"
+      - "agency"
+      - "anachronism"
+      - "revisionist"
+    informal_acceptable_for_beginner:
+      - "at the time"
+      - "people living then"
+      - "the rulers"
+      - "the poor"
+    always_avoid:
+      - "obviously"
+      - "clearly" (in historical interpretation — nothing is clear)
+      - "good vs evil" framings
+      - "history repeats itself" (cliché — use 'historical parallels' instead)
+      - "as everyone knows"
+      - "the rest is history" (cliché ending)
+
+adaptation_rules:
+  beginner:
+    sentence_transformations:
+      - before: "The structural contradictions of the ancien régime rendered revolutionary upheaval near-inevitable"
+        after: "The old system in France had deep problems: a government that was broke, a nobility that paid no taxes, and ordinary people going hungry. Something had to break."
+      - before: "The Soviet collectivisation programme involved the forced reorganisation of individual peasant holdings into collective farms"
+        after: "Under Stalin, millions of peasant farmers were forced to give up their land and work together on state-run collective farms — whether they agreed or not"
+      - before: "The historiography of the First World War has been shaped by the revisionist intervention of Fischer's Griff nach der Weltmacht"
+        after: "For decades, many historians thought all the major powers shared the blame for World War One. Then one historian argued that Germany had planned and wanted the war from the start — and the debate has continued ever since"
+
+    narrative_policy:
+      - "Lead with people and events, not with abstract forces"
+      - "Anchor every scene in a specific place, date, and human actor"
+      - "Use short sentences for rapid narrative sequences; slightly longer for causal explanation"
+      - "Avoid introducing more than two historical figures per scene"
+
+  intermediate:
+    sentence_transformations:
+      - before: "The February Revolution of 1917 reflected the collapse of the Romanov dynasty's political legitimacy"
+        after: "By February 1917, the Romanov dynasty had lost the confidence of almost every sector of Russian society — from striking workers to disillusioned generals"
+      - before: "Decolonisation was driven by a combination of nationalist movements and post-war metropolitan weakness"
+        after: "The end of colonial empires was the result of two forces meeting: independence movements growing stronger in the colonies, and European powers — exhausted and indebted after the Second World War — no longer able or willing to hold them by force"
+
+    historiography_policy:
+      - "Introduce historiographical positions as part of the analysis, not as separate footnotes"
+      - "Use language like 'historians have interpreted this differently' — not as evasion, but as intellectual honesty"
+      - "Name major interpretive schools (Whig history, Annales school, post-colonial history) without requiring the student to know their full context"
+
+  advanced:
+    sentence_transformations:
+      - before: "The causes of the French Revolution are complex"
+        after: "The traditional account privileged political crisis and financial insolvency as the primary causes — but social historians have shifted the focus to the longer-term transformation of French society under the pressure of demographic growth, commercial capitalism, and an emergent public sphere"
+      - before: "Historians disagree about whether the Holocaust was planned from the beginning"
+        after: "The intentionalist-functionalist debate — whether the Holocaust was the product of Hitler's long-held intent or of a cumulative radicalisation emerging from wartime improvisation — remains one of the most consequential historiographical controversies of the twentieth century"
+
+    depth_policy:
+      - "Engage with named historians and their specific arguments — Hobsbawm, Thompson, Hilberg, Schama, etc."
+      - "Evaluate methodology: what kind of sources does each interpretation rely on? What are the epistemological limits?"
+      - "Introduce periodization debates: why does the choice of when to begin or end a period matter analytically?"
+
+forbidden_phrases:
+  presentism_phrases:
+    reason: "Projecting modern values onto the past without acknowledgment distorts historical understanding"
+    banned:
+      - "Obviously, slavery was wrong..."
+      - "Of course, we now know better..."
+      - "Clearly, they should have..."
+      - "It's obvious that [historical actor] made the wrong choice..."
+    replace_with:
+      - "From our contemporary perspective, [X] — though we need to understand that at the time..."
+      - "By the standards of the era, [X] — though this is contested by [perspective]..."
+      - "[Actor] made the decision based on [their understanding/pressures] — which [assessment]"
+
+  visual_reference_phrases:
+    reason: "Narration describes content, not the medium"
+    banned:
+      - "As you can see on the screen..."
+      - "Look at this timeline..."
+      - "In this image..."
+      - "As shown in this map..."
+    replace_with:
+      - "The timeline reveals..."
+      - "The map shows that..."
+      - "[Event] unfolded across [geography]..."
+
+  vague_historical_phrases:
+    reason: "Vagueness in historical narration signals weak analysis"
+    banned:
+      - "History repeated itself..."
+      - "The rest is history..."
+      - "People were different back then..."
+      - "Times were different..."
+      - "It was a more violent age..."
+      - "Back then, everyone thought..."
+    replace_with:
+      - Specific claims with specific evidence
+      - "Contemporary accounts suggest that [specific claim]..."
+      - "The dominant view in [group] at the time was [specific view], shaped by [specific context]"
+
+  condescension_phrases:
+    reason: "History is not simple — students who find it hard are not wrong"
+    banned:
+      - "Obviously..."
+      - "Clearly, the cause was..."
+      - "As everyone knows..."
+      - "Simply put..."
+      - "This is straightforward..."
+    replace_with:
+      - "The evidence suggests..."
+      - "The key factor was..."
+      - "What made this distinctive was..."
+
+  filler_phrases:
+    reason: "Historical narration must earn every second — no dead air"
+    banned:
+      - "So, basically..."
+      - "Right, so..."
+      - "Let's go ahead and..."
+      - "Now then..."
+      - "Moving on..."
+    replace_with:
+      - "This brings us to..." (active transition)
+      - "What changed next was..."
+      - Direct statement of the next historical development
+
+hooks:
+  vivid_opening_hooks:
+    - "On the night of 9 November 1989, crowds gathered on both sides of the Berlin Wall and began tearing it down with their bare hands. The Cold War — which had divided Europe for forty-four years — was ending not with a diplomatic agreement, but with improvised tools and the weight of human determination."
+    - "In the summer of 1348, ships from Caffa arrived in Messina carrying grain — and something else. Within weeks, people across Sicily were dying of a disease no one had seen before. The Black Death had reached Europe."
+    - "When Mansa Musa, ruler of the Mali Empire, made the pilgrimage to Mecca in 1324, he brought with him sixty thousand attendants and enough gold to collapse the Egyptian economy for a decade. Most Europeans had never heard of him."
+    - "By the morning of 6 August 1945, Hiroshima did not exist as it had the morning before. A single bomb had killed approximately seventy thousand people instantly. The nuclear age had begun."
+
+  question_hooks:
+    - "Why do some empires last for centuries while others collapse within decades? The Roman Empire endured for five hundred years in the West — and a further thousand in the East. What determined how long they lasted?"
+    - "How does a revolutionary movement turn into a dictatorship? It happened in France after 1789, in Russia after 1917, in China after 1949. What is the pattern — and why does it recur?"
+    - "Who benefits from a historical event? To understand the industrial revolution, we need to ask not just what was produced, but who profited — and who paid the human cost."
+
+  continuity_and_change_hooks:
+    - "The trade routes that connected ancient Rome to Han Dynasty China still roughly correspond to the roads and ports that carry global trade today. Two thousand years of infrastructure continuity — and the geopolitics that go with it."
+    - "Mass migration is often described as a modern phenomenon. But the last two thousand years of human history are, in large part, a story of people moving — driven by climate, war, famine, and opportunity."
+
+transitions:
+  chronological:
+    - "In the years that followed..."
+    - "By [date], the situation had changed significantly..."
+    - "Within [timeframe], the consequences became clear..."
+    - "Meanwhile, in [other location]..."
+    - "This set the stage for what came next: [event]."
+
+  causal:
+    - "This [event] was a direct response to [prior event]..."
+    - "It was precisely because of [cause A] that [actor] chose [action]..."
+    - "The connection between [A] and [B] was not accidental — it was structural..."
+    - "Against this background, [event] becomes more comprehensible..."
+
+  interpretive:
+    - "The conventional account holds [X]. But a closer look at the evidence suggests..."
+    - "Different historians have emphasised different aspects of this development..."
+    - "To understand why [event] happened, we need to look beyond [surface cause] to [deeper cause]..."
+    - "The significance of [event] only becomes clear when we consider [context]..."
+
+closing_patterns:
+  scene_closings:
+    - "[Event] was not inevitable — it was the product of [specific cause] and [specific decision]."
+    - "The significance of [event] extends beyond [immediate outcome]: it [longer legacy]."
+    - "This is where [period] ends and [next period] begins."
+    - "Understanding [event] as [interpretation] — rather than [simpler alternative] — changes how we read [consequence]."
+
+  section_closings:
+    - "We've traced [event/period] from [starting point] to [endpoint]. The key argument: [central claim]."
+    - "The historical record of [period] is a reminder that [historical theme]. That lesson is far from out of date."
+    - "In the next section, we follow the consequences of [event] into [next period or region]."
+    - "Three factors drove [development]: [A], [B], and [C]. We've seen each at work. Now we see what they produced."
