@@ -1,0 +1,174 @@
+meta:
+  file: "output_format.yaml"
+  purpose: |
+    Defines the expected JSON output schemas for each agent.
+    Agents must return outputs matching these schemas exactly.
+    Loaded by all agents as a formatting constraint reference.
+  loaded_by:
+    - "curriculum_agent"
+    - "script_agent"
+    - "visual_asset_agent"
+    - "fact_checker_agent"
+    - "animation_router_agent"
+  version: "2024-01"
+  load_order: 3
+
+global_output_rules:
+  json_discipline: |
+    [HARD CONSTRAINT]
+    Return ONLY valid JSON. No preamble. No postamble. No markdown code fences.
+    The first character of your response must be '{' or '['.
+    The last character must be '}' or ']'.
+    Any explanatory text must be inside the JSON structure as field values.
+
+  field_completeness: |
+    Every required field in the schema must be present.
+    Use null for optional fields you cannot populate.
+    Never omit a required field — the pipeline will fail silently if you do.
+
+  string_escaping: |
+    Escape all special characters in string values:
+    - Double quotes inside strings: \"
+    - Newlines inside strings: \n
+    - Backslashes: \\
+    Mathematical expressions in visual_content may contain LaTeX — escape backslashes.
+
+  encoding: |
+    Use UTF-8 throughout.
+    Mathematical symbols in narration_text must use Unicode characters, not LaTeX:
+      Use "π" (U+03C0) — NO
+      Use "pi" — YES (narration_text)
+      Use "\\pi" — YES (visual_content LaTeX fields only)
+
+agent_output_schemas:
+  curriculum_agent:
+    description: "Outputs curriculum context that enriches the GraphState"
+    schema:
+      curriculum_standards: "list[str] — official syllabus codes for topics covered"
+      learning_objectives: "list[str] — specific LOs from curriculum document"
+      prerequisite_concepts: "list[str] — what students must already know"
+      assessment_relevance: "str — which exam components this content is tested in"
+      curriculum_prompt_fragment: "str — formatted curriculum context for downstream agents"
+      fact_check_prompt_fragment: "str — subject-specific fact-check rules for this topic"
+      llm_cost_usd: "float — estimated cost of this agent's LLM call"
+      errors: "list[str] — any errors encountered (empty list if none)"
+    example:
+      curriculum_standards: ["Math AA HL 5.1", "Math AA HL 5.2"]
+      learning_objectives:
+        - "Understand the definition of derivative as limit of difference quotient"
+        - "Apply product, quotient, and chain rules to differentiate functions"
+      prerequisite_concepts: ["Functions and their graphs", "Limits and continuity"]
+      assessment_relevance: "Paper 1 (no calculator) and Paper 2 — core calculus questions"
+      curriculum_prompt_fragment: "IB Mathematics AA HL content. Topic 5: Calculus..."
+      fact_check_prompt_fragment: "Verify all derivative rules against IB Data Booklet..."
+      llm_cost_usd: 0.003
+      errors: []
+
+  script_agent:
+    description: "Outputs scene-level scripts with narration and metadata"
+    schema:
+      scenes: "list[SceneOutput]"
+      total_estimated_duration_seconds: "float"
+      llm_cost_usd: "float"
+      flags: "list[FlagOutput] — NEEDS_VERIFICATION items"
+      errors: "list[str]"
+    scene_schema:
+      scene_index: "int — 0-based"
+      title: "str — short scene title (max 60 chars)"
+      scene_role: "str — hook|concept_intro|worked_example_1|worked_example_2|proof|common_mistakes|summary"
+      narration_text: "str — speakable narration, no LaTeX, no markdown, complete sentences"
+      key_terms: "list[str] — technical terms introduced in this scene"
+      estimated_duration_seconds: "float — based on word count / 130 wpm"
+      is_placeholder: "bool — true if scene content needs human review before use"
+    flag_schema:
+      flag_type: "str — NEEDS_VERIFICATION|CONTENT_WARNING|LEVEL_UNCERTAINTY"
+      scene_index: "int or null — which scene the flag applies to"
+      content: "str — the specific claim or content flagged"
+      reason: "str — why it is flagged"
+      suggested_action: "str — what should be checked or done"
+
+  visual_asset_agent:
+    description: "Outputs visual specifications for each scene"
+    schema:
+      scene_visuals: "list[VisualOutput]"
+      llm_cost_usd: "float"
+      errors: "list[str]"
+    visual_schema:
+      scene_index: "int"
+      renderer_type: "str — manim|lottie|flux_sdxl|kling|timeline|diagram|graph|code"
+      primary_content: "str — renderer-specific main content (LaTeX array, Mermaid, code, etc.)"
+      secondary_content: "str or null — additional content for renderer"
+      color_palette: "list[str] — hex colors, max 5, from subject profile"
+      animation_config: "dict — renderer-specific configuration"
+      generation_prompt: "str or null — for flux_sdxl only: image generation prompt"
+      asset_references: "list[str] — GCS URLs of reusable assets if any"
+
+  fact_checker_agent:
+    description: "Outputs validation result for a set of scenes"
+    schema:
+      fact_check_passed: "bool"
+      confidence_score: "float 0.0-1.0"
+      issues: "list[IssueOutput]"
+      retry_hint: "str or null — instruction for regeneration if not passed"
+      llm_cost_usd: "float"
+      validated_at: "str — ISO 8601"
+    issue_schema:
+      check_id: "str — e.g. FC-M-001"
+      severity: "str — CRITICAL|WARNING|INFO"
+      scene_index: "int or null"
+      description: "str"
+      incorrect_content: "str or null"
+      correction: "str or null"
+      source: "str or null"
+
+  animation_router_agent:
+    description: "Outputs renderer assignment and configuration per scene"
+    schema:
+      scene_assignments: "list[AssignmentOutput]"
+      llm_cost_usd: "float"
+      errors: "list[str]"
+    assignment_schema:
+      scene_index: "int"
+      renderer_type: "str"
+      renderer_rationale: "str — why this renderer was chosen"
+      animation_config_overrides: "dict — any overrides to visual_asset_agent config"
+      decision_log: "list[str] — routing decision trace for debugging"
+
+error_response_format:
+  description: "When an agent cannot complete its task, it must return this format"
+  schema:
+    error: "str — error type: LLM_FAILURE|SCHEMA_VIOLATION|CONTEXT_INSUFFICIENT|TIMEOUT"
+    message: "str — human-readable description"
+    partial_output: "dict or null — whatever was completed before failure"
+    retry_recommended: "bool"
+    llm_cost_usd: "float — cost incurred even in failure"
+
+narration_text_validation:
+  description: "Rules that narration_text must pass before being accepted"
+  rules:
+    no_latex:
+      pattern: "\\\\[a-zA-Z]|\\{|\\}"
+      action: "REJECT — LaTeX detected in narration_text"
+      message: "Narration text contains LaTeX. Move to visual_content or rewrite in spoken English."
+
+    no_markdown:
+      pattern: "\\*\\*|__|##|^-\\s|^\\d+\\.\\s"
+      action: "REJECT — Markdown detected in narration_text"
+      message: "Narration text contains markdown formatting. Rewrite as plain prose."
+
+    no_symbols_in_narration:
+      banned_characters: ["√", "∫", "∑", "∂", "∏", "∞", "≤", "≥", "≠", "→", "⇒", "∀", "∃"]
+      action: "REJECT — Mathematical symbol detected in narration_text"
+      message: "Replace symbol with spoken equivalent: '√' → 'the square root of', '∞' → 'infinity'"
+
+    complete_sentences:
+      rule: "Narration text must consist of complete sentences ending with punctuation"
+      action: "WARNING — incomplete sentence detected"
+
+    minimum_length:
+      min_words: 40
+      action: "WARNING — narration text very short; may produce audio too brief for scene"
+
+    maximum_length:
+      max_words: 200
+      action: "WARNING — narration text very long; TTS duration will exceed scene bounds"
