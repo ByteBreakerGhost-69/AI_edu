@@ -1,0 +1,331 @@
+meta:
+  subject: "science"
+  covers: ["physics", "chemistry", "biology"]
+  loaded_by: ["fact_checker_agent"]
+  version: "2024-01"
+  design_principle: |
+    Science fact-checking must enforce three things simultaneously:
+    1. Factual accuracy: physical constants, chemical formulae, biological facts
+    2. Scientific rigour: correct distinction between observation, model, and theory
+    3. Safety: no dangerous experimental instructions reachable by school-age students
+    The LLM fact-checker checks claim plausibility and consistency.
+    It is NOT a full physics simulation — it checks for known errors, not novel ones.
+
+validation_criteria:
+  physical_constants:
+    description: "Core physical constants must match IB/Cambridge/AP data booklet values"
+    reference_values:
+      speed_of_light: "c = 3.00 × 10⁸ m s⁻¹"
+      gravitational_constant: "G = 6.67 × 10⁻¹¹ N m² kg⁻²"
+      planck_constant: "h = 6.63 × 10⁻³⁴ J s"
+      elementary_charge: "e = 1.60 × 10⁻¹⁹ C"
+      electron_mass: "mₑ = 9.11 × 10⁻³¹ kg"
+      avogadro_number: "Nₐ = 6.02 × 10²³ mol⁻¹"
+      boltzmann_constant: "k = 1.38 × 10⁻²³ J K⁻¹"
+      gas_constant: "R = 8.31 J K⁻¹ mol⁻¹"
+      gravitational_field_earth: "g = 9.81 m s⁻² (9.80 acceptable; 10 acceptable for beginner estimates only)"
+      stefan_boltzmann: "σ = 5.67 × 10⁻⁸ W m⁻² K⁻⁴"
+      faraday_constant: "F = 96 500 C mol⁻¹"
+    checks:
+      - id: "FC-S-001"
+        name: "Physical constant accuracy"
+        rule: "Flag any physical constant that deviates by more than 2% from reference value"
+        severity: "CRITICAL"
+        action: "REJECT — incorrect constant propagates to all calculations using it"
+
+  physics_laws:
+    checks:
+      - id: "FC-S-002"
+        name: "Newton's laws stated correctly"
+        reference:
+          first_law: "An object remains at rest or in uniform motion unless acted on by a net external force"
+          second_law: "F = ma where F is net force, m is mass, a is acceleration"
+          third_law: "For every action there is an equal and opposite reaction (forces act on different objects)"
+        common_errors:
+          - "Second law stated as F = ma where F is any force, not net force"
+          - "Third law action-reaction pair described as acting on same object"
+          - "First law stated as 'objects at rest stay at rest' (omits uniform motion)"
+        severity: "CRITICAL"
+        action: "REJECT"
+
+      - id: "FC-S-003"
+        name: "Conservation laws correctly stated"
+        reference:
+          energy: "Total energy of an isolated system is conserved"
+          momentum: "Total momentum of an isolated system is conserved in all directions"
+          charge: "Net electric charge of an isolated system is conserved"
+          mass_energy: "In nuclear reactions, mass-energy is conserved (E = mc²)"
+        common_errors:
+          - "Kinetic energy stated as conserved in all collisions (only elastic)"
+          - "Momentum described as conserved 'in the direction of motion' only"
+        severity: "CRITICAL"
+        action: "REJECT"
+
+      - id: "FC-S-004"
+        name: "Thermodynamic laws correctly stated"
+        reference:
+          zeroth: "If A and B are in thermal equilibrium with C, then A and B are in thermal equilibrium with each other"
+          first: "Energy cannot be created or destroyed — only converted between forms"
+          second: "Entropy of an isolated system tends to increase over time"
+          third: "Entropy approaches a constant minimum as temperature approaches absolute zero"
+        common_errors:
+          - "First law stated as 'energy is always conserved' without specifying isolated system context"
+          - "Second law stated as 'heat flows from hot to cold' (consequence, not the law itself)"
+          - "Entropy described as 'disorder' without qualification (acceptable analogy but imprecise)"
+        severity: "WARNING"
+        action: "FLAG — thermodynamic law imprecision is a common teaching error"
+
+      - id: "FC-S-005"
+        name: "Electromagnetic laws and equations"
+        reference:
+          coulombs_law: "F = kq₁q₂/r² where k = 1/(4πε₀)"
+          ohms_law: "V = IR (valid for ohmic conductors at constant temperature)"
+          faradays_law: "EMF = -dΦ/dt (magnitude: EMF = ΔΦ/Δt)"
+        common_errors:
+          - "Ohm's law stated as universal law rather than defining property of ohmic conductors"
+          - "Coulomb's law written without stating r is the separation distance"
+        severity: "WARNING"
+        action: "FLAG"
+
+  chemistry_accuracy:
+    checks:
+      - id: "FC-S-006"
+        name: "Chemical formula accuracy"
+        rule: |
+          Verify that chemical formulas for named compounds are correct.
+          Flag any formula that contradicts standard chemistry.
+        reference_compounds:
+          water: "H₂O"
+          carbon_dioxide: "CO₂"
+          sodium_chloride: "NaCl"
+          sulfuric_acid: "H₂SO₄"
+          hydrochloric_acid: "HCl"
+          ammonia: "NH₃"
+          methane: "CH₄"
+          ethanol: "C₂H₅OH or CH₃CH₂OH"
+          glucose: "C₆H₁₂O₆"
+          carbon_monoxide: "CO (not CO₂)"
+        severity: "CRITICAL"
+        action: "REJECT — wrong formula is a fundamental factual error"
+
+      - id: "FC-S-007"
+        name: "Chemical equation balance"
+        rule: |
+          For any balanced chemical equation shown:
+          1. Atoms of each element must be equal on both sides
+          2. Charge must be balanced in ionic equations
+          3. State symbols must be chemically plausible (gas products at room temperature, etc.)
+        common_errors:
+          - "Combustion of methane: CH₄ + 2O₂ → CO₂ + 2H₂O (correct) vs CH₄ + O₂ → CO₂ + H₂O (unbalanced)"
+          - "Electrolysis: incorrect half-equation balancing"
+          - "Acid-base: H⁺ + OH⁻ → H₂O (correct) vs H + OH → H₂O (missing charges)"
+        severity: "CRITICAL"
+        action: "REJECT"
+
+      - id: "FC-S-008"
+        name: "Reaction type classification accuracy"
+        rule: |
+          Verify that named reaction types are correctly classified.
+        reference:
+          addition_reaction: "Two reactants combine to form one product (e.g., alkene + Br₂)"
+          substitution_reaction: "One atom/group replaces another"
+          elimination_reaction: "Small molecule removed to form a double bond"
+          oxidation: "Loss of electrons / increase in oxidation state"
+          reduction: "Gain of electrons / decrease in oxidation state"
+        common_errors:
+          - "Redox described with oxidation and reduction as separate reactions occurring independently"
+          - "Addition confused with substitution in organic reactions"
+        severity: "WARNING"
+        action: "FLAG"
+
+      - id: "FC-S-009"
+        name: "Periodic table trends accuracy"
+        rule: |
+          Verify that stated periodic trends are correct and correctly attributed.
+        reference_trends:
+          atomic_radius: "Increases down a group; decreases across a period (left to right)"
+          ionisation_energy: "Decreases down a group; increases across a period (with exceptions at Group 3 and 6)"
+          electronegativity: "Increases across a period; decreases down a group (highest: F)"
+          metallic_character: "Increases down a group; decreases across a period"
+        common_errors:
+          - "Atomic radius stated as increasing across a period (it decreases)"
+          - "Ionisation energy stated as always increasing across a period (exceptions at Mg/Al and P/S)"
+          - "Electronegativity highest element stated as O instead of F"
+        severity: "CRITICAL"
+        action: "REJECT"
+
+  biology_accuracy:
+    checks:
+      - id: "FC-S-010"
+        name: "Cell biology facts"
+        rule: |
+          Verify core cell biology claims against established facts.
+        reference_facts:
+          prokaryote_eukaryote: "Prokaryotes lack a membrane-bound nucleus; eukaryotes have one"
+          dna_location: "DNA in eukaryotes: nucleus (chromosomal), mitochondria, chloroplasts"
+          cell_membrane: "Phospholipid bilayer — hydrophilic heads outward, hydrophobic tails inward"
+          atp_structure: "ATP = adenosine triphosphate; hydrolysis releases ~30.5 kJ mol⁻¹"
+          mitosis_phases: "Prophase → Metaphase → Anaphase → Telophase → Cytokinesis"
+          meiosis_outcome: "Produces 4 haploid cells (n) from 1 diploid cell (2n)"
+          mitosis_outcome: "Produces 2 genetically identical diploid cells"
+        common_errors:
+          - "Mitosis described as producing 4 cells (that is meiosis)"
+          - "Cell membrane described as rigid (it is fluid)"
+          - "DNA described as double-stranded RNA (it is DNA — deoxyribose, not ribose)"
+          - "Prokaryotes described as having mitochondria (they do not)"
+        severity: "CRITICAL"
+        action: "REJECT"
+
+      - id: "FC-S-011"
+        name: "Genetics and inheritance accuracy"
+        rule: |
+          Verify genetics claims against Mendelian and molecular genetics principles.
+        reference_facts:
+          dna_bases: "Adenine pairs with Thymine (DNA); Adenine pairs with Uracil (RNA)"
+          codon: "Three consecutive nucleotide bases = one codon; codes for one amino acid"
+          start_codon: "AUG (methionine)"
+          stop_codons: "UAA, UAG, UGA"
+          transcription_direction: "5' to 3' on the new mRNA strand"
+          translation_location: "Ribosomes (rough ER or cytoplasm)"
+        common_errors:
+          - "Adenine stated as pairing with Uracil in DNA (Uracil is RNA only — pairs with A in RNA)"
+          - "Transcription described as occurring at ribosomes (it occurs in the nucleus)"
+          - "Translation described as producing DNA (it produces polypeptide/protein)"
+          - "Codons stated as pairs of bases (they are triplets)"
+        severity: "CRITICAL"
+        action: "REJECT"
+
+      - id: "FC-S-012"
+        name: "Evolution accuracy"
+        rule: |
+          Verify that evolutionary claims are scientifically accurate and avoid
+          teleological or Lamarckian framing.
+        prohibited_claims:
+          - "Organisms evolve 'in order to' survive (implies intent — Lamarckian)"
+          - "Genes mutate 'to adapt' to the environment (mutations are random)"
+          - "Evolution is 'just a theory' (in scientific usage, theory = well-supported explanation)"
+          - "Humans evolved from chimpanzees (humans and chimps share a common ancestor)"
+        required_precision:
+          natural_selection: "Differential reproductive success of heritable variants — not survival of the fittest alone"
+          mutation: "Random changes in DNA sequence — not directed toward adaptation"
+          speciation: "Reproductive isolation + genetic divergence over time"
+        severity: "CRITICAL"
+        action: "REJECT — Lamarckian or teleological evolution is scientifically incorrect"
+
+  safety_checks:
+    description: "Ensure no content could enable harmful experimentation by students"
+    checks:
+      - id: "FC-S-013"
+        name: "Dangerous experimental instruction filter"
+        rule: |
+          Flag any content that provides:
+          - Specific quantities or procedures for generating toxic gases at home
+          - Instructions for creating energetic reactions without safety equipment context
+          - Specific synthesis routes for controlled substances
+          - High-voltage electrical experiments without clear safety framing
+        allowed:
+          - Describing that chlorine gas is toxic and how it was used historically
+          - Explaining the chemistry of combustion conceptually
+          - Describing electrochemistry in electrolysis with standard lab safety context
+        prohibited:
+          - Step-by-step home synthesis of chlorine, hydrogen sulfide, or nitrogen dioxide
+          - Mixing ratios for energetic reactions without professional safety context
+        severity: "CRITICAL"
+        action: "REJECT — content safety violation"
+
+  unit_validation:
+    checks:
+      - id: "FC-S-014"
+        name: "SI unit consistency"
+        rule: |
+          Verify that units are correctly used and consistently applied.
+          Curriculum standard: negative-exponent notation (ms⁻¹ not m/s).
+          Flag unit errors in final answers and intermediate steps.
+        common_unit_errors:
+          - "Speed stated in m/s instead of ms⁻¹ (curriculum notation)"
+          - "Energy stated in joules when kilojoules expected (thermochemistry)"
+          - "Pressure in Pa stated as kPa without conversion"
+          - "Temperature in Celsius used in gas law calculations (must use Kelvin)"
+          - "Concentration stated as mol/L instead of mol dm⁻³ (IB/Cambridge)"
+        severity: "WARNING"
+        action: "FLAG — unit errors mislead students in quantitative work"
+
+      - id: "FC-S-015"
+        name: "Temperature scale validation"
+        rule: |
+          Gas law calculations must use Kelvin (K).
+          Thermochemistry can use Celsius for ΔT.
+          Absolute temperature: T(K) = T(°C) + 273 (or 273.15 for precision).
+          Flag: T = 0°C used directly in pV = nRT without conversion.
+        severity: "CRITICAL"
+        action: "REJECT — temperature scale error corrupts all gas law calculations"
+
+confidence_scoring:
+  rubric:
+    bands:
+      "0.90 - 1.00":
+        label: "HIGH CONFIDENCE — PASS"
+        criteria: "No critical errors. Units consistent. Curriculum appropriate. Safety clear."
+        action: "fact_check_passed = true"
+
+      "0.70 - 0.89":
+        label: "MODERATE CONFIDENCE — PASS WITH FLAG"
+        criteria: "No critical errors. Minor notation or precision warnings. Safe content."
+        action: "fact_check_passed = true; log warnings"
+
+      "0.50 - 0.69":
+        label: "LOW CONFIDENCE — RETRY"
+        criteria: "One potential critical error OR multiple warnings OR safety ambiguity."
+        action: "fact_check_passed = false; retry with correction hint"
+
+      "0.00 - 0.49":
+        label: "FAIL — REJECT"
+        criteria: "Confirmed critical error: wrong constant, wrong formula, wrong fact, safety violation."
+        action: "fact_check_passed = false; escalate to human review"
+
+  score_deductions:
+    wrong_physical_constant: -0.45
+    wrong_chemical_formula: -0.45
+    wrong_biological_fact: -0.40
+    safety_violation: -1.00
+    unit_error_in_calculation: -0.20
+    teleological_evolution_language: -0.30
+    lamarckian_framing: -0.40
+    notation_inconsistency: -0.10
+    missing_state_symbol: -0.08
+
+output_format:
+  schema: |
+    {
+      "fact_check_passed": boolean,
+      "confidence_score": float (0.0-1.0),
+      "issues": [
+        {
+          "check_id": "FC-S-001",
+          "severity": "CRITICAL|WARNING|INFO",
+          "scene_index": integer or null,
+          "description": "What was found",
+          "incorrect_content": "Exact incorrect text",
+          "correction": "What it should be",
+          "source": "Reference (IB Data Booklet, IUPAC, etc.)"
+        }
+      ],
+      "safety_cleared": boolean,
+      "retry_hint": "Specific correction instruction",
+      "validated_at": "ISO 8601 timestamp"
+    }
+
+  retry_hint_templates:
+    wrong_constant: |
+      "Physical constant [name] is stated incorrectly. The correct value is [value with units].
+       Please regenerate using the exact value from the IB/Cambridge Data Booklet."
+    unbalanced_equation: |
+      "The chemical equation for [reaction] is not balanced. Verify that atom counts
+       are equal on both sides and that state symbols are chemically plausible."
+    teleological_language: |
+      "The phrase '[phrase]' implies evolutionary intent. Rewrite using mechanistic language:
+       mutations are random; natural selection acts on heritable variation. Remove all
+       'in order to' or 'trying to' language from evolutionary content."
+    unit_error: |
+      "Temperature must be in Kelvin for gas law calculations. Replace [value °C] with
+       [value + 273] K. Review all thermodynamic calculations for temperature unit consistency."
