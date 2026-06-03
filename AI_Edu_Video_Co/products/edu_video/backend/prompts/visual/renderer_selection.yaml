@@ -1,0 +1,534 @@
+meta:
+  file: "renderer_selection.yaml"
+  purpose: |
+    Decision framework for selecting the correct renderer for each scene.
+    Used by visual_asset_agent and animation_router_agent to choose between:
+    manim, lottie, flux_sdxl, kling, timeline, diagram, graph, code.
+    This file defines WHEN to use each renderer, what inputs it expects,
+    and what its output should look like for educational content.
+  loaded_by:
+    - "visual_asset_agent"
+    - "animation_router_agent"
+  version: "2024-01"
+  load_order: 2
+
+selection_framework:
+  primary_decision_tree: |
+    Step 1: Does the scene contain mathematical equations or geometric animations?
+      YES → manim
+      NO  → Step 2
+
+    Step 2: Is the scene from history subject with chronological events?
+      YES → timeline
+      NO  → Step 3
+
+    Step 3: Does the scene show a flowchart, process diagram, or structural relationship?
+      YES → diagram
+      NO  → Step 4
+
+    Step 4: Does the scene show a graph with data (supply/demand, statistics, scientific)?
+      YES → graph
+      NO  → Step 5
+
+    Step 5: Does the scene show computer code with syntax highlighting?
+      YES → code
+      NO  → Step 6
+
+    Step 6: Does the scene need a photorealistic educational illustration?
+      YES → flux_sdxl
+      NO  → Step 7
+
+    Step 7: Does the scene need a short animated video clip (process, motion)?
+      YES → kling (premium only) OR flux_sdxl (fallback)
+      NO  → lottie (default for text/concept scenes)
+
+  override_rules:
+    - "Subject profile always overrides general decision tree for primary renderer"
+    - "Difficulty=beginner: prefer manim or lottie over kling (simpler, clearer)"
+    - "Scene_role=hook: prefer flux_sdxl or kling for visual impact"
+    - "Scene_role=summary: prefer lottie text_reveal (clean, no distraction)"
+    - "Scene_role=worked_example: prefer manim (shows working step by step)"
+    - "Scene_role=proof: always manim"
+
+renderers:
+  manim:
+    best_for:
+      - "Mathematical equations and their manipulation"
+      - "Geometric constructions and transformations"
+      - "Graphs of mathematical functions (y = f(x))"
+      - "Vector diagrams"
+      - "Proof steps — logical progression of equations"
+      - "Calculus visualisations (area under curve, derivative as slope)"
+    subjects: ["mathematics", "physics"]
+    scene_roles: ["concept_intro", "worked_example_1", "worked_example_2", "proof"]
+
+    primary_content_format: |
+      JSON array of LaTeX expression strings.
+      Each string is one equation or expression to animate.
+      Order determines animation sequence.
+      Example:
+        ["x^2 + 5x + 6 = 0",
+         "(x+2)(x+3) = 0",
+         "x = -2 \\text{ or } x = -3"]
+
+    animation_config_schema:
+      animation_sequence:
+        description: "List of animation steps"
+        schema: |
+          [
+            {
+              "type": "write|fadein|fadeout|highlight|transform",
+              "obj_index": 0,
+              "duration": 1.5,
+              "color": "YELLOW (optional, for highlight)"
+            }
+          ]
+      background_elements:
+        description: "Optional background elements"
+        options: ["number_plane", "axes", "circle", "none"]
+      text_color: "#FFFFFF"
+      manim_scene_class: "EducationalScene"
+
+    quality_guidelines:
+      - "LaTeX expressions must be valid — test against math_validator.py patterns"
+      - "Maximum 6 equations visible simultaneously — more creates overload"
+      - "Highlight the active step in primary colour; dim previous steps to 50% opacity"
+      - "For worked examples: reveal one line at a time, synchronised with narration"
+      - "For proofs: each logical step on a new line, brief pause after each"
+
+    generation_prompt: null
+
+    common_mistakes:
+      - "Putting narrative text in primary_content — that belongs in narration_text"
+      - "Using raw variable names without LaTeX: 'x^2' not 'x squared'"
+      - "Putting too many equations in one scene — split across multiple scenes"
+      - "Using LaTeX commands not supported by Manim CE (verify against Manim docs)"
+
+  lottie:
+    best_for:
+      - "Text reveal and concept introduction"
+      - "Abstract concept visualisation with colour and motion"
+      - "Transition scenes and scene summaries"
+      - "Language and literature subjects (non-mathematical)"
+      - "Key terms and definitions displayed cleanly"
+      - "Background animations for narration-heavy scenes"
+    subjects: ["all — default fallback"]
+    scene_roles: ["hook", "concept_intro", "summary", "common_mistakes"]
+
+    primary_content_format: |
+      Plain text string — the main text to display.
+      This appears in the Lottie animation as the central text element.
+      Maximum 120 characters.
+      No LaTeX. No markdown.
+      Example: "Opportunity Cost: the value of the next-best alternative foregone"
+
+    animation_config_schema:
+      animation_type:
+        options: ["text_reveal", "fade_transition", "particle_float"]
+        guidance: |
+          text_reveal: best for definitions and key terms
+          fade_transition: best for summary and transitional scenes
+          particle_float: best for hook scenes with abstract concept
+      text_overlay:
+        description: "Main text displayed in animation (max 120 chars)"
+      key_terms_highlight:
+        description: "List of words within text_overlay to highlight in accent colour"
+        example: ["opportunity cost", "foregone"]
+
+    quality_guidelines:
+      - "Text must be readable at 1920×1080 — minimum 36px equivalent"
+      - "Key terms highlighted in primary colour; rest in text_primary"
+      - "Background colour must be from subject palette"
+      - "Animation speed: text reveals at approximately narration pace"
+      - "Never put LaTeX in text_overlay — it will be rendered as literal characters"
+
+    generation_prompt: null
+
+  flux_sdxl:
+    best_for:
+      - "Photorealistic educational illustrations (cells, ecosystems, historical scenes)"
+      - "Scientific phenomena that cannot be animated (electron microscopy scale)"
+      - "Hook scenes requiring visual impact and realism"
+      - "Geography: landscapes, aerial views, urban scenes"
+      - "Biology: organism illustrations, anatomical diagrams"
+      - "History: period scenes (described, not specific historical photographs)"
+    subjects: ["biology", "geography", "history", "economics", "general"]
+    scene_roles: ["hook", "concept_intro", "observation_setup"]
+
+    primary_content_format: |
+      Detailed text description of the image to generate.
+      This is the generation_prompt — it is passed directly to the Flux API.
+      Must be: specific, educational, appropriate for 14-19 year olds.
+      Must avoid: real people, logos, text overlaid on image, copyrighted characters.
+      Example:
+        "Cross-section diagram of a plant cell showing chloroplast, nucleus,
+         cell wall, and vacuole. Scientific illustration style, high detail,
+         labelled diagram format, clean white background, educational textbook quality"
+
+    animation_config_schema:
+      existing_asset_url:
+        description: "GCS URL of an existing asset to reuse — skips generation"
+        type: "string or null"
+      zoom_effect:
+        description: "Whether to apply Ken Burns zoom to the generated image"
+        type: "boolean"
+        default: true
+      negative_prompt:
+        description: "What to exclude from the generated image"
+        example: "text overlaid, watermark, blurry, nsfw, violence, real people"
+
+    quality_guidelines:
+      - "Generation prompt must be specific and educational — vague prompts produce generic results"
+      - "Always include style qualifier: 'scientific illustration', 'educational diagram', 'textbook quality'"
+      - "Include colour guidance to match subject palette: 'green and teal colour scheme'"
+      - "Specify perspective/angle for geography: 'aerial view', 'cross-section', 'close-up'"
+      - "For biology: include scale reference where relevant ('microscopic view', 'cellular level')"
+      - "Never generate images of real named individuals — describe roles instead"
+
+    forbidden_prompt_elements:
+      - "Real person names in generation prompt"
+      - "Brand names, logos, or trademarks"
+      - "Text overlaid on image (generate clean image; text added by compositor)"
+      - "Violence, weapons, or graphic content"
+      - "Sexually suggestive content of any kind"
+      - "Controversial political symbols or imagery"
+
+    generation_prompt_templates:
+      biology_cell: |
+        "[Cell type] cell cross-section showing [organelles].
+         Scientific illustration style, high detail, labelled anatomy diagram,
+         [subject colour] colour scheme, clean educational background,
+         textbook quality, no text overlaid"
+      biology_organism: |
+        "[Organism name] showing [specific features].
+         Natural history illustration style, detailed and accurate,
+         [habitat/environment] background, educational quality,
+         appropriate for biology textbook"
+      geography_landscape: |
+        "[Landform/biome type] in [region].
+         [Aerial/ground-level/cross-section] view,
+         geographic features clearly visible,
+         photorealistic, educational, wide angle"
+      history_period: |
+        "[Historical period] [setting: market/court/battlefield/city].
+         [Specific visual elements describing the scene].
+         Historical illustration style, no modern elements,
+         period-accurate architecture and clothing,
+         educational documentary quality"
+
+  kling:
+    best_for:
+      - "Process animations that require realistic motion (water flow, plant growth)"
+      - "Dynamic scientific phenomena (weather patterns, geological processes)"
+      - "Hook scenes requiring cinematic impact for premium users"
+      - "Biology: cellular processes, organism behaviour"
+    subjects: ["biology", "geography", "physics"]
+    scene_roles: ["hook", "observation_setup"]
+    access: "premium_users_only"
+    fallback: "flux_sdxl"
+
+    primary_content_format: |
+      Text description of the video motion to generate.
+      Describe the motion clearly — what moves, how, in what direction.
+      Duration is set from estimated_duration_seconds (max 10s per API call).
+      Example:
+        "Time-lapse of a plant growing from seed to seedling over 72 hours.
+         Roots extend downward, stem extends upward toward light source.
+         Educational biology footage style, clean white background,
+         slow smooth motion"
+
+    animation_config_schema:
+      motion_strength:
+        description: "Amount of motion in the generated video"
+        type: "float 0.0-1.0"
+        default: 0.7
+        guidance: "0.3 for subtle motion; 0.7 for clear motion; 1.0 for dramatic motion"
+
+    quality_guidelines:
+      - "Describe motion explicitly — 'a red blood cell moving through a capillary'"
+      - "Include duration context: 'over 5 seconds', 'slow motion', 'time-lapse'"
+      - "Specify camera perspective: 'close-up', 'aerial', 'cross-section view'"
+      - "Educational style qualifier: 'documentary footage style', 'scientific visualisation'"
+
+  timeline:
+    best_for:
+      - "Chronological sequences of historical events"
+      - "Process timelines in science (geological eras, evolutionary history)"
+      - "Cause-and-effect chains in history or economics"
+      - "Biography overviews showing key dates"
+    subjects: ["history", "geography", "biology"]
+    scene_roles: ["context_scene", "event_narration", "concept_intro"]
+
+    primary_content_format: |
+      JSON array of event objects.
+      Each object has: date (string) and event (string, max 60 chars).
+      Maximum 8 events per timeline scene.
+      Events must be in chronological order.
+      Example:
+        [
+          {"date": "1789", "event": "French Revolution begins — Estates-General convened"},
+          {"date": "1792", "event": "First French Republic declared"},
+          {"date": "1793", "event": "Reign of Terror begins under Robespierre"},
+          {"date": "1799", "event": "Napoleon seizes power in the Coup of 18 Brumaire"}
+        ]
+
+    animation_config_schema:
+      title:
+        description: "Timeline title displayed above"
+        example: "The French Revolution: Key Events 1789-1799"
+      orientation:
+        options: ["horizontal"]
+        default: "horizontal"
+        note: "Horizontal is the only currently implemented orientation"
+
+    quality_guidelines:
+      - "Event descriptions must be short enough to fit without truncation (max 60 chars)"
+      - "Dates must be specific — '1789' is better than 'late 18th century'"
+      - "Maximum 8 events — more creates unreadable crowding"
+      - "Events should represent genuine turning points, not routine occurrences"
+      - "Period events should match the curriculum prompt's historical period"
+
+  diagram:
+    best_for:
+      - "Flowcharts showing process or decision sequences"
+      - "Structural relationships (food webs, organisational structures)"
+      - "Biological cycles (nitrogen cycle, carbon cycle, cell cycle)"
+      - "Computer science algorithms and data structures"
+      - "Economic circular flow diagrams"
+    subjects: ["biology", "computer_science", "economics", "geography"]
+    scene_roles: ["concept_intro", "mechanism_explanation", "worked_example_1"]
+
+    primary_content_format: |
+      Valid Mermaid diagram syntax string.
+      Must use one of: flowchart, graph, sequenceDiagram, classDiagram.
+      Keep complexity appropriate to difficulty level:
+        beginner: max 6 nodes
+        intermediate: max 10 nodes
+        advanced: max 16 nodes
+      Example:
+        "flowchart TD
+           A[Glucose] --> B[Glycolysis]
+           B --> C[Pyruvate]
+           C --> D{Oxygen available?}
+           D -->|Yes| E[Krebs Cycle]
+           D -->|No| F[Fermentation]
+           E --> G[ATP produced]"
+
+    animation_config_schema:
+      title:
+        description: "Diagram title"
+        example: "Cellular Respiration Overview"
+      mermaid_theme:
+        options: ["dark"]
+        default: "dark"
+        note: "Dark theme is enforced for visual consistency"
+
+    quality_guidelines:
+      - "Node labels must be concise — max 4 words per node"
+      - "Use descriptive edge labels for decision branches (Yes/No, Presence/Absence)"
+      - "Arrow direction must reflect information or process flow"
+      - "Do not create diagrams that would require scrolling — all nodes must be visible"
+      - "For biological cycles: ensure arrows form a complete loop"
+      - "Test Mermaid syntax mentally — common error: missing quotes around node text with spaces"
+
+    mermaid_syntax_reference:
+      flowchart: |
+        flowchart TD
+          A[Rectangle node] --> B{Diamond decision}
+          B -->|Yes| C[Result A]
+          B -->|No| D[Result B]
+      sequence: |
+        sequenceDiagram
+          participant A as Stimulus
+          participant B as Receptor
+          A->>B: Signal
+          B->>A: Response
+      class: |
+        classDiagram
+          class Animal {
+            +name: string
+            +breathe()
+          }
+          Animal <|-- Mammal
+
+  graph:
+    best_for:
+      - "Supply and demand curves (economics)"
+      - "Statistical distributions and histograms"
+      - "Scientific data plots (velocity-time, pressure-volume)"
+      - "Population growth curves (biology, geography)"
+      - "Cost curves (economics)"
+      - "Comparative bar charts across categories"
+    subjects: ["economics", "biology", "geography", "physics", "mathematics"]
+    scene_roles: ["worked_example_1", "worked_example_2", "observation_setup", "analysis_demonstration"]
+
+    primary_content_format: |
+      JSON object with graph specification.
+      Schema:
+        {
+          "type": "line|bar|scatter",
+          "title": "Graph title",
+          "x_label": "X axis label with units",
+          "y_label": "Y axis label with units",
+          "datasets": [
+            {
+              "label": "Series name",
+              "data": [y_value_list],
+              "color": "#HEX (optional)"
+            }
+          ]
+        }
+      Example (supply and demand):
+        {
+          "type": "line",
+          "title": "Market for Wheat",
+          "x_label": "Quantity (thousand tonnes)",
+          "y_label": "Price (£ per tonne)",
+          "datasets": [
+            {"label": "Demand", "data": [500,400,300,200,100], "color": "#3B82F6"},
+            {"label": "Supply", "data": [100,200,300,400,500], "color": "#F97316"}
+          ]
+        }
+
+    animation_config_schema:
+      chart_type:
+        options: ["line", "bar", "scatter"]
+        default: "line"
+      x_axis:
+        label: "str"
+        min: "float or null"
+        max: "float or null"
+      y_axis:
+        label: "str"
+        min: "float or null"
+        max: "float or null"
+      annotations:
+        description: "Key points to label on the graph"
+        example: [{"x": 300, "y": 300, "label": "Equilibrium"}]
+
+    quality_guidelines:
+      - "Always include axis labels with units"
+      - "Maximum 4 data series — more creates unreadable overplotting"
+      - "For economics: price on y-axis, quantity on x-axis — always"
+      - "Data values must be plausible for the real-world context described"
+      - "If showing equilibrium: mark it explicitly with annotation"
+      - "For AP/IB economics: verify curve shape matches theoretical prediction"
+
+  code:
+    best_for:
+      - "Algorithm demonstration with syntax highlighting"
+      - "Data structure implementation examples"
+      - "Pseudocode display for AP CS A or Cambridge 9618"
+      - "Debugging examples (correct vs incorrect code)"
+      - "Sorting algorithm step-through"
+    subjects: ["computer_science"]
+    scene_roles: ["worked_example_1", "worked_example_2", "common_mistakes"]
+
+    primary_content_format: |
+      Raw code or pseudocode string.
+      Include language hint at top as comment:
+        # language: python
+        # language: java
+        # language: pseudocode
+      Maximum 28 lines per scene — more requires scrolling which is not supported.
+      Example:
+        "# language: python
+        def binary_search(arr, target):
+            left, right = 0, len(arr) - 1
+            while left <= right:
+                mid = (left + right) // 2
+                if arr[mid] == target:
+                    return mid
+                elif arr[mid] < target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+            return -1"
+
+    animation_config_schema:
+      language:
+        options: ["python", "java", "pseudocode", "javascript", "text"]
+        default: "python"
+      show_line_numbers:
+        type: "boolean"
+        default: true
+      highlight_lines:
+        description: "List of line numbers to highlight in the scene"
+        example: [5, 6, 7]
+        guidance: "Highlight the lines being described in narration"
+
+    quality_guidelines:
+      - "Code must be syntactically correct for the stated language"
+      - "For AP CS A: Java only — no Python"
+      - "For Cambridge 9618: Cambridge pseudocode convention or Java"
+      - "highlight_lines should match the lines described in narration"
+      - "Maximum 28 lines — split longer examples across two scenes"
+      - "Variable names must be meaningful — no single-letter variables except loop counters"
+      - "Include comments in code that clarify the algorithm's intent"
+
+subject_renderer_defaults:
+  mathematics:
+    primary: "manim"
+    fallback: "lottie"
+    scene_role_overrides:
+      hook: "lottie"
+      summary: "lottie"
+
+  physics:
+    primary: "manim"
+    fallback: "graph"
+    scene_role_overrides:
+      hook: "flux_sdxl"
+      observation_setup: "flux_sdxl"
+
+  chemistry:
+    primary: "diagram"
+    fallback: "lottie"
+    scene_role_overrides:
+      hook: "flux_sdxl"
+      worked_example_1: "lottie"
+
+  biology:
+    primary: "flux_sdxl"
+    fallback: "diagram"
+    scene_role_overrides:
+      mechanism_explanation: "diagram"
+      worked_example_1: "lottie"
+
+  history:
+    primary: "timeline"
+    fallback: "lottie"
+    scene_role_overrides:
+      hook: "flux_sdxl"
+      source_analysis: "lottie"
+
+  geography:
+    primary: "flux_sdxl"
+    fallback: "graph"
+    scene_role_overrides:
+      data_scene: "graph"
+      process_scene: "diagram"
+
+  economics:
+    primary: "graph"
+    fallback: "diagram"
+    scene_role_overrides:
+      hook: "lottie"
+      summary: "lottie"
+
+  computer_science:
+    primary: "code"
+    fallback: "diagram"
+    scene_role_overrides:
+      hook: "lottie"
+      concept_intro: "diagram"
+
+  literature:
+    primary: "lottie"
+    fallback: "flux_sdxl"
+    scene_role_overrides:
+      hook: "flux_sdxl"
+
+  language:
+    primary: "lottie"
+    fallback: "lottie"
