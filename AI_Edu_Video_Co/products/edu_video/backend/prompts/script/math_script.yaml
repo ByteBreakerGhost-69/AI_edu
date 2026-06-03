@@ -1,0 +1,482 @@
+meta:
+  subject_group: "mathematics"
+  covers_subjects: ["mathematics"]
+  loaded_by: ["script_generator", "difficulty_adapter"]
+  design_principle: |
+    Mathematics video narration must bridge the gap between symbolic notation
+    and verbal explanation. The challenge: mathematical symbols exist on screen
+    (rendered by Manim) while narration runs in parallel — narration must
+    DESCRIBE what the viewer is watching, not replace it.
+    Core rule: narration never reads out raw LaTeX. Instead it narrates meaning.
+
+narration_style:
+  voice: "precise, patient, step-by-step"
+  person: "first-person plural — 'we' ('We can see that...', 'Let us now...')"
+  avoid_person: "second-person imperative overuse — reduce 'you must', 'you need to'"
+
+  register: |
+    Formal enough to respect mathematical rigour.
+    Accessible enough that a student watching alone at midnight understands.
+    Never talk down. Never assume the student is struggling.
+    Assume the student is capable and just needs clear guidance.
+
+  rhythm: |
+    Mathematics narration has a natural rhythm: state → show → explain → connect.
+    State what we're about to do.
+    Show it happening on screen (Manim renders the equation).
+    Explain each step verbally as it appears.
+    Connect to why it matters or what comes next.
+
+  equation_narration_rules: |
+    NEVER read LaTeX syntax aloud.
+    NEVER say "backslash frac" or "open curly brace".
+
+    Instead, narrate MEANING:
+      dy/dx                → "the rate of change of y with respect to x"
+      integral from 0 to 1 → "the definite integral of f of x from zero to one"
+      lim x→∞              → "as x approaches infinity"
+      sum n=1 to ∞         → "the sum from n equals one to infinity"
+      f'(x) = 2x           → "the derivative of f of x equals two x"
+      x² + y² = r²         → "x squared plus y squared equals r squared"
+      sqrt(b²-4ac)         → "the square root of b squared minus four a c"
+      e^(iπ) + 1 = 0       → "e to the power of i pi, plus one, equals zero"
+      v · w                → "the dot product of vectors v and w"
+
+    When an equation appears on screen:
+      Step 1: Say what it represents before reading the parts
+      Step 2: Walk through each term from left to right
+      Step 3: Say what the whole equation tells us
+
+explanation_patterns:
+  beginner:
+    strategy: "Concrete before abstract"
+    pattern: |
+      1. Open with a real-world situation the student already understands
+      2. Show the situation numerically — specific numbers first
+      3. Reveal the pattern in the specific case
+      4. Generalise: "This always works when..."
+      5. Name the concept AFTER demonstrating it
+      6. End with: "So that's what [term] means"
+
+    equation_intro: |
+      Never show the formula cold.
+      Always say: "Let's think about this before we write it down."
+      Build it piece by piece on screen.
+      For each symbol introduced: pause and name it.
+      Example: "Here's the variable t — that represents time."
+
+    worked_example_style: |
+      Say every single step out loud.
+      No skipped steps. No "obviously" or "clearly".
+      After each step: "And now we have..." (reinforce progress).
+      At the end: "Look — we started here, and ended here. That's the process."
+
+    number_handling: |
+      Use small, friendly numbers: 2, 3, 5, 10.
+      Avoid fractions in first examples — use integers.
+      When fractions unavoidable: "one half" not "zero point five".
+
+  intermediate:
+    strategy: "Pattern recognition and formal definition"
+    pattern: |
+      1. State the concept using its formal name immediately
+      2. Give the formal definition or formula
+      3. Unpack each component briefly
+      4. Show a clean worked example (moderate complexity)
+      5. Point out what to watch for: "The tricky part is..."
+      6. Connect to related concepts already covered
+
+    equation_intro: |
+      Present formula directly, then explain parts:
+      "The quadratic formula gives us x equals negative b, plus or minus
+       the square root of b squared minus four ac, all over two a.
+       Let's unpack what each part does."
+
+    worked_example_style: |
+      Show key steps — skip arithmetic details, show algebraic moves.
+      Call out technique: "Here we're using the chain rule."
+      Speed is moderate — not rushed, not painfully slow.
+      Pause at decision points: "Now, why do we do this instead of that?"
+
+    proof_style: |
+      For proofs: state what we're proving, then proceed logically.
+      Call out each logical move: "Since A is true, we know B must follow."
+      At QED: summarise what was shown in one sentence.
+
+  advanced:
+    strategy: "Formal mathematical discourse"
+    pattern: |
+      1. State theorem or result with full formal precision
+      2. Note conditions and domain of validity explicitly
+      3. Prove or derive — full rigour, no hand-waving
+      4. Identify where the proof technique generalises
+      5. State corollaries or related results
+      6. Note historical context or significance where relevant
+
+    equation_intro: |
+      Present results in standard mathematical form.
+      No "let's think about it first" — assume fluency.
+      State hypotheses before conclusion: "Given that f is differentiable
+       on the open interval (a, b) and continuous on [a, b)..."
+
+    proof_style: |
+      Use proof language: "We claim that...", "It suffices to show...",
+      "By contradiction, suppose...", "Without loss of generality...",
+      "This completes the proof."
+      Never say "obviously" — state why something follows.
+
+    abstraction_level: |
+      Introduce abstract notation after the concrete case is established.
+      Use epsilon-delta definitions where appropriate.
+      Reference well-known theorems by name where applicable.
+
+pacing_guide:
+  words_per_minute: 130
+  target_seconds_per_scene:
+    beginner: 45
+    intermediate: 35
+    advanced: 30
+
+  pause_rules: |
+    Pause AFTER:
+      - Stating a definition (500ms — let it land)
+      - Writing an equation on screen (800ms — student reads it)
+      - Completing a proof step (400ms — mental bookmark)
+      - Surprising or counterintuitive result (600ms — create moment)
+
+    Never pause:
+      - Mid-sentence (breaks comprehension)
+      - After transition phrases ("Now let's look at...")
+      - During rapid calculation narration
+
+  sentence_length:
+    beginner: "Maximum 12 words. Split long ideas across two sentences."
+    intermediate: "Maximum 18 words. Complex ideas get one sentence each."
+    advanced: "Maximum 25 words. Subordinate clauses acceptable."
+
+  equation_read_pace: |
+    Read equations 20% slower than normal narration pace.
+    Each symbol or term: 0.5–0.8 seconds.
+    Full equation: read once, then pause, then continue.
+    Never repeat an equation in narration — students can rewind.
+
+scene_templates:
+  hook:
+    purpose: "Establish WHY this mathematics matters or surprises"
+    duration_seconds: 25
+    structure: |
+      [Intriguing question OR surprising fact OR everyday puzzle]
+      [Brief tension: why is this non-obvious?]
+      [Promise: "By the end of this, you'll be able to..."]
+    examples:
+      - "How do GPS satellites know exactly where you are? The answer involves a branch of mathematics called trilateration — and it depends entirely on what we're about to study."
+      - "Here's something strange: the sum of all positive integers — one plus two plus three, forever — is sometimes written as negative one-twelfth. How is that possible?"
+      - "Imagine folding a piece of paper fifty times. How thick would the result be? The answer requires understanding exponential growth."
+      - "A stretched rubber band stores energy. A compressed spring stores energy. What do these have in common? An equation we're about to derive."
+
+  concept_intro:
+    purpose: "Introduce the definition and core idea"
+    duration_seconds: 40
+    structure: |
+      [Name the concept clearly]
+      [Formal definition — stated carefully]
+      [Plain English restatement]
+      [Simplest possible example]
+    narration_pattern: |
+      "A [concept] is [formal definition].
+       In plain terms: [accessible restatement].
+       The simplest example: [concrete case]."
+
+  worked_example_1:
+    purpose: "First demonstration — clean, accessible"
+    duration_seconds: 55
+    structure: |
+      [State the problem]
+      [Identify what approach to use and why]
+      [Execute step by step — narrate each move]
+      [State the result clearly]
+      [Check: does the answer make sense?]
+    narration_pattern: |
+      "Let's work through this together.
+       We have [problem]. To solve this, we'll use [method], because [brief reason].
+       [Step 1: narrate each algebraic move]
+       And there's our answer: [result].
+       Does this make sense? [Brief sanity check]."
+
+  worked_example_2:
+    purpose: "Second example — harder case or different context"
+    duration_seconds: 55
+    structure: |
+      [State harder problem]
+      [Note what's different from example 1]
+      [Execute — faster pace, fewer sub-steps narrated]
+      [Highlight the key insight that cracked it]
+    narration_pattern: |
+      "Now a harder case. This time [what's different].
+       The approach is the same — but watch what happens at this step.
+       [Execute with tighter narration]
+       The key insight here: [single central idea that made this work]."
+
+  proof:
+    purpose: "Demonstrate why a result is true"
+    duration_seconds: 60
+    structure: |
+      [State what we're proving]
+      [State proof strategy: direct, contradiction, or induction]
+      [Execute proof with clear logical connectives]
+      [State what was proved — restate the result]
+    narration_pattern: |
+      "Let's prove that [statement].
+       We'll use [proof method].
+       [Logical steps narrated as connected sequence]
+       And that completes our proof. We've shown that [restate result]."
+
+  common_mistakes:
+    purpose: "Pre-emptive error correction"
+    duration_seconds: 40
+    structure: |
+      [Name the mistake students commonly make]
+      [Show the wrong approach]
+      [Show why it fails — not just that it's wrong]
+      [Show the correct approach and why it works]
+    narration_pattern: |
+      "Before we continue — there's a mistake that trips many students here.
+       They [incorrect approach]. Let's see why that doesn't work.
+       [Demonstrate failure with a concrete case]
+       The correct approach is [correct method] because [underlying reason]."
+
+  summary:
+    purpose: "Consolidate and connect"
+    duration_seconds: 30
+    structure: |
+      [What we covered: 2–3 key ideas max]
+      [The single most important insight]
+      [What comes next and how it connects]
+    narration_pattern: |
+      "Let's recap. In this section, we covered [topic].
+       The key takeaway: [single core insight].
+       Next, we'll build on this to explore [next topic]."
+
+vocabulary_guide:
+  technical_term_introduction:
+    first_use: "Always define on first use: '[term], which means [definition]'"
+    subsequent_use: "Use term freely after introduction — no re-definition needed"
+    symbol_introduction: "Name symbol, state what it represents, then use it in context"
+
+  register_words:
+    formal_preferred:
+      - "hence"
+      - "therefore"
+      - "consequently"
+      - "it follows that"
+      - "we observe"
+      - "consider"
+      - "suppose"
+      - "let"
+      - "denote"
+      - "we assert"
+      - "it can be shown"
+    informal_acceptable_for_beginner:
+      - "so"
+      - "which means"
+      - "notice that"
+      - "think of it as"
+      - "in other words"
+      - "that tells us"
+    always_avoid:
+      - "obviously"
+      - "clearly"
+      - "trivially"
+      - "just"
+      - "simply"
+      - "easy"
+      - "just remember"
+      - "as we all know"
+      - "of course"
+      - "needless to say"
+
+  number_narration:
+    integers: "Say 'negative three' not 'minus three' when describing a number (sign vs operation)"
+    operations: "Say 'minus' for the subtraction operation; 'negative' for a signed value"
+    fractions: "Say 'three over four' not 'three fourths' in formal mathematical context"
+    infinity: "Always say 'approaches infinity' — never 'goes to infinity'"
+    approximations: "Say 'approximately' not 'about' or 'around' — preserve register"
+
+adaptation_rules:
+  beginner:
+    sentence_transformations:
+      - before: "Differentiating with respect to x gives us..."
+        after: "When we find the rate of change — how fast y is changing as x changes — we get..."
+      - before: "The function is continuous on [a, b]"
+        after: "The function has no breaks or jumps anywhere between a and b"
+      - before: "Let ε > 0 be given"
+        after: "Suppose we want to get within any tiny distance of the value L — no matter how small"
+      - before: "The series converges to L"
+        after: "The running total gets closer and closer to L — and stays there"
+      - before: "The function is bounded above by M"
+        after: "The function's values never exceed M — M acts as a ceiling"
+
+    formula_handling:
+      - "Announce the formula before showing it: 'Here comes an important formula — let's build it piece by piece'"
+      - "Introduce each symbol separately with a pause before moving to the next"
+      - "After the full formula appears: restate in plain English what it calculates"
+      - "Show a numerical example before the general algebraic form"
+      - "Do not introduce more than two new symbols per scene"
+
+  intermediate:
+    sentence_transformations:
+      - before: "By the chain rule, the derivative of f(g(x)) is..."
+        after: "Applying the chain rule to the composite function f(g(x)) gives us..."
+      - before: "The limit doesn't exist because..."
+        after: "This limit fails to exist because..."
+      - before: "We integrate by substitution"
+        after: "We use substitution — replacing the inner expression with a single variable u"
+      - before: "The matrix is singular"
+        after: "The matrix has no inverse — its determinant is zero"
+
+    formula_handling:
+      - "Present the formula directly, then identify the most important term or condition"
+      - "Connect explicitly to formulas already introduced: 'This is the same structure as...'"
+      - "Mention any special cases or restrictions immediately after the formula"
+
+  advanced:
+    sentence_transformations:
+      - before: "Let's think about what this formula means"
+        after: "Formally, this states that..."
+      - before: "A good way to picture this is..."
+        after: "Geometrically, this corresponds to..."
+      - before: "This is essentially the same as..."
+        after: "This is equivalent to... by [theorem name]"
+      - before: "This becomes tricky when..."
+        after: "The critical case arises when the hypothesis [condition] fails..."
+
+    formula_handling:
+      - "Present in standard mathematical form without preamble"
+      - "State domain restrictions and edge cases in the same breath as the formula"
+      - "Reference the result's name or origin: 'This is the Cauchy-Schwarz inequality'"
+      - "After stating, immediately note the sharpest known bounds or generalisations"
+
+forbidden_phrases:
+  visual_reference_phrases:
+    reason: "Student can see the screen — narrating the medium wastes words"
+    banned:
+      - "As you can see on the screen..."
+      - "Look at the equation above..."
+      - "In the diagram shown here..."
+      - "As shown in this figure..."
+      - "If you look at the animation..."
+      - "Watch the screen now..."
+      - "Here on the right side of the screen..."
+    replace_with:
+      - "Notice that..." (content reference, not medium reference)
+      - "The graph shows..." (describe what, not where)
+      - "The equation tells us..."
+      - "Here, the key term is..."
+
+  condescension_phrases:
+    reason: "Damages student confidence and erodes trust in the narrator"
+    banned:
+      - "This is simple..."
+      - "Obviously..."
+      - "Clearly..."
+      - "Trivially..."
+      - "Just..."
+      - "Simply..."
+      - "As everyone knows..."
+      - "You should know this already..."
+      - "This is easy once you..."
+      - "Most students find this straightforward..."
+    replace_with:
+      - "Notice that..."
+      - "It follows that..."
+      - "This tells us..."
+      - "Here we see..."
+      - "From this we can conclude..."
+
+  vague_affirmations:
+    reason: "Wastes narration time without adding information — suited to live classrooms, not video"
+    banned:
+      - "That's great!"
+      - "Excellent work!"
+      - "Well done!"
+      - "Fantastic!"
+      - "Amazing!"
+      - "Perfect!"
+      - "Brilliant!"
+    note: "Affirmations belong to human teachers responding in real time — not scripted video"
+
+  filler_phrases:
+    reason: "Consume word count and pacing without contributing meaning"
+    banned:
+      - "So, basically..."
+      - "Right, so..."
+      - "OK so what we're going to do is..."
+      - "Now then, let's take a look at..."
+      - "Alright, moving on..."
+      - "So yeah..."
+      - "Let's go ahead and..."
+      - "What I want to do here is..."
+      - "So without further ado..."
+    replace_with:
+      - "Next, we..." (direct transition)
+      - "Now consider..." (pivot without filler)
+      - Direct statement of the next concept or step
+
+hooks:
+  curiosity_hooks:
+    - "What happens when we try to measure something infinitely small? That question led mathematicians to invent calculus."
+    - "Here's a number that appears everywhere in nature — from spirals in shells to the branching of trees. We call it the golden ratio."
+    - "Can you add up infinitely many numbers and get a finite answer? Surprisingly, yes — and we'll see exactly when."
+    - "The same equation that describes heat spreading through metal also models how diseases spread through populations."
+    - "Prime numbers seem completely random — scattered unpredictably among the integers. But they follow a deep, hidden pattern."
+    - "A single matrix transformation can encode a rotation, a reflection, and a scaling all at once. Here's how that works."
+
+  problem_hooks:
+    - "A ball rolls off a table at two metres per second. Where does it land? Answering this precisely requires the tools we're about to develop."
+    - "A company needs to build the largest possible box from a fixed sheet of cardboard. Finding the right dimensions is a calculus problem."
+    - "Two trains approach each other at known speeds. When do they meet? The algebra is straightforward — but setting it up requires care."
+    - "A population of bacteria doubles every three hours. Starting from one thousand, how long until there are one million? That's an exponential equation."
+
+  counterintuitive_hooks:
+    - "A line has infinitely many points. A square also has infinitely many points. But surprisingly, these infinities are different sizes."
+    - "Two random events can be independent — yet correlated. And they can be uncorrelated — yet dependent. Both are possible. Let's see why."
+    - "There exist continuous functions that are differentiable nowhere. Not just at a few points — nowhere at all. They look smooth, but they aren't."
+    - "The shortest path between two points on a sphere is not a straight line — because on a sphere, straight lines don't exist in the usual sense."
+
+transitions:
+  between_steps:
+    - "Now that we have [X], the next step is..."
+    - "With that in place, we can now..."
+    - "This gives us [X], which we substitute into..."
+    - "Taking this result and applying it to..."
+    - "From here, the path is clear: we..."
+    - "Having established [X], we're ready to tackle..."
+
+  between_scenes:
+    - "In the last section, we found [result]. Now we use that to..."
+    - "Building on our understanding of [topic A], let's move to [topic B]."
+    - "We've seen [concept] defined. Now let's see it in action."
+    - "That was the theory. Here's what it looks like in practice."
+    - "The pattern we identified carries through to the next idea."
+
+  introducing_complexity:
+    - "So far we've worked with simple cases. Now let's see what happens when..."
+    - "This works cleanly when [simple condition]. For [harder condition], we need one extra step."
+    - "There's a subtlety here that's worth pausing on."
+    - "The general case requires a slight variation on what we just did."
+    - "This next example is harder — and more interesting."
+
+closing_patterns:
+  scene_closings:
+    - "So: [one-sentence summary of what was shown]."
+    - "That's [concept] — [its essential property in one clause]."
+    - "The key takeaway from this step: [single insight]."
+    - "And that's the [method] — powerful, precise, and widely applicable."
+    - "We've now shown that [result] — and the proof technique generalises."
+    - "From this point forward, [result] is a tool we can use."
+
+  section_closings:
+    - "Let's recap the three ideas we covered: [A], [B], and [C]. The common thread is [unifying insight]."
+    - "We started with [simple case], built to [complex case], and the method held throughout."
+    - "Next, we'll use everything from this section to prove [upcoming result]."
+    - "That completes [topic]. In the next section, we turn to [next topic] — which depends on exactly this foundation."
