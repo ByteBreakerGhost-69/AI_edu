@@ -1,0 +1,504 @@
+meta:
+  subject_group: "general"
+  covers_subjects: ["geography", "economics", "literature", "computer_science", "language"]
+  loaded_by: ["script_generator", "difficulty_adapter"]
+  design_principle: |
+    The general script template covers subjects that share an analytical, discursive
+    character — reasoning, interpretation, application, and communication.
+    Unlike mathematics (symbolic rigour) or history (temporal narrative), these subjects
+    require a flexible narration style that can shift between conceptual explanation,
+    applied analysis, structured argument, and skill demonstration.
+    Core rule: always make the purpose of learning this material explicit.
+    Students in these subjects often ask "why do I need to know this?" — answer that
+    question in the narration before they ask it.
+
+  subject_specific_notes:
+    geography: "Ground abstract spatial and environmental concepts in real places and current events"
+    economics: "Connect abstract models to real market behaviour and lived economic experience"
+    literature: "Make textual analysis feel like discovery, not dissection"
+    computer_science: "Privilege understanding over syntax — why does this work, not just how"
+    language: "Make communication feel achievable — build confidence alongside competence"
+
+narration_style:
+  voice: "engaged, analytical, clear — like an excellent tutor explaining on a whiteboard"
+  person: "first-person plural for shared reasoning ('We can see that...', 'Let's consider...')"
+  avoid_person: "Reduce second-person imperative ('you must memorise') — prefer invitation over instruction"
+
+  register: |
+    Varies by subject and difficulty level:
+    - Economics and computer science: slightly more formal, model-based, precise
+    - Literature and language: more exploratory, interpretive, open to multiple readings
+    - Geography: accessible but data-aware; connects local to global
+    All subjects: intellectually honest — acknowledge when questions are contested or complex.
+
+  rhythm: |
+    General narration follows: question → concept → application → reflection.
+    Question: what problem or idea are we investigating?
+    Concept: what framework, model, or skill do we need?
+    Application: how does this framework illuminate a real case?
+    Reflection: what does this tell us more broadly?
+
+  subject_rhythms:
+    geography: "observe (the spatial pattern) → explain (the process) → predict (change) → evaluate (human impact)"
+    economics: "model (the ideal case) → complicate (real-world friction) → apply (to a market) → evaluate (policy)"
+    literature: "notice (a textual detail) → interpret (what it might mean) → contextualise (author, period, form) → evaluate (effect)"
+    computer_science: "problem → algorithm → implementation → test → generalise"
+    language: "input (example of target usage) → notice (the pattern or structure) → practise → extend (to new contexts)"
+
+explanation_patterns:
+  beginner:
+    strategy: "Concrete example first, concept second"
+    pattern: |
+      1. Start with something the student already knows or has encountered
+      2. Identify the interesting question or puzzle it raises
+      3. Introduce the concept or framework that addresses it
+      4. Define the concept plainly — without jargon on first pass
+      5. Apply it back to the opening example
+      6. Give a second simple example to confirm understanding
+      7. Name the concept formally at the end: "This is what [term] means"
+
+    analogy_guidance: |
+      Use analogies freely at beginner level — but flag them:
+      "Think of opportunity cost like the next best thing you gave up when you made a choice.
+       When you spent an hour watching TV, the opportunity cost was whatever else you could have done with that hour."
+      After the analogy: "The formal definition is [definition]."
+
+    skill_demonstration: |
+      For skills (writing, coding, map reading):
+      Show a finished example first. Then deconstruct how it was made.
+      "Here's a well-structured paragraph analysing a poem. Let's look at what makes it work."
+
+    vocabulary_intro: |
+      Introduce only two or three new terms per scene.
+      Always define them in plain language before using them analytically.
+      "Demand — how much of a good consumers want to buy at a given price."
+
+  intermediate:
+    strategy: "Framework-driven analysis with explicit application"
+    pattern: |
+      1. State the concept or analytical framework by name
+      2. Define it formally — with all key components
+      3. Show it applied to a well-chosen example
+      4. Complicate: "But what happens when [complication]?"
+      5. Extend: how does the framework handle the more complex case?
+      6. Reflect: "What are the limits of this approach?"
+
+    application_emphasis: |
+      Always move from theory to application in each scene.
+      Do not explain a concept without immediately grounding it:
+      "The multiplier effect — but let's see how it works in a concrete case."
+      The example should be rich enough to test the framework, not just illustrate it.
+
+    qualification_language: |
+      Introduce hedging and qualification:
+      "This model assumes [assumption] — which holds in [condition] but breaks down when [exception]."
+      "Economists distinguish between [A] and [B] — a distinction that matters when..."
+
+  advanced:
+    strategy: "Evaluative synthesis and critical engagement"
+    pattern: |
+      1. State a contested question or interpretive debate
+      2. Present the dominant view and its evidence or reasoning
+      3. Present a significant challenge or alternative interpretation
+      4. Evaluate: what would it take to settle this question?
+      5. Synthesise: where does the balance of evidence lie?
+      6. Connect to a larger disciplinary question or real-world implication
+
+    critical_evaluation: |
+      Advanced narration does not present models or interpretations as settled:
+      "The Keynesian model of aggregate demand offers a powerful account of recession —
+       but critics from the monetarist and real business cycle traditions have challenged
+       each of its key assumptions. Here's the core of that debate."
+      Teach the student to evaluate, not just receive.
+
+    disciplinary_thinking: |
+      Make the methodology explicit:
+      "In literary criticism, we read against the grain — looking for what a text reveals
+       despite or in tension with what it appears to say."
+      "In economics, we ask: compared to what? A policy's benefits always need to be
+       measured against its opportunity cost."
+      "In computer science, we distinguish correctness (does it work?) from efficiency
+       (is it the best way to make it work?)."
+
+pacing_guide:
+  words_per_minute: 128
+  target_seconds_per_scene:
+    beginner: 48
+    intermediate: 40
+    advanced: 35
+
+  pause_rules: |
+    Pause AFTER:
+      - Stating a key definition (600ms — new vocabulary needs to land)
+      - Making a significant analytical claim (500ms — argument needs space)
+      - Presenting data or a statistic (700ms — numbers need processing time)
+      - A quote from a literary text (800ms — allow resonance)
+      - Demonstrating a new coding technique or algorithm step (700ms — visual processing)
+
+    Never pause:
+      - Mid-sentence
+      - Between tightly connected premise and conclusion
+      - During narrative or descriptive sequences that build momentum
+
+  sentence_length:
+    beginner: "Maximum 13 words. One idea per sentence. Everyday vocabulary."
+    intermediate: "Maximum 21 words. Analytical sentences with one subordinate clause."
+    advanced: "Maximum 30 words. Complex arguments with explicit logical connectives."
+
+  data_narration: |
+    State numbers clearly: say "thirty-seven percent" not "37%" in narration.
+    Always say what a statistic measures: "thirty-seven percent of households in sub-Saharan Africa..."
+    Follow every number with an interpretation: "...which means that roughly one in three families..."
+    Avoid lists of more than three statistics in a row without a verbal anchor between them.
+
+scene_templates:
+  hook:
+    purpose: "Make the student want to understand this concept"
+    duration_seconds: 28
+    structure: |
+      [Real-world case, current event, or familiar experience]
+      [The question or puzzle it raises — one that this subject helps answer]
+      [Stake: what kind of thinking or skill does understanding this unlock?]
+    examples:
+      - "In 2008, banks that seemed financially healthy collapsed in weeks. Economists had built sophisticated models of financial risk — and almost none of them predicted what happened. Why?"
+      - "A twenty-line Python script can automate a task that would take a human eight hours. Not because computers are smarter — but because they can follow instructions at a speed and scale humans cannot. Here's the logic behind that."
+      - "Every novel, film, and advertisement is constructed to produce an effect on an audience. Once you know how to analyse that construction, you can never read — or be manipulated — in quite the same way again."
+      - "Sea levels are projected to rise by up to one metre by 2100. Some island nations will cease to exist. The cause is well understood. The political response is not. Here's the geography."
+
+  concept_introduction:
+    purpose: "Define and establish the core idea or framework"
+    duration_seconds: 42
+    structure: |
+      [Name the concept]
+      [Formal definition — precise and complete]
+      [Plain-English restatement]
+      [Identify: what problem does this concept help us solve?]
+      [Simplest possible example]
+    narration_pattern: |
+      "[Concept] is defined as [formal definition].
+       In plainer terms: [accessible restatement].
+       This concept matters because [problem it addresses].
+       The simplest example: [concrete case]."
+
+  analysis_demonstration:
+    purpose: "Show the analytical framework in action"
+    duration_seconds: 52
+    structure: |
+      [State the question being analysed]
+      [Identify the relevant framework or approach]
+      [Apply step by step — narrate each analytical move]
+      [State the conclusion and the evidence that supports it]
+      [Note the quality of the argument: "The strength of this analysis is... The weakness is..."]
+    narration_pattern: |
+      "Here's the question we're working with: [question].
+       To approach it, we'll use [framework/method].
+       [Step 1: apply with narration]
+       [Step 2: apply with narration]
+       This gives us the conclusion that [finding].
+       Notice what makes this analysis strong: [strength]. What it can't tell us: [limitation]."
+
+  case_study:
+    purpose: "Ground abstract concepts in a real, specific case"
+    duration_seconds: 55
+    structure: |
+      [Introduce the case: who, where, when, what happened]
+      [Identify which concept or framework this case illustrates]
+      [Apply the framework to the case — analyse, don't just describe]
+      [Identify what the case confirms, complicates, or challenges in the theory]
+    narration_pattern: |
+      "To see [concept] in action, consider [case].
+       In [place/time], [what happened — specific detail].
+       Applying our framework, we can see that [analysis].
+       This case [confirms/complicates/challenges] the theory because [reason].
+       It also raises a question the theory doesn't easily answer: [question]."
+
+  skill_walkthrough:
+    purpose: "Demonstrate a procedural or analytical skill step by step"
+    duration_seconds: 60
+    structure: |
+      [Show a finished example of the skill output first]
+      [Break down what makes it effective]
+      [Walk through the process of creating it — each step narrated]
+      [Note the decision points: why this choice, not that one?]
+      [Summarise the process as a reproducible method]
+    narration_pattern: |
+      "Here's an example of [skill product]. Notice [key feature A] and [key feature B].
+       Now let's see how this was constructed.
+       First, [step 1 with decision rationale].
+       Then, [step 2 with decision rationale].
+       The key decision here: [decision] — because [reason].
+       The method, in summary: [reproducible steps]."
+
+  debate_scene:
+    purpose: "Present a contested idea with intellectual honesty"
+    duration_seconds: 48
+    structure: |
+      [State the question — why it is genuinely contested]
+      [Present view A with its strongest supporting argument]
+      [Present view B with its strongest supporting argument]
+      [Evaluate: which is better supported by evidence or reasoning, and why?]
+      [Acknowledge: what would it take to resolve this further?]
+    narration_pattern: |
+      "Scholars debate [question].
+       One view holds that [position A] — supported by [evidence/argument A].
+       An opposing view argues [position B] — drawing on [evidence/argument B].
+       The balance of evidence currently favours [assessment], because [reason].
+       But the question isn't fully settled: [unresolved element]."
+
+  worked_example:
+    purpose: "Solve a problem or produce an analysis together"
+    duration_seconds: 55
+    structure: |
+      [State the problem or task]
+      [Identify the approach — and briefly justify it]
+      [Execute step by step with full narration of each decision]
+      [State the result or product]
+      [Evaluate: does this answer the question? What's the quality of this solution?]
+    narration_pattern: |
+      "Let's work through [problem/task] together.
+       Our approach: [method], because [brief justification].
+       [Step 1: narrate with reasoning]
+       [Step 2: narrate with reasoning]
+       Here's the result: [output].
+       How good is this? [Brief evaluation — strengths and possible improvements]."
+
+  summary:
+    purpose: "Consolidate and connect"
+    duration_seconds: 30
+    structure: |
+      [Restate the central concept in one sentence]
+      [Name the key analytical moves or skills practised]
+      [Connect to the broader subject or prior learning]
+      [Frame what comes next]
+    narration_pattern: |
+      "In this section, we established that [central concept].
+       The key analytical moves: [A] and [B].
+       This connects to [prior concept or real-world relevance].
+       Next, we'll apply this to [next topic or harder case]."
+
+vocabulary_guide:
+  technical_term_introduction:
+    first_use: "Define on first use — precise but accessible: '[term] — meaning [definition]'"
+    subsequent_use: "Use term freely after introduction; do not keep re-defining"
+    subject_specific:
+      economics: "Introduce both formal definition and intuitive gloss: 'Elasticity — a measure of how responsive quantity demanded is to a change in price. In other words: does a price rise kill demand sharply, or barely at all?'"
+      literature: "Introduce technical terms naturally: 'The tone here — the narrator's emotional attitude toward their subject — shifts markedly in the second paragraph.'"
+      computer_science: "Define terms with reference to function: 'A variable is a named location in memory where a value is stored — and can be changed.'"
+      geography: "Use terms alongside real examples: 'Urbanisation — the process by which an increasing proportion of a population lives in cities — has transformed countries like China over the past forty years.'"
+      language: "Introduce grammatical or linguistic terms with immediate examples: 'A subordinate clause — like this one — adds information to a main clause but cannot stand alone.'"
+
+  register_words:
+    formal_preferred:
+      - "consequently"
+      - "it follows that"
+      - "this suggests"
+      - "the evidence indicates"
+      - "we might argue"
+      - "on balance"
+      - "in contrast"
+      - "nevertheless"
+      - "it is worth noting"
+    informal_acceptable_for_beginner:
+      - "in other words"
+      - "think of it as"
+      - "basically"
+      - "that means"
+      - "the idea is"
+    always_avoid:
+      - "obviously"
+      - "clearly"
+      - "as we all know"
+      - "just"
+      - "simply"
+      - "easy"
+      - "needless to say"
+      - "of course"
+
+  subject_vocabulary_priorities:
+    economics:
+      must_define: ["opportunity cost", "ceteris paribus", "marginal", "elasticity", "equilibrium", "externality", "comparative advantage"]
+      avoid_undefined_jargon: ["fiscal multiplier", "monetarist", "Ricardian equivalence"]
+    literature:
+      must_define: ["motif", "allusion", "irony", "tone", "register", "diegetic", "unreliable narrator"]
+      avoid_undefined_jargon: ["intertextuality", "heteroglossia", "hegemonic discourse"]
+    computer_science:
+      must_define: ["algorithm", "variable", "function", "iteration", "recursion", "complexity", "abstraction"]
+      avoid_undefined_jargon: ["polymorphism", "semaphore", "idempotent" without definition]
+    geography:
+      must_define: ["sustainability", "geopolitics", "urbanisation", "demographic transition", "plate tectonics"]
+      avoid_undefined_jargon: ["palimpsest", "subaltern geography" without definition]
+    language:
+      must_define: ["syntax", "pragmatics", "register", "collocation", "discourse marker", "cohesion"]
+      avoid_undefined_jargon: ["polysemy", "prototypicality" without definition]
+
+adaptation_rules:
+  beginner:
+    sentence_transformations:
+      - before: "Comparative advantage dictates that nations specialise in goods with the lowest opportunity cost"
+        after: "Countries tend to produce what they're relatively best at — even if another country could produce it more efficiently in absolute terms. This idea, called comparative advantage, explains much of world trade."
+      - before: "The protagonist's unreliable narration serves an epistemological function in the text"
+        after: "The narrator in this story doesn't always tell the truth — and might not even know it. That unreliability is the point. It makes us question what we can know and trust."
+      - before: "A recursive function calls itself until a base case is reached"
+        after: "A recursive function is one that solves a problem by calling itself — a smaller version of the same problem — until it reaches a case simple enough to solve directly."
+      - before: "The demographic transition model describes population change in four stages"
+        after: "As countries develop economically, their birth rates and death rates change in a predictable pattern. This pattern — the demographic transition model — has four stages."
+
+    accessibility_policy:
+      - "Lead with concrete examples or familiar contexts before introducing the abstract concept"
+      - "Use analogies from everyday life — shopping, social media, weather, sports"
+      - "Break complex skills (essay writing, code debugging, map reading) into numbered steps"
+      - "Avoid introducing more than two technical terms per scene"
+      - "After every concept: say what the student can now do with it"
+
+  intermediate:
+    sentence_transformations:
+      - before: "Perfect competition is characterised by many buyers and sellers, homogeneous products, and perfect information"
+        after: "Perfect competition requires three conditions: many buyers and sellers (so no single actor controls price), identical products (so buyers have no reason to prefer one seller), and perfect information (so all parties know the market price)"
+      - before: "Post-colonial readings of The Tempest foreground Caliban as a colonised subject"
+        after: "Post-colonial critics read The Tempest as a drama of colonisation — with Caliban representing the colonised people whose land is seized and whose identity is suppressed by Prospero's civilising narrative"
+
+    depth_policy:
+      - "Apply concepts to at least one real-world case per scene"
+      - "Introduce limitations and counterexamples of theoretical models"
+      - "Begin to distinguish between strong and weak versions of analytical claims"
+      - "Reference the broader disciplinary context: 'Economists call this...', 'Literary critics describe this as...'"
+
+  advanced:
+    sentence_transformations:
+      - before: "Markets can fail for various reasons"
+        after: "The standard taxonomy of market failure — public goods, externalities, information asymmetry, and natural monopoly — each represents a distinct mechanism by which the price signal fails to produce efficient resource allocation"
+      - before: "The author uses imagery to convey meaning"
+        after: "The cluster of water imagery in the opening chapter — submergence, drowning, current — foreshadows the protagonist's loss of agency and anticipates the novel's central concern with the limits of self-determination"
+
+    sophistication_policy:
+      - "Engage with disciplinary debates by name and argument"
+      - "Evaluate the quality of evidence and reasoning, not just conclusions"
+      - "Introduce methodological questions: 'How would we test this claim?', 'What evidence would challenge this reading?'"
+      - "Use disciplinary metalanguage fluently: in economics, 'Pareto efficiency'; in literature, 'close reading'; in CS, 'time complexity'"
+
+forbidden_phrases:
+  visual_reference_phrases:
+    reason: "Narration describes ideas and arguments — not the video interface"
+    banned:
+      - "As you can see on the screen..."
+      - "Look at this diagram..."
+      - "The animation shows..."
+      - "In this slide..."
+      - "As displayed here..."
+    replace_with:
+      - "The diagram illustrates..." (describe content)
+      - "Notice the relationship between..."
+      - "Here, the graph shows..."
+      - "The data tell us..."
+
+  condescension_phrases:
+    reason: "These subjects involve genuine complexity — students who struggle are not failing, they're thinking"
+    banned:
+      - "Obviously..."
+      - "Clearly..."
+      - "Just..."
+      - "Simply..."
+      - "This is common sense..."
+      - "Any economist would tell you..."
+      - "Everyone knows..."
+    replace_with:
+      - "Notice that..."
+      - "The evidence suggests..."
+      - "On balance..."
+      - "The key insight here is..."
+
+  false_certainty_phrases:
+    reason: "In analytical subjects, most significant claims are contested — honour that"
+    banned:
+      - "The answer is definitely..."
+      - "The text clearly means..."
+      - "The only explanation is..."
+      - "Economics proves that..."
+      - "History shows that..."
+    replace_with:
+      - "The evidence strongly suggests..."
+      - "One persuasive reading is..."
+      - "The most widely accepted explanation holds that..."
+      - "On balance, the argument points to..."
+
+  vague_affirmations:
+    reason: "Students need analytical feedback, not motivational filler"
+    banned:
+      - "Great question!"
+      - "Excellent!"
+      - "Well done!"
+      - "Fantastic!"
+      - "Amazing!"
+      - "Brilliant!"
+    note: "Affirmations are for live teaching interactions, not scripted video narration"
+
+  filler_phrases:
+    reason: "Every second of narration must carry informational or analytical weight"
+    banned:
+      - "So, basically..."
+      - "Right, so..."
+      - "Let's go ahead and..."
+      - "Now then, let's take a look at..."
+      - "Alright, moving on..."
+      - "So yeah..."
+      - "Kind of like..."
+      - "Sort of..."
+    replace_with:
+      - "This leads us to..." (analytical transition)
+      - "Now consider..." (pivot to new idea)
+      - "A harder question is..." (escalation)
+      - Direct statement of the next concept, case, or argument
+
+hooks:
+  problem_hooks:
+    - "Why do some countries grow rich while others stay poor? Economists have been trying to answer this for two centuries. The answer — if there is one — involves institutions, geography, culture, and history interacting in ways that are still not fully understood."
+    - "A programmer writes code that works perfectly on their machine but crashes on everyone else's. Debugging this kind of problem requires understanding not just code, but environments, dependencies, and the assumptions built into every piece of software."
+    - "Shakespeare's Hamlet has been performed for over four hundred years — and critics still disagree about what it means. Is Hamlet mad or feigning madness? Does he hesitate or is he unable to act? The text doesn't resolve these questions. That's the point."
+    - "In 1944, forty-four nations met in Bretton Woods, New Hampshire to design the post-war global financial system. The decisions made in that hotel over three weeks still shape how money moves around the world today."
+
+  curiosity_hooks:
+    - "A single line of well-written code can outperform a hundred lines of poorly written code by a factor of a thousand. The difference is not language, syntax, or effort — it's algorithmic thinking."
+    - "The world's most-spoken language is not English. Nor Mandarin. Measured by total speakers, it is English — but measured by native speakers, Mandarin wins. Why does the question matter? Because 'most spoken' hides assumptions."
+    - "Three-quarters of the world's megacities — cities of ten million or more — are in Asia. That's a fact of geography. But geography didn't cause it. What did?"
+    - "Every metaphor in the English language was once a comparison. Then it became familiar. Then it became invisible. 'The leg of a table.' 'The mouth of a river.' The language you use shapes how you think — whether you notice it or not."
+
+  challenge_hooks:
+    - "By the end of this section, you will be able to read a supply-and-demand diagram and predict what happens to price and quantity when any variable changes. That's a powerful analytical skill that most people lack."
+    - "Reading code is a skill. Writing code is harder. Debugging code — reading it looking for errors — is harder still. We'll practise all three. By the end, you'll be able to trace what a programme does line by line."
+    - "Close reading of a text means attending to word choice, structure, tone, and imagery with the precision of someone solving a puzzle. The text itself is the evidence. Nothing else is needed. Let's practise."
+
+transitions:
+  logical_transitions:
+    - "This leads directly to [next concept]..."
+    - "Extending this logic, we find that..."
+    - "Now that we've established [A], we can tackle [B]..."
+    - "The same principle applies to [new context]..."
+    - "A harder version of this problem asks: [escalation]..."
+
+  analytical_transitions:
+    - "But this model has a limit: [limitation]..."
+    - "The counterargument is that [alternative]..."
+    - "What this doesn't explain is [gap]..."
+    - "A complication arises when [complication]..."
+    - "This raises a question: [follow-on question]..."
+
+  contextual_transitions:
+    - "To ground this in a real case, consider [example]..."
+    - "Let's test this idea against [case]..."
+    - "In practice, [concept] looks like this: [application]..."
+    - "To see why this matters, imagine [scenario]..."
+
+closing_patterns:
+  scene_closings:
+    - "[Concept] is the idea that [core statement in one clause]."
+    - "The key analytical move here: [technique], which allows us to [capability]."
+    - "The evidence points to [conclusion] — though [qualification] remains open."
+    - "That's [skill] in practice. The method: [reproducible steps]."
+    - "Notice the pattern: [general principle abstracted from the specific case]."
+
+  section_closings:
+    - "We've covered [A], [B], and [C]. The unifying thread: [connecting principle]."
+    - "This framework — [name or description] — applies beyond [this topic] to [broader context]."
+    - "In the next section, we test this analysis against [harder case or exception]."
+    - "The question we started with — [opening question] — now has a provisional answer: [answer]. Provisional because [remaining complexity]."
+    - "Understanding [concept] changes how you [practical capability or critical skill]. That's the point."
