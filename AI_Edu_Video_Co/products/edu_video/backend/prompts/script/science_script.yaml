@@ -1,0 +1,487 @@
+meta:
+  subject_group: "science"
+  covers_subjects: ["physics", "chemistry", "biology"]
+  loaded_by: ["script_generator", "difficulty_adapter"]
+  design_principle: |
+    Science video narration must honour the empirical nature of science:
+    observations come first, explanations follow, models are always provisional.
+    The narration should convey that science is a process of finding out —
+    not a collection of facts to memorise.
+    For physics: equations describe physical reality — always connect formula to phenomenon.
+    For chemistry: transformations are real, molecular — make the invisible visible through narration.
+    For biology: systems are interconnected — narrate the big picture alongside the detail.
+
+narration_style:
+  voice: "curious, methodical, evidence-grounded"
+  person: "first-person plural for shared inquiry ('We observe...', 'Let's investigate...')"
+  avoid_person: "Avoid passive voice overuse — 'it is observed that' weakens engagement"
+
+  register: |
+    Precise but never sterile. Science narration should feel like working alongside
+    a knowledgeable colleague, not listening to a lecture theatre recitation.
+    Maintain scientific rigour — acknowledge uncertainty, distinguish observation from inference,
+    qualify claims where appropriate.
+    Do not anthropomorphise molecules or forces without flagging it as analogy.
+
+  rhythm: |
+    Science narration follows: observe → question → model → predict → test.
+    Start with the observable phenomenon.
+    Ask: why does this happen?
+    Introduce the model or mechanism that explains it.
+    Show what the model predicts.
+    (Where relevant) note how predictions are tested experimentally.
+
+  subject_specific_rules:
+    physics: |
+      Every formula introduced must connect immediately to a physical phenomenon.
+      Never present an equation without saying what physical situation it describes.
+      Units are non-negotiable — state units at every step.
+      Distinguish vector quantities from scalar quantities explicitly.
+      Use "magnitude" and "direction" as standard vocabulary.
+
+    chemistry: |
+      Atomic and molecular reality underlies everything — make it vivid.
+      When a reaction occurs, describe it at the particle level: "The sodium ion
+       releases its outer electron, which the chlorine atom accepts."
+      State symbols must be mentioned in narration context: "in solution" = (aq),
+       "as a gas" = (g), "as a solid precipitate" = (s).
+      Exothermic vs endothermic: always describe from the system's perspective.
+
+    biology: |
+      Structure determines function — make this connection explicit every time.
+      Use precise anatomical and biochemical terminology, but define it on first use.
+      Evolution is the unifying framework — connect adaptations to selective pressure where relevant.
+      Avoid teleological language ("the cell wants to", "the gene is trying to") — use
+       mechanistic language: "this triggers...", "this results in...".
+
+explanation_patterns:
+  beginner:
+    strategy: "Observation first, concept second"
+    pattern: |
+      1. Describe something the student has seen or experienced in everyday life
+      2. Name the scientific observation (not the explanation yet)
+      3. Ask: "Why does this happen?"
+      4. Introduce the simplest model that explains it
+      5. Show the model making a prediction
+      6. Name the concept formally: "This is called [term]"
+
+    analogy_guidance: |
+      Use analogies generously — but flag them explicitly:
+      "Think of electrons in a circuit like water in a pipe — the current is the flow rate.
+       It's not a perfect analogy, but it captures the key idea."
+      Always state where the analogy breaks down.
+
+    experimental_reference: |
+      Reference familiar experiments: "In a simple experiment with a prism..."
+      Do not require the student to know experimental technique.
+      Describe what was observed, not how it was set up.
+
+    number_handling: |
+      Use round numbers and standard examples: g = 10 m/s² (not 9.81) for beginners.
+      Scientific notation: introduce gradually. "About one billion" before "10⁹".
+      Unit prefixes: define milli-, kilo-, mega- on first use.
+
+  intermediate:
+    strategy: "Model building and quantitative application"
+    pattern: |
+      1. State the phenomenon and its scientific name
+      2. Present the governing model or law (formula or mechanism)
+      3. Define all variables and state all assumptions
+      4. Apply to a concrete quantitative example
+      5. Discuss the limits of the model: "This works when... but breaks down when..."
+      6. Connect to experimental evidence or real-world application
+
+    equation_handling: |
+      Present equations with all variables defined in the same breath.
+      "F equals m times a — where F is the net force in newtons,
+       m is the mass in kilograms, and a is the acceleration in metres per second squared."
+      Always specify which quantities are being held constant in a given situation.
+
+    uncertainty_language: |
+      Introduce scientific uncertainty naturally:
+      "We say the value is approximately..." / "Within experimental uncertainty..."
+      "The model predicts... which agrees with observed values to within 2%."
+
+  advanced:
+    strategy: "Theoretical derivation and critical evaluation"
+    pattern: |
+      1. State the result or principle precisely
+      2. Identify the underlying assumptions and domain of validity
+      3. Derive or develop mathematically — showing each logical and algebraic step
+      4. Interpret the result physically, chemically, or biologically
+      5. Note experimental confirmation and known deviations
+      6. State current frontiers or unresolved questions where relevant
+
+    derivation_style: |
+      Narrate physical reasoning alongside mathematical steps:
+      "As the temperature increases, the average kinetic energy rises — which tells us
+       the pressure must increase. Mathematically, this follows from..."
+      Never derive without saying what the derivation tells us about the world.
+
+    critical_evaluation: |
+      Model limitations are part of the content, not footnotes:
+      "The ideal gas law holds well for low pressure and high temperature.
+       At high pressure, intermolecular forces become significant — and the model breaks down."
+      Distinguish established theory from active research.
+
+pacing_guide:
+  words_per_minute: 135
+  target_seconds_per_scene:
+    beginner: 45
+    intermediate: 38
+    advanced: 32
+
+  pause_rules: |
+    Pause AFTER:
+      - Stating a law or principle (600ms — significant claim deserves space)
+      - Writing a formula with units (800ms — student notes it down mentally)
+      - Describing a particle-level event in chemistry (500ms — visualisation time)
+      - A surprising experimental result (700ms — cognitive surprise needs resolution)
+      - Naming a new biological structure or process (500ms — new vocabulary)
+
+    Never pause:
+      - Mid-sentence
+      - Between tightly connected cause-and-effect statements
+      - During rapid step-by-step calculation narration
+
+  sentence_length:
+    beginner: "Maximum 13 words. One scientific idea per sentence."
+    intermediate: "Maximum 20 words. Cause-effect can be one sentence."
+    advanced: "Maximum 28 words. Complex qualifications acceptable with clear structure."
+
+  unit_narration_pace: |
+    Always say units — never skip them even under time pressure.
+    Read units at the same speed as the number: "nine-point-eight-one metres per second squared"
+    Compound units: slight pause between quantity and unit.
+    Unit analysis sentences: read at 15% slower than normal narration.
+
+scene_templates:
+  hook:
+    purpose: "Establish WHY this phenomenon is worth understanding"
+    duration_seconds: 28
+    structure: |
+      [Observable phenomenon — familiar to the student]
+      [The question: why does this happen? What controls it?]
+      [Stakes: what understanding this unlocks practically or scientifically]
+    examples:
+      - "Every time you drop something, it falls at the same acceleration — regardless of mass. How do we know? Galileo tested it, and so can you. The reason lies in the equivalence principle."
+      - "A match lights by striking it on a rough surface. Millions of molecules rearrange in milliseconds, releasing stored chemical energy as heat and light. How does that happen at the atomic level?"
+      - "Your body maintains a constant temperature of 37 degrees Celsius even in a cold room. This isn't passive — it's an active, energy-consuming process called thermoregulation."
+      - "Two transparent materials can look identical to the human eye, yet bend light completely differently. The difference is in how light interacts with their electron structures."
+
+  observation_setup:
+    purpose: "Ground the concept in an observable or measurable phenomenon"
+    duration_seconds: 35
+    structure: |
+      [Describe the physical, chemical, or biological observation clearly]
+      [Quantify where possible — give actual numbers]
+      [Identify the variables: what changes, what stays constant]
+      [Pose the scientific question: what determines [quantity]?]
+    narration_pattern: |
+      "Consider [observable phenomenon].
+       We can measure [quantity] and find that [value with units].
+       When we change [variable], [quantity] changes in a predictable way.
+       The question is: what determines this relationship?"
+
+  model_introduction:
+    purpose: "Present the scientific model or law"
+    duration_seconds: 45
+    structure: |
+      [Name the law, model, or mechanism]
+      [State it — quantitatively if at intermediate/advanced level]
+      [Define all terms and units]
+      [State what assumptions the model makes]
+    narration_pattern: |
+      "[Scientist's name]'s [law/model] states that [formal statement].
+       In equation form: [equation in words with units].
+       Here, [variable A] is [what it represents], measured in [units].
+       This model assumes [key assumptions]."
+
+  worked_example_1:
+    purpose: "Apply the model to a concrete, quantitative problem"
+    duration_seconds: 55
+    structure: |
+      [State the problem — give all known quantities with units]
+      [Identify which law or model applies and why]
+      [Solve step by step — narrate units at every step]
+      [State the result with units and physical interpretation]
+      [Sanity check: does the magnitude make sense physically?]
+    narration_pattern: |
+      "Let's apply this to a concrete example.
+       We have [setup]. We know [quantity A = value, unit], [quantity B = value, unit].
+       We want to find [quantity C].
+       Using [law/formula], we get [calculation].
+       The result: [value, unit]. Does this make physical sense? [Check magnitude and sign]."
+
+  worked_example_2:
+    purpose: "More complex application or different physical context"
+    duration_seconds: 55
+    structure: |
+      [State the harder problem]
+      [Identify what's different — multiple steps, vector component, or new variable]
+      [Solve with narration — call out technique choices]
+      [Highlight the physical insight, not just the answer]
+
+  mechanism_explanation:
+    purpose: "Explain the underlying process at particle, molecular, or cellular level"
+    duration_seconds: 50
+    structure: |
+      [Zoom in: from macroscopic observation to microscopic mechanism]
+      [Describe particles, molecules, or cells and their interactions]
+      [Connect mechanism to observable behaviour]
+      [Note: 'This mechanism explains why we observe [phenomenon]']
+    narration_pattern: |
+      "To understand why [macroscopic behaviour], we need to look at what's happening
+       at the [particle/molecular/cellular] level.
+       [Microscopic description — specific and visual]
+       This [microscopic event] is what causes the [macroscopic observation] we see."
+
+  experimental_context:
+    purpose: "Ground the science in real experimental evidence"
+    duration_seconds: 40
+    structure: |
+      [Describe the key experiment that established this result]
+      [State what was measured and what was found]
+      [Connect to the model: 'These results are consistent with...']
+      [Note any surprising aspects or historical significance]
+    narration_pattern: |
+      "The evidence for [concept] comes from [experiment/observation].
+       [Scientist(s)], working in [era/context], measured [quantity]
+       and found [result]. This [confirmed/challenged/established] the model."
+
+  common_mistakes:
+    purpose: "Address frequent conceptual errors"
+    duration_seconds: 42
+    structure: |
+      [State the misconception precisely]
+      [Explain why it seems reasonable — give it credit]
+      [Show why it leads to a wrong prediction or contradiction]
+      [State the correct understanding and why it works]
+    narration_pattern: |
+      "A common misconception here: [incorrect idea].
+       It's understandable — [why it seems reasonable].
+       But this leads to a problem: [contradiction or wrong prediction].
+       The correct understanding is [correct idea], because [mechanistic reason]."
+
+  summary:
+    purpose: "Consolidate the core scientific understanding"
+    duration_seconds: 30
+    structure: |
+      [Restate the key law, model, or mechanism in one sentence]
+      [Connect it to the opening observation]
+      [State one real-world application or implication]
+      [Bridge to next topic]
+    narration_pattern: |
+      "To summarise: [concept] tells us that [core statement].
+       This explains the [opening phenomenon] we started with.
+       In practice, this matters because [application].
+       Next, we'll extend this to [next topic]."
+
+vocabulary_guide:
+  technical_term_introduction:
+    first_use: "Define immediately and precisely: '[term] — the [definition]'"
+    subsequent_use: "Use consistently; avoid synonyms that introduce ambiguity"
+    symbol_introduction: "For physics equations: '[Symbol] represents [quantity], measured in [unit]'"
+
+  precision_language:
+    distinguish_carefully:
+      - "mass vs weight — mass is a property of matter; weight is a force due to gravity"
+      - "speed vs velocity — speed is magnitude only; velocity includes direction"
+      - "temperature vs heat — temperature is a state; heat is energy in transfer"
+      - "atom vs molecule vs ion — never conflate"
+      - "correlation vs causation — be explicit about which is established"
+    cause_effect_language:
+      prefer: ["causes", "results in", "leads to", "triggers", "produces", "inhibits"]
+      avoid: ["makes", "creates" (imprecise), "the atom wants to", "the body tries to"]
+
+  register_words:
+    formal_preferred:
+      - "we observe"
+      - "the data indicate"
+      - "it can be shown"
+      - "this is consistent with"
+      - "the model predicts"
+      - "experimental evidence suggests"
+      - "this follows from"
+    informal_acceptable_for_beginner:
+      - "think of it as"
+      - "imagine"
+      - "picture"
+      - "like a..."
+    always_avoid:
+      - "obviously"
+      - "clearly"
+      - "just"
+      - "simply"
+      - "as everyone knows"
+      - "the atom decides to"
+      - "the cell wants to"
+      - "nature prefers"
+
+  unit_handling:
+    rule: "Always state units — in narration, every measured quantity has a unit"
+    compound_units: "Say 'metres per second squared' — never skip 'squared'"
+    prefixes: "Define on first use: 'nano — one billionth, 10 to the negative nine'"
+    scientific_notation: "Say 'ten to the power of [n]' — never 'E notation'"
+
+adaptation_rules:
+  beginner:
+    sentence_transformations:
+      - before: "The net force is the vector sum of all applied forces"
+        after: "The overall push or pull on an object is what you get when you add all the forces acting on it — including their directions"
+      - before: "Entropy increases in all spontaneous processes"
+        after: "Things left to themselves tend to become more disordered over time — a dropped egg doesn't reassemble itself"
+      - before: "The mitochondria are the site of oxidative phosphorylation"
+        after: "Mitochondria produce the cell's main energy molecule, ATP, using a chain of chemical reactions powered by oxygen"
+      - before: "Le Chatelier's principle states that a system at equilibrium responds to a disturbance by opposing it"
+        after: "When something upsets a chemical balance, the reaction shifts to restore that balance — like a see-saw correcting itself"
+
+    analogy_policy:
+      - "Use at least one analogy per new concept"
+      - "State the analogy explicitly: 'Think of this like...'"
+      - "Immediately note where the analogy breaks down: 'Of course, unlike [analogy], here...'"
+      - "Draw from experiences students have had: traffic, cooking, sport, weather"
+
+  intermediate:
+    sentence_transformations:
+      - before: "The reaction proceeds via a nucleophilic substitution mechanism"
+        after: "In this reaction, a nucleophile — an electron-rich species — attacks and displaces the leaving group via a substitution mechanism"
+      - before: "Allele frequencies change under genetic drift"
+        after: "In small populations, random chance can shift how common an allele is — even without natural selection"
+
+    analogy_policy:
+      - "Use analogies only when they add precision, not decoration"
+      - "Reference previously introduced models: 'Recall our model of...'"
+      - "Use quantitative analogies where possible: 'This is proportional to... just as...'"
+
+  advanced:
+    sentence_transformations:
+      - before: "At equilibrium, the forward and reverse reaction rates are equal"
+        after: "At dynamic equilibrium, the rate of the forward reaction equals the rate of the reverse reaction — the concentrations remain constant, but molecular exchange continues"
+      - before: "The wavefunction squared gives the probability density"
+        after: "The modulus-squared of the wavefunction, |ψ|², gives the probability density — the probability per unit volume of finding the particle at a given location"
+
+    analogy_policy:
+      - "Use analogies sparingly — only when they genuinely clarify, not to avoid formalism"
+      - "When analogies are used, state them and then move past them quickly"
+      - "Distinguish rigorously between models and reality"
+
+forbidden_phrases:
+  visual_reference_phrases:
+    reason: "Narration should describe phenomena and data — not the video interface"
+    banned:
+      - "As you can see on the screen..."
+      - "Look at this diagram..."
+      - "The animation shows..."
+      - "In this figure..."
+      - "As depicted here..."
+    replace_with:
+      - "Notice that..." (content, not medium)
+      - "The graph shows a linear relationship between..."
+      - "Here, the molecule..."
+      - "The diagram illustrates..."
+
+  teleological_phrases:
+    reason: "Science describes mechanism, not intention — teleological language misrepresents science"
+    banned:
+      - "The electron wants to reach lower energy"
+      - "The cell tries to maintain homeostasis"
+      - "Nature prefers..."
+      - "The gene is designed to..."
+      - "Evolution intended..."
+    replace_with:
+      - "The electron moves to lower energy because [mechanistic reason]"
+      - "Homeostasis is maintained through [feedback mechanism]"
+      - "Evolution by natural selection results in..."
+
+  condescension_phrases:
+    reason: "Science is hard — honour the difficulty, respect the student"
+    banned:
+      - "This is simple..."
+      - "Obviously..."
+      - "Clearly..."
+      - "Just..."
+      - "Simply..."
+      - "This is common sense..."
+      - "Any student of physics knows..."
+    replace_with:
+      - "Notice that..."
+      - "It follows from our model that..."
+      - "The evidence shows..."
+      - "This result tells us..."
+
+  vague_affirmations:
+    reason: "Wastes word count; students need information, not cheerleading"
+    banned:
+      - "Great question!"
+      - "Excellent!"
+      - "Well done!"
+      - "Fantastic!"
+      - "Perfect!"
+    note: "Science narration earns trust through accuracy and clarity, not affirmation"
+
+  filler_phrases:
+    reason: "Dead air in narration; consume time without contributing meaning"
+    banned:
+      - "So, basically..."
+      - "Right, so..."
+      - "Let's go ahead and..."
+      - "Now then..."
+      - "OK so..."
+      - "Moving right along..."
+    replace_with:
+      - Direct statement of the next observation, concept, or step
+      - "This raises a question: [question]"
+      - "Now consider what happens when..."
+
+hooks:
+  curiosity_hooks:
+    - "Every atom in your body was forged inside a star. Not a metaphor — literally true. Here's how stellar nucleosynthesis works."
+    - "A single teaspoon of neutron star material weighs roughly a billion tonnes. What makes matter that dense — and can we make it in a lab?"
+    - "The same fundamental force that holds your pen to a table also holds galaxies together. That force is gravity — and it's far stranger than it appears."
+    - "CRISPR lets scientists edit a living organism's DNA with precision that was unimaginable thirty years ago. The mechanism behind it was discovered in bacteria."
+    - "Why does ice float? For almost every other substance, the solid sinks in its own liquid. The answer lies in hydrogen bonding."
+
+  problem_hooks:
+    - "A car brakes from 30 metres per second to a stop. How far does it travel? The answer depends on understanding work and energy — not just Newton's second law."
+    - "A reaction produces toxic gas at high temperature. How do we maximise the yield while keeping the reaction safe? Equilibrium chemistry has the answer."
+    - "A patient's blood tests show elevated enzyme activity. What does that tell a doctor about the underlying cellular process? Enzyme kinetics provides the framework."
+
+  counterintuitive_hooks:
+    - "The heavier a star, the shorter its life. More fuel, but it burns faster. The relationship is steep — a star ten times the Sun's mass lives a thousand times fewer years."
+    - "Cooling a system can sometimes make a reaction go faster. At first this seems to contradict chemistry — but the reason makes perfect sense at the molecular level."
+    - "An object falling in a vacuum and one falling in air reach the same terminal velocity if you drop them from high enough. Wait — that can't be right. Can it?"
+
+transitions:
+  between_steps:
+    - "With [quantity] established, we can now calculate..."
+    - "Substituting this into our equation gives us..."
+    - "This result allows us to..."
+    - "Applying conservation of [energy/momentum/charge], we find..."
+    - "At the molecular level, this means..."
+
+  between_scenes:
+    - "In the last section, we established [law/model]. Now let's apply it to..."
+    - "We've seen how [mechanism A] works at the molecular level. Now let's zoom out and see the macroscopic consequence."
+    - "That experiment confirmed [result]. The theoretical explanation comes from..."
+    - "From [topic A], we now have the tools to understand [topic B]."
+
+  introducing_complexity:
+    - "So far, we've assumed [simplification]. In reality, we also need to account for..."
+    - "This model works well when [condition]. When [condition] no longer holds..."
+    - "There's an important exception here that changes the analysis."
+    - "The case where [variable] is not constant requires a different approach."
+
+closing_patterns:
+  scene_closings:
+    - "[Law/model] tells us that [core statement in one sentence]."
+    - "That's [concept] — a [mechanism] that [effect]."
+    - "The key result: [quantity] depends on [variables] in [relationship]."
+    - "This explains the [opening observation] and predicts [new phenomenon]."
+    - "From this model, we can now calculate [practical quantity]."
+
+  section_closings:
+    - "To summarise: [concept A], [concept B], and [concept C] together explain [big picture phenomenon]."
+    - "We started with an observation, built a model, tested it against data, and found [result]. That's the scientific method in action."
+    - "In the next section, we extend this model to cover [harder case] — which will require one new assumption."
+    - "This foundation in [topic A] is essential for what comes next: [topic B]."
