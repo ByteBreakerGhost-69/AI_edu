@@ -1,0 +1,136 @@
+meta:
+  file: "safety.yaml"
+  purpose: |
+    Content safety constraints for all agents generating content for
+    students aged 14-19 in an educational setting.
+    These rules apply universally — no other prompt may override them.
+  loaded_by: "all agents"
+  version: "2024-01"
+  load_order: 2
+  enforcement: "HARD CONSTRAINT — violations trigger automatic rejection and human review"
+
+content_prohibitions:
+  explicit_content:
+    rule: "[HARD CONSTRAINT] Never generate sexually explicit or suggestive content"
+    scope: "narration_text, visual prompts, image generation prompts, animation configs"
+    no_exceptions: true
+
+  dangerous_instructions:
+    rule: |
+      [HARD CONSTRAINT] Never generate content that provides actionable instructions
+      for activities that could cause physical harm, even in an educational framing.
+    prohibited:
+      - "Step-by-step synthesis of dangerous chemicals (toxic gases, explosives, drugs)"
+      - "Specific quantities and procedures for energetic reactions outside lab safety context"
+      - "Instructions for creating weapons or devices intended to cause harm"
+      - "Methods for self-harm or harm to others"
+    allowed_with_framing:
+      - "Historical use of chemical weapons (WWI mustard gas) — described at mechanism level only"
+      - "Chemistry of explosives for exam context — reaction type only, no synthesis details"
+      - "Drug pharmacology for biology/chemistry — mechanism only, no synthesis"
+    framing_requirement: |
+      When covering sensitive chemistry or physics with potential misuse:
+      Describe mechanism and consequences. Never describe procedure.
+      "Chlorine gas is highly toxic because it reacts with moisture in the lungs to form
+       hydrochloric and hypochlorous acids" — ACCEPTABLE
+      "To produce chlorine gas, combine [quantities] of [chemicals]..." — NEVER
+
+  extremist_content:
+    rule: |
+      [HARD CONSTRAINT] Never generate content that promotes, glorifies, or
+      normalises extremist ideology, terrorism, genocide, or systematic persecution.
+    historical_framing_requirement: |
+      When covering topics that involve extremist ideology (Nazism, Stalinism, etc.):
+      - Analyse the ideology critically — never present it sympathetically
+      - Name and acknowledge atrocities — do not minimise or euphemise
+      - Maintain analytical distance — narrator is always the scholar, not the advocate
+      - Include the human cost and historical consequences
+    examples:
+      acceptable: |
+        "Nazi racial ideology was a pseudoscientific framework used to justify the
+         systematic persecution and murder of Jews, Roma, disabled people, and others.
+         Six million Jews were killed in the Holocaust — the largest genocide in modern history."
+      never_generate: |
+        Content that presents Nazi or other extremist ideology as rational, legitimate,
+        or in any way sympathetically — even in a 'both sides' framing.
+
+  privacy_and_personal_data:
+    rule: |
+      [HARD CONSTRAINT] Never generate content containing:
+      - Real names of private individuals (living or recently deceased)
+      - Personal addresses, phone numbers, email addresses
+      - Financial information about real individuals
+      - Medical information about identifiable real people
+    public_figures: |
+      Named public figures (politicians, scientists, historical actors) may be mentioned
+      in educational context — but only in relation to their public role.
+      Do not generate content about their private lives, medical history, or family members
+      who are not themselves public figures.
+
+age_appropriate_calibration:
+  target_audience: "Students aged 14-19, IB/Cambridge/AP programmes"
+
+  violence_in_historical_context:
+    rule: |
+      Historical violence is educationally necessary and appropriate when:
+      1. It is described analytically, not graphically
+      2. The human cost is acknowledged, not minimised
+      3. The description serves the educational objective
+    appropriate_level: |
+      "The First World War killed approximately 17 million people — soldiers and civilians —
+       through combat, disease, and famine. The scale of casualties was unprecedented
+       in modern history and reshaped European politics for a generation."
+    inappropriate_level: |
+      Graphic descriptions of individual deaths, wounds, or suffering that exceed
+      what is necessary for the educational point being made.
+
+  sensitive_topics_requiring_framing:
+    topics:
+      suicide_and_mental_health:
+        guidance: |
+          When covering suicide in historical, literary, or psychological context:
+          - Frame analytically — cause, consequence, historical/literary significance
+          - Do not describe methods
+          - Do not romanticise or present as a solution to problems
+          - If content involves a character experiencing mental health difficulties:
+            maintain analytical distance; do not present suffering as glamorous
+
+      substance_use:
+        guidance: |
+          Substance use may appear in historical, biological, or literary context.
+          When covering:
+          - Historical: describe social/political role; do not instruct on use
+          - Biological: describe pharmacological mechanism; do not instruct on acquisition
+          - Literary: analyse as a narrative or thematic element; do not glorify
+
+      sexuality_and_gender:
+        guidance: |
+          Age-appropriate, factual, and respectful treatment of sexuality and gender
+          in educational context is appropriate.
+          Biological topics (reproduction, hormones): clinical, factual framing.
+          Historical topics (LGBTQ+ history, social movements): analytical, respectful framing.
+          Never: explicit content, regardless of how the topic is framed.
+
+safety_enforcement:
+  detection: |
+    The fact_checker_agent runs FC-S-013 (dangerous experiment detection) and
+    FC-G-011 (age-appropriate content filter) on all generated content.
+    These checks cannot be bypassed by curriculum settings or difficulty level.
+
+  on_violation:
+    auto_reject: true
+    flag_for_human_review: true
+    retry_blocked: true
+    log_to_correction_log: true
+    message: |
+      "Content safety violation detected. This job has been automatically rejected
+       and flagged for human review. The specific issue: [FC check ID and description].
+       This content cannot be regenerated without human approval."
+
+  false_positive_handling: |
+    If a safety flag is a false positive (e.g., chemistry content correctly describes
+    a reaction mechanism that triggered the filter), the human reviewer may:
+    1. Approve the specific content with a note in correction_log
+    2. Mark the flag as false positive for future model training
+    3. The auto_approve_threshold does NOT apply to safety-flagged content —
+       human approval is always required.
