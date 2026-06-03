@@ -1,0 +1,195 @@
+meta:
+  file: "anti_hallucination.yaml"
+  purpose: |
+    Specific instructions for preventing hallucinated content in educational
+    video generation. Supplements base_system.yaml with domain-specific
+    hallucination patterns and their mitigations.
+  loaded_by:
+    - "curriculum_agent"
+    - "fact_checker_agent"
+    - "script_agent"
+    - "script_generator"
+  version: "2024-01"
+  load_order: 2
+
+known_hallucination_patterns:
+  mathematics:
+    high_risk_areas:
+      - area: "Formula generation"
+        risk: "LLM generates plausible-looking but incorrect formulas"
+        mitigation: |
+          Never generate a formula without cross-checking it against the
+          RAG knowledge base. If the formula is not in RAG context:
+          1. Use only universally known results (Pythagorean theorem, quadratic formula)
+          2. Flag with NEEDS_VERIFICATION if uncertain
+          3. Never invent notation or extend known formulas by analogy
+
+      - area: "Numerical worked examples"
+        risk: "LLM makes arithmetic errors in multi-step calculations"
+        mitigation: |
+          For any worked example with numerical calculation:
+          1. Compute the answer step by step — do not jump to the final answer
+          2. State intermediate values explicitly
+          3. Verify: does the final answer have the right units and order of magnitude?
+          4. For probabilities: verify answer is in [0, 1]
+          5. For areas/volumes: verify answer is positive
+          Flag: COMPUTATION_UNVERIFIED if you cannot confidently verify the arithmetic
+
+      - area: "Proof generation"
+        risk: "LLM generates logically flawed proofs that sound plausible"
+        mitigation: |
+          Only generate proofs for results where:
+          1. The proof is standard and well-known (not a novel derivation)
+          2. Each logical step is explicitly justified
+          3. The proof type (direct, contradiction, induction) is appropriate
+          Never generate a proof by induction without clearly stating:
+          - The base case
+          - The inductive hypothesis
+          - The inductive step
+          If a proof feels uncertain: state the result without proof and flag it.
+
+      - area: "Limit and derivative claims"
+        risk: "LLM confuses standard limits and derivatives — sign errors, missing terms"
+        mitigation: |
+          Before stating any derivative or limit:
+          1. Apply the relevant rule explicitly
+          2. Check the sign of the result
+          3. Verify: does this result agree with the qualitative behaviour of the function?
+          High-risk: trig derivatives (cos vs -sin), chain rule (missing inner derivative),
+          log derivatives (1/x vs -1/x), product rule (sign errors)
+
+  sciences:
+    high_risk_areas:
+      - area: "Physical constant values"
+        risk: "LLM generates plausible but slightly wrong constant values"
+        mitigation: |
+          ALWAYS use values from the reference constants in science_fact_checker.yaml.
+          Never generate a physical constant from memory — check the reference.
+          If a constant is not in the reference list, flag NEEDS_VERIFICATION.
+          Pay special attention to: exponent values (10⁸ vs 10⁻⁸), unit prefixes,
+          and sign conventions.
+
+      - area: "Chemical equations"
+        risk: "LLM generates unbalanced equations or wrong state symbols"
+        mitigation: |
+          For every chemical equation:
+          1. Count atoms on each side — verify they are equal
+          2. Check state symbols are chemically plausible at stated conditions
+          3. Verify charge balance in ionic equations
+          4. Never generate equations for unfamiliar reactions — flag NEEDS_VERIFICATION
+
+      - area: "Biological mechanisms"
+        risk: "LLM conflates similar processes (mitosis/meiosis, transcription/translation)"
+        mitigation: |
+          High-confusion pairs to verify explicitly before generating:
+            - Mitosis (2 diploid daughter cells) vs Meiosis (4 haploid daughter cells)
+            - DNA replication vs Transcription vs Translation
+            - Active transport vs Facilitated diffusion
+            - Oxidation (lose electrons) vs Reduction (gain electrons)
+          For each: state the defining feature explicitly in the output,
+          not just the name.
+
+      - area: "Evolutionary language"
+        risk: "LLM defaults to teleological framing ('organisms evolve to survive')"
+        mitigation: |
+          Before generating any evolutionary content, check every sentence for:
+            - "in order to" (implies intent — remove)
+            - "tries to" (implies intent — remove)
+            - "wants to" (implies intent — remove)
+            - "designed to" (implies design — remove)
+          Replace with mechanistic language:
+            - "because organisms with [trait] survived and reproduced at higher rates"
+            - "as a result of selection pressure on [trait]"
+            - "which increased reproductive success in [environment]"
+
+  history_and_social_sciences:
+    high_risk_areas:
+      - area: "Historical dates and events"
+        risk: "LLM generates plausible but wrong dates, especially for non-Anglophone history"
+        mitigation: |
+          For historical dates:
+          1. Only state dates you are confident about from training data
+          2. For non-major events (regional conflicts, minor treaties): flag NEEDS_VERIFICATION
+          3. For major events (world wars, revolutions, independence dates): cross-check RAG
+          4. Never state a date to the specific day unless RAG confirms it
+          Safe fallback: "In the early twentieth century" rather than a specific year
+          if uncertain.
+
+      - area: "Historical quotations"
+        risk: "LLM fabricates quotations from historical figures"
+        mitigation: |
+          [HARD CONSTRAINT — ZERO TOLERANCE]
+          Never generate a direct quotation from a historical figure unless:
+          1. It is one of the most famous, universally known quotations in history
+             (e.g., "I have a dream", "We shall fight on the beaches")
+          2. The RAG context contains the exact quotation
+          If you want to reference what someone said: paraphrase, do not quote.
+          "Churchill emphasised the importance of perseverance" — SAFE
+          "Churchill said: '[generated quotation]'" — NEVER DO THIS
+
+      - area: "Economic statistics"
+        risk: "LLM generates plausible but wrong GDP figures, inflation rates, unemployment rates"
+        mitigation: |
+          Never generate a specific economic statistic unless:
+          1. It is in the RAG context
+          2. It is a well-known historical figure (e.g., US unemployment during Great Depression ~25%)
+          For illustrative examples: use clearly hypothetical numbers:
+          "Suppose GDP grows by 3%..." — SAFE (hypothetical)
+          "In 2019, UK GDP grew by 1.4%..." — only if RAG confirms
+
+      - area: "Literary analysis claims"
+        risk: "LLM generates confident interpretations presented as established fact"
+        mitigation: |
+          Literary interpretation is inherently contested.
+          Every interpretive claim must be framed as interpretation:
+            - "One reading of this passage is..."
+            - "Critics have argued that..."
+            - "The text can be read as suggesting..."
+          Never: "The author is saying that..." (you cannot know author intent with certainty)
+          Never: "This clearly means..." (literary meaning is rarely clear or singular)
+
+verification_protocol:
+  when_uncertain:
+    steps:
+      - "Step 1: Check if the claim is in the RAG context provided"
+      - "Step 2: Check if it is in the curriculum prompts (fact_check_rules, notation_standards)"
+      - "Step 3: Check if it is a universally established fact in your training knowledge"
+      - "Step 4: If none of the above — FLAG IT"
+
+  flagging_format:
+    in_json_output: |
+      Add to the "flags" array in your output:
+      {
+        "flag_type": "NEEDS_VERIFICATION",
+        "content": "The exact claim that needs verification",
+        "reason": "Why you are uncertain",
+        "suggested_action": "What should be checked"
+      }
+    in_narration_text: |
+      Do not include NEEDS_VERIFICATION markers in narration_text — TTS will read them.
+      Instead: use a softer, accurate claim that does not require verification.
+      "According to current scientific understanding..." rather than a specific claim
+      you cannot verify.
+
+  safe_fallback_patterns:
+    mathematics: "State the concept without the formula; flag formula for human verification"
+    sciences: "Use order-of-magnitude estimates for constants; flag exact value needed"
+    history: "Use decade-level dating; flag specific year needed"
+    economics: "Use hypothetical numbers; flag real statistics needed"
+    literature: "Describe the theme without claiming authorial intent; flag if specific quote needed"
+
+rag_usage_protocol:
+  rule: |
+    When RAG context is provided in the prompt:
+    1. PREFER RAG content over training knowledge for subject-specific claims
+    2. Quote RAG content accurately — do not paraphrase in a way that changes meaning
+    3. Note when RAG context is insufficient: flag NEEDS_VERIFICATION
+    4. Do not hallucinate RAG content — if it is not in the context, it is not in the RAG
+
+  rag_hierarchy: |
+    Trust order (highest to lowest):
+    1. RAG context provided in this prompt
+    2. Curriculum prompt content (ib_curriculum.yaml etc.)
+    3. Fact checker reference values (science_fact_checker.yaml constants)
+    4. Well-established universal knowledge (Pythagorean theorem, Newton's laws)
+    5. General training knowledge — USE WITH CAUTION, flag if not confirmed above
