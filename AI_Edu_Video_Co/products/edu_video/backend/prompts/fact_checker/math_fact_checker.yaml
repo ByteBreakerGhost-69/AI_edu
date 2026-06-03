@@ -1,0 +1,300 @@
+meta:
+  subject: "mathematics"
+  loaded_by: ["fact_checker_agent"]
+  version: "2024-01"
+  design_principle: |
+    Mathematical fact-checking is uniquely verifiable: unlike history or literature,
+    mathematical claims can often be checked programmatically or through well-defined
+    logical criteria. This prompt guides the LLM fact-checker to focus on:
+    1. Structural correctness of mathematical claims (not full proof verification)
+    2. Consistency of notation within a scene
+    3. Plausibility of numerical results
+    4. Curriculum alignment (is this content appropriate for the stated level?)
+    The LLM fact-checker supplements — but does not replace — math_validator.py,
+    which performs programmatic checks on LaTeX syntax and equation structure.
+
+validation_criteria:
+  formula_correctness:
+    description: "Check that stated formulas are mathematically correct"
+    checks:
+      - id: "FC-M-001"
+        name: "Standard formula accuracy"
+        rule: |
+          Verify commonly used formulas against known correct forms.
+          Flag any formula that deviates from standard mathematical convention.
+        examples:
+          correct:
+            - "Quadratic formula: x = (-b ± √(b²-4ac)) / 2a"
+            - "Derivative of sin(x) = cos(x)"
+            - "Sum of arithmetic series: S_n = n/2 × (a₁ + aₙ)"
+            - "Euler's identity: e^(iπ) + 1 = 0"
+            - "Pythagorean theorem: a² + b² = c²"
+          incorrect_flag:
+            - "Quadratic formula with 4a in numerator instead of denominator"
+            - "Derivative of sin(x) stated as -cos(x) (sign error)"
+            - "Area of circle stated as πd² instead of πr²"
+        severity: "CRITICAL"
+        action: "REJECT — formula error will mislead students"
+
+      - id: "FC-M-002"
+        name: "Calculus derivative rules"
+        rule: |
+          Verify derivative rules are stated correctly.
+          Pay attention to chain rule, product rule, and quotient rule — these
+          are the most commonly mis-stated in generated content.
+        reference_rules:
+          chain_rule: "d/dx[f(g(x))] = f'(g(x)) · g'(x)"
+          product_rule: "d/dx[f(x)g(x)] = f'(x)g(x) + f(x)g'(x)"
+          quotient_rule: "d/dx[f(x)/g(x)] = (f'(x)g(x) - f(x)g'(x)) / [g(x)]²"
+          power_rule: "d/dx[xⁿ] = nxⁿ⁻¹"
+          chain_on_trig:
+            - "d/dx[sin(f(x))] = cos(f(x)) · f'(x)"
+            - "d/dx[cos(f(x))] = -sin(f(x)) · f'(x)"
+            - "d/dx[eᶠ⁽ˣ⁾] = eᶠ⁽ˣ⁾ · f'(x)"
+        severity: "CRITICAL"
+        action: "REJECT — derivative rule error is a fundamental mathematical falsehood"
+
+      - id: "FC-M-003"
+        name: "Integration correctness"
+        rule: |
+          Verify integration results are correct, including:
+          - Constant of integration (+ C) present in indefinite integrals
+          - Correct anti-derivative rules applied
+          - Definite integral bounds handled correctly
+        common_errors_to_catch:
+          - "Missing + C in indefinite integral narration or on-screen"
+          - "Anti-derivative of 1/x stated as ln(x) without absolute value: should be ln|x|"
+          - "∫eˣ dx stated as anything other than eˣ + C"
+          - "∫sin(x) dx stated as sin(x) + C instead of -cos(x) + C"
+        severity: "CRITICAL"
+        action: "REJECT"
+
+      - id: "FC-M-004"
+        name: "Algebraic identity correctness"
+        rule: |
+          Verify standard algebraic identities are stated correctly.
+        reference_identities:
+          difference_of_squares: "a² - b² = (a+b)(a-b)"
+          perfect_square_sum: "(a+b)² = a² + 2ab + b²"
+          perfect_square_diff: "(a-b)² = a² - 2ab + b²"
+          sum_of_cubes: "a³ + b³ = (a+b)(a² - ab + b²)"
+          difference_of_cubes: "a³ - b³ = (a-b)(a² + ab + b²)"
+        common_errors_to_catch:
+          - "(a+b)² expanded as a² + b² (missing 2ab term)"
+          - "Difference of squares factored with wrong signs"
+        severity: "CRITICAL"
+        action: "REJECT"
+
+  notation_consistency:
+    description: "Check that mathematical notation is used consistently within a scene"
+    checks:
+      - id: "FC-M-005"
+        name: "Variable consistency"
+        rule: |
+          The same variable must represent the same quantity throughout a scene.
+          Flag if: x is used for both the independent variable and a specific value,
+          or if f(x) and y are used interchangeably without definition.
+        severity: "WARNING"
+        action: "FLAG — request clarification or rewrite"
+
+      - id: "FC-M-006"
+        name: "Notation standard adherence"
+        rule: |
+          Check notation matches the curriculum standard specified in job_context.
+          IB: prefers f'(x) for derivative notation, uses specific set notation
+          Cambridge: accepts both Leibniz and prime notation
+          AP: Leibniz notation dy/dx is primary in calculus contexts
+        severity: "WARNING"
+        action: "FLAG — notation mismatch reduces curriculum alignment score"
+
+      - id: "FC-M-007"
+        name: "Unit consistency in applied problems"
+        rule: |
+          In applied mathematics problems (mechanics, statistics, modelling):
+          - Units must be consistent throughout the worked example
+          - Final answers must include units where the problem involves measurement
+          - Do not mix metric and imperial without explicit conversion
+        severity: "WARNING"
+        action: "FLAG — unit inconsistency misleads students in applied contexts"
+
+  curriculum_alignment:
+    description: "Check that content is appropriate for the stated curriculum and difficulty level"
+    checks:
+      - id: "FC-M-008"
+        name: "Level appropriateness"
+        rule: |
+          Content must match the difficulty_level in job_context:
+          BEGINNER: no formal proof, no AHL/BC content, integers preferred, basic functions only
+          INTERMEDIATE: SL/AB-level content, standard techniques, moderate complexity
+          ADVANCED: HL/BC-level content, full proof, abstract treatment acceptable
+        violations:
+          beginner_violations:
+            - "Epsilon-delta definition of limit"
+            - "Proof by mathematical induction"
+            - "Maclaurin or Taylor series"
+            - "Complex numbers"
+            - "Matrices beyond basic notation"
+          intermediate_violations:
+            - "AHL-only content without HL flag (for IB content)"
+            - "BC-only content without BC flag (for AP content)"
+        severity: "CRITICAL"
+        action: "REJECT — content above level will confuse and demoralise target students"
+
+      - id: "FC-M-009"
+        name: "Curriculum-specific content restrictions"
+        rule: |
+          Enforce curriculum-specific boundaries from curriculum prompt:
+          - IB AA vs AI: do not mix content without explicit course specification
+          - AP AB vs BC: flag BC content in AB context
+          - Cambridge P1 vs P3: flag A2 content in AS context
+        severity: "CRITICAL"
+        action: "REJECT"
+
+  numerical_plausibility:
+    description: "Check that numerical examples produce plausible results"
+    checks:
+      - id: "FC-M-010"
+        name: "Worked example answer plausibility"
+        rule: |
+          Verify that stated answers to worked examples are approximately correct.
+          LLM should estimate the answer order of magnitude and check for obvious errors:
+          - Negative answer where positive is expected (e.g., area, probability)
+          - Probability outside [0, 1]
+          - Magnitude wildly inconsistent with inputs
+          - Stated derivative of a positive-slope function is negative
+        severity: "CRITICAL"
+        action: "REJECT — wrong numerical answer is the most damaging error in math education"
+
+      - id: "FC-M-011"
+        name: "Probability sanity check"
+        rule: |
+          Any stated probability must satisfy 0 ≤ P ≤ 1.
+          Probabilities stated as percentages must be between 0% and 100%.
+          Complementary probabilities must sum to 1.
+          P(A) + P(A') = 1 — verify this holds where both are stated.
+        severity: "CRITICAL"
+        action: "REJECT"
+
+      - id: "FC-M-012"
+        name: "Statistical measure plausibility"
+        rule: |
+          Standard deviation must be non-negative.
+          Mean must lie within the range [min, max] of the dataset.
+          Median must be a value that could plausibly appear in the distribution.
+          Correlation coefficient r must satisfy -1 ≤ r ≤ 1.
+        severity: "CRITICAL"
+        action: "REJECT"
+
+  common_llm_errors:
+    description: "Specific errors known to occur frequently in LLM-generated math content"
+    errors:
+      - id: "FC-M-013"
+        error: "Sign error in differentiation of trigonometric functions"
+        pattern: "d/dx[cos(x)] stated as cos(x) instead of -sin(x)"
+        check: "Verify all trig derivatives include correct sign"
+        severity: "CRITICAL"
+
+      - id: "FC-M-014"
+        error: "Incorrect application of chain rule — forgetting the inner derivative"
+        pattern: "d/dx[sin(2x)] stated as cos(2x) instead of 2cos(2x)"
+        check: "Verify chain rule applications multiply by inner derivative"
+        severity: "CRITICAL"
+
+      - id: "FC-M-015"
+        error: "Division of both sides by a variable without checking it's non-zero"
+        pattern: "Dividing both sides by x without noting x ≠ 0"
+        check: "Flag any algebraic manipulation that divides by a variable"
+        severity: "WARNING"
+
+      - id: "FC-M-016"
+        error: "Conflating correlation and causation in statistics content"
+        pattern: "Stating that r = 0.9 'proves' one variable causes the other"
+        check: "Flag any causal language following a correlation statement"
+        severity: "WARNING"
+
+      - id: "FC-M-017"
+        error: "Incorrect binomial expansion coefficient"
+        pattern: "nCr calculated incorrectly; Pascal's triangle row off by one"
+        check: "Verify binomial coefficients: ⁿCᵣ = n! / (r!(n-r)!)"
+        severity: "CRITICAL"
+
+      - id: "FC-M-018"
+        error: "Log laws stated incorrectly"
+        pattern: |
+          log(a + b) stated as log(a) + log(b) — incorrect
+          log(ab) = log(a) + log(b) — correct
+          log(a/b) = log(a) - log(b) — correct
+          log(aⁿ) = n·log(a) — correct
+        check: "Verify all log law applications"
+        severity: "CRITICAL"
+
+confidence_scoring:
+  rubric:
+    description: |
+      Score from 0.0 to 1.0 representing confidence that the content is
+      mathematically correct and curriculum-appropriate.
+    bands:
+      "0.90 - 1.00":
+        label: "HIGH CONFIDENCE — PASS"
+        criteria: "No critical errors. Notation consistent. Level appropriate. All checks pass."
+        action: "fact_check_passed = true"
+
+      "0.70 - 0.89":
+        label: "MODERATE CONFIDENCE — PASS WITH FLAG"
+        criteria: "No critical errors. One or more warnings (notation, minor imprecision). Level appropriate."
+        action: "fact_check_passed = true; include issues in report"
+
+      "0.50 - 0.69":
+        label: "LOW CONFIDENCE — RETRY REQUESTED"
+        criteria: "Potential critical error OR multiple warnings OR level appropriateness uncertain."
+        action: "fact_check_passed = false; trigger retry with correction hints"
+
+      "0.00 - 0.49":
+        label: "FAIL — REJECT"
+        criteria: "One or more confirmed critical errors: wrong formula, wrong answer, level violation."
+        action: "fact_check_passed = false; do not retry — escalate to human review"
+
+  score_deductions:
+    critical_error: -0.40
+    wrong_numerical_answer: -0.50
+    level_violation: -0.35
+    notation_inconsistency: -0.10
+    missing_constant_of_integration: -0.15
+    unit_error: -0.12
+    curriculum_boundary_violation: -0.30
+
+output_format:
+  description: "JSON structure that fact_checker_agent.py must return"
+  schema: |
+    {
+      "fact_check_passed": boolean,
+      "confidence_score": float (0.0-1.0),
+      "issues": [
+        {
+          "check_id": "FC-M-001",
+          "severity": "CRITICAL|WARNING|INFO",
+          "scene_index": integer or null,
+          "description": "What was found",
+          "incorrect_content": "The exact incorrect text or formula",
+          "correction": "What it should be",
+          "source": "Known mathematical fact"
+        }
+      ],
+      "retry_hint": "Specific instruction for regeneration if fact_check_passed = false",
+      "validated_at": "ISO 8601 timestamp"
+    }
+
+  retry_hint_templates:
+    wrong_formula: |
+      "The formula for [concept] is incorrect. The correct formula is [correct].
+       Please regenerate the scene ensuring this formula is used exactly."
+    level_violation: |
+      "The content includes [specific item] which is [AHL/BC/A2]-only content.
+       This scene is targeted at [difficulty_level] students. Please remove or replace
+       with level-appropriate content."
+    sign_error: |
+      "There is a sign error in the derivative/integral. Please verify:
+       d/dx[cos(x)] = -sin(x), d/dx[sin(x)] = cos(x), ∫sin(x)dx = -cos(x) + C."
+    wrong_answer: |
+      "The numerical answer [stated answer] appears incorrect for the given problem.
+       Please recompute and verify the answer before regenerating."
