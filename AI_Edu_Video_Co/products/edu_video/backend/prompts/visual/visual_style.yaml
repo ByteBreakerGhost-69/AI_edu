@@ -1,0 +1,294 @@
+meta:
+  file: "visual_style.yaml"
+  purpose: |
+    Global visual design system for all rendered educational video scenes.
+    Defines color systems, typography rules, layout constraints, and
+    visual language that applies across all renderers and subjects.
+    Loaded by visual_asset_generator.py before subject-specific routing.
+  loaded_by:
+    - "visual_asset_generator"
+    - "animation_router_agent"
+  version: "2024-01"
+  load_order: 1
+
+design_philosophy:
+  core_principle: |
+    Educational video visuals serve one purpose: making abstract ideas concrete.
+    Every visual element must earn its place by clarifying something that
+    narration alone cannot convey.
+    
+    Visual hierarchy: content > clarity > aesthetics.
+    If a visual is beautiful but confusing, it has failed.
+    If a visual is plain but instantly comprehensible, it has succeeded.
+
+  what_visuals_must_never_do:
+    - "Distract from the narration — visuals support narration, they do not compete with it"
+    - "Introduce new information not covered in narration — narration and visuals must be in sync"
+    - "Use decorative elements that carry no informational weight"
+    - "Use colour in a way that is inaccessible to colour-blind viewers (avoid red-green only distinctions)"
+    - "Move faster than a student can read — all text on screen must be readable at narration pace"
+
+  what_visuals_must_always_do:
+    - "Appear in sync with the narration that describes them"
+    - "Use consistent visual language within a video (same colours mean the same things throughout)"
+    - "Include sufficient contrast for readability on standard displays"
+    - "Scale appropriately — key elements must be visible on a mobile screen"
+
+canvas_specification:
+  resolution: "1920 × 1080 pixels (16:9)"
+  frame_rate: 30
+  color_space: "sRGB"
+  safe_area:
+    horizontal_margin: 96
+    vertical_margin: 54
+    description: "Keep all text and key elements within 1728 × 972 active area"
+
+typography:
+  primary_font: "DejaVu Sans (available in all renderers)"
+  monospace_font: "DejaVu Sans Mono (for code renderer)"
+  math_font: "LaTeX Computer Modern (via Manim MathTex)"
+
+  size_hierarchy:
+    title: 56
+    subtitle: 42
+    body: 36
+    caption: 28
+    label: 24
+    annotation: 20
+
+  line_height_multiplier: 1.4
+  letter_spacing: "normal"
+
+  readability_rules:
+    - "Minimum font size on screen: 20px — smaller is unreadable on mobile"
+    - "Maximum characters per line: 60 — longer lines require eye tracking"
+    - "Maximum lines of text per screen: 8 — more creates cognitive overload"
+    - "Text on dark background: use #F9FAFB or #FFFFFF — never pure white on pure black"
+    - "Text on light background: use #111827 — never pure black"
+
+color_system:
+  design_rule: |
+    Colour carries meaning in educational visuals — use it consistently.
+    The same colour must mean the same thing throughout a video.
+    Never use more than 4 colours in a single scene (background + 3 content colours).
+
+  universal_semantic_colours:
+    background_primary: "#1F2937"
+    background_secondary: "#111827"
+    text_primary: "#F9FAFB"
+    text_secondary: "#D1D5DB"
+    highlight_correct: "#10B981"
+    highlight_error: "#EF4444"
+    highlight_warning: "#F59E0B"
+    highlight_neutral: "#6B7280"
+    emphasis_box: "#374151"
+
+  subject_palettes:
+    mathematics:
+      primary: "#3B82F6"
+      secondary: "#8B5CF6"
+      accent: "#06B6D4"
+      background: "#1F2937"
+      text: "#F9FAFB"
+      semantic: |
+        Blue (#3B82F6): variables and unknowns
+        Purple (#8B5CF6): constants and given values
+        Cyan (#06B6D4): results and conclusions
+        Use consistently — never swap meanings mid-video
+
+    physics:
+      primary: "#F97316"
+      secondary: "#EAB308"
+      accent: "#84CC16"
+      background: "#1F2937"
+      text: "#F9FAFB"
+      semantic: |
+        Orange (#F97316): forces and vectors
+        Yellow (#EAB308): energy and fields
+        Green (#84CC16): derived quantities and results
+
+    chemistry:
+      primary: "#10B981"
+      secondary: "#14B8A6"
+      accent: "#6EE7B7"
+      background: "#1F2937"
+      text: "#F9FAFB"
+      semantic: |
+        Green (#10B981): reactants
+        Teal (#14B8A6): products
+        Light green (#6EE7B7): catalysts and intermediates
+
+    biology:
+      primary: "#22C55E"
+      secondary: "#86EFAC"
+      accent: "#BEF264"
+      background: "#1F2937"
+      text: "#F9FAFB"
+      semantic: |
+        Green (#22C55E): living structures, cells
+        Light green (#86EFAC): molecules and biochemistry
+        Lime (#BEF264): processes and pathways
+
+    history:
+      primary: "#D97706"
+      secondary: "#92400E"
+      accent: "#FCD34D"
+      background: "#1C1917"
+      text: "#F5F5F4"
+      semantic: |
+        Amber (#D97706): events and dates
+        Brown (#92400E): context and background
+        Yellow (#FCD34D): key figures and turning points
+
+    geography:
+      primary: "#06B6D4"
+      secondary: "#0EA5E9"
+      accent: "#7DD3FC"
+      background: "#0F172A"
+      text: "#F0F9FF"
+      semantic: |
+        Cyan (#06B6D4): physical geography
+        Blue (#0EA5E9): human geography
+        Light blue (#7DD3FC): data and statistics
+
+    economics:
+      primary: "#8B5CF6"
+      secondary: "#A78BFA"
+      accent: "#DDD6FE"
+      background: "#1E1B4B"
+      text: "#EDE9FE"
+      semantic: |
+        Purple (#8B5CF6): demand curves and consumer behaviour
+        Light purple (#A78BFA): supply curves and producer behaviour
+        Lavender (#DDD6FE): equilibrium and policy effects
+
+    computer_science:
+      primary: "#F472B6"
+      secondary: "#A855F7"
+      accent: "#67E8F9"
+      background: "#0F172A"
+      text: "#F8FAFC"
+      semantic: |
+        Pink (#F472B6): control flow and logic
+        Purple (#A855F7): data structures
+        Cyan (#67E8F9): input/output and interfaces
+
+    literature:
+      primary: "#F87171"
+      secondary: "#FB923C"
+      accent: "#FDE68A"
+      background: "#1C1917"
+      text: "#FAFAF9"
+      semantic: |
+        Red (#F87171): themes and motifs
+        Orange (#FB923C): character and narrative
+        Yellow (#FDE68A): language and style features
+
+    language:
+      primary: "#34D399"
+      secondary: "#6EE7B7"
+      accent: "#A7F3D0"
+      background: "#064E3B"
+      text: "#ECFDF5"
+      semantic: |
+        Green tones: target language structures
+        Light green: native language reference
+        Pale green: new vocabulary items
+
+layout_templates:
+  equation_centered:
+    description: "Single equation displayed prominently — used in Manim math scenes"
+    layout: |
+      Background: subject palette background
+      Equation: centered, 60% of canvas width, MathTex font
+      Label above: 28px caption describing what the equation represents
+      Label below: 24px annotation for any conditions or notes
+    padding: 80px all sides
+
+  step_by_step:
+    description: "Sequential working — equation builds line by line"
+    layout: |
+      Working area: left 65% of canvas
+      Step labels: right 35% of canvas (what each step does)
+      Current line highlighted: use primary colour
+      Previous lines: dimmed to 60% opacity
+      Maximum visible lines: 6
+    progression: "Each new line appears as narration describes it"
+
+  comparison_split:
+    description: "Two cases side by side — correct vs incorrect, before vs after"
+    layout: |
+      Left panel: 45% width, labelled with red (#EF4444) header for 'incorrect'
+                  or amber (#F59E0B) for 'before'
+      Right panel: 45% width, labelled with green (#10B981) for 'correct'
+                   or blue (#3B82F6) for 'after'
+      Divider: 2px line in #374151
+      Content: same font size, same colour system within each panel
+
+  graph_full:
+    description: "Full-canvas graph — economics, statistics, science"
+    layout: |
+      Plot area: 75% of canvas, centered
+      Axis labels: 28px, text_secondary colour
+      Title: 36px, text_primary, above plot area
+      Legend: bottom right of plot area, 24px
+      Data labels: 20px annotation on key points
+
+  timeline_horizontal:
+    description: "Chronological timeline — history, process sequences"
+    layout: |
+      Timeline bar: horizontal, 80% canvas width, centered vertically
+      Event nodes: circles on the timeline bar
+      Labels above: dates, 24px
+      Labels below: event descriptions, 28px, max 40 chars each
+      Alternating: events alternate above and below bar to avoid overlap
+      Maximum events: 8 per scene
+
+  text_reveal:
+    description: "Key concept or definition revealed — general and language subjects"
+    layout: |
+      Background: solid subject palette background
+      Central text box: 70% canvas width, centered
+      Text: 36px body, text_primary
+      Accent line: 4px horizontal rule above text in primary colour
+      Subtitle: 24px below main text, text_secondary
+
+  code_display:
+    description: "Syntax-highlighted code block — computer science"
+    layout: |
+      Background: #0F172A (dark)
+      Code area: 85% canvas width, centred
+      Font: DejaVu Sans Mono, 22px
+      Line numbers: left, 20px, text_secondary
+      Highlighted lines: background #374151
+      Title bar: 50px height, #1E293B, with language label
+
+  diagram_full:
+    description: "Flowchart or structural diagram — Mermaid output"
+    layout: |
+      Background: subject palette background
+      Diagram: centred, max 90% canvas, dark theme Mermaid config
+      Title: 42px above diagram
+      Node colour: subject primary palette
+      Edge colour: text_secondary
+
+animation_principles:
+  timing:
+    fade_in_duration: 400
+    fade_out_duration: 300
+    slide_in_duration: 500
+    equation_write_speed: "0.8 seconds per term (Manim Write animation)"
+    highlight_duration: 600
+
+  motion_rules:
+    - "Elements appear when the narration first mentions them — not before, not after"
+    - "Avoid simultaneous motion of more than 2 elements"
+    - "All motion should feel deliberate — no idle animations or decorative movement"
+    - "Transitions between scenes: simple fade (400ms) — no wipes or spins"
+    - "Ken Burns zoom for static images: maximum 1.05× over full scene duration — subtle"
+
+  accessibility:
+    - "No flashing or strobing effects — epilepsy risk"
+    - "Minimum 4:1 contrast ratio between text and background (WCAG AA)"
+    - "Key information never conveyed by colour alone — always pair with shape or label"
+    - "Animations can be slowed 50% without losing meaning — never rely on split-second timing"
