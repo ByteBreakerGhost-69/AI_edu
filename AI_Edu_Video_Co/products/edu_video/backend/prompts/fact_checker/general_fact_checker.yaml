@@ -1,0 +1,354 @@
+meta:
+  subject: "general"
+  covers: ["history", "geography", "economics", "literature", "computer_science", "language"]
+  loaded_by: ["fact_checker_agent"]
+  version: "2024-01"
+  design_principle: |
+    General subject fact-checking differs fundamentally from STEM checking:
+    most claims are not mathematically verifiable, and many are genuinely contested.
+    The fact-checker's role here is to:
+    1. Catch factual errors that are clearly wrong (wrong dates, impossible geography, etc.)
+    2. Flag claims that are presented as fact but are actually interpretation
+    3. Ensure that contested claims include appropriate qualification language
+    4. Identify anachronism, presentism, or logical inconsistency in argument
+    The confidence score in general subjects reflects epistemic appropriateness
+    (is the certainty level of the claim appropriate?) as much as factual accuracy.
+
+validation_criteria:
+  factual_accuracy:
+    checks:
+      - id: "FC-G-001"
+        name: "Historical date and event accuracy"
+        rule: |
+          Verify that major historical dates and events are correct.
+          Flag claims that are clearly factually wrong — not just contested interpretations.
+        reference_check_policy: |
+          Do NOT flag as error:
+          - Historiographical interpretations ("the primary cause was X")
+          - Contested periodisations ("the Cold War ended in 1989 or 1991")
+          - Complex causal chains with legitimate scholarly disagreement
+          DO flag as error:
+          - Wrong dates for clearly established events (wrong year for WWI start, etc.)
+          - Wrong attribution of key actions to the wrong historical actor
+          - Factual impossibilities (claiming an event happened before a prerequisite event)
+        examples_of_clear_errors:
+          - "World War I stated as beginning in 1915 (correct: 1914)"
+          - "Napoleon stated as Emperor of Britain (he was not)"
+          - "The Berlin Wall stated as falling in 1991 (correct: 1989)"
+          - "The French Revolution stated as beginning in 1800 (correct: 1789)"
+        severity: "CRITICAL"
+        action: "REJECT — factual date and event errors undermine historical credibility"
+
+      - id: "FC-G-002"
+        name: "Geographic accuracy"
+        rule: |
+          Verify geographic facts stated in content.
+        reference_check_policy:
+          check_carefully:
+            - "Capital cities — flag if wrong capital stated for a country"
+            - "Continent assignment — flag if a country assigned to wrong continent"
+            - "Major river/mountain attribution — flag if major landform attributed to wrong country"
+            - "Ocean names — Pacific, Atlantic, Indian, Arctic, Southern — must be correct"
+          do_not_flag:
+            - "Border disputes where international consensus is absent"
+            - "Contested territories where multiple claims exist"
+        common_errors:
+          - "Australia described as being in Asia (it is in Oceania)"
+          - "Cairo stated as the capital of Morocco (capital of Egypt)"
+          - "Amazon River stated as being in Africa (it is in South America)"
+          - "Himalayas stated as being in Africa or Europe"
+        severity: "WARNING for borderline; CRITICAL for major geographic errors"
+        action: "REJECT for clear errors; FLAG for contested geography"
+
+      - id: "FC-G-003"
+        name: "Economic model and theory accuracy"
+        rule: |
+          Verify that named economic theories and models are correctly described.
+        reference_facts:
+          law_of_demand: "As price increases, quantity demanded decreases (ceteris paribus)"
+          law_of_supply: "As price increases, quantity supplied increases (ceteris paribus)"
+          comparative_advantage: "Countries benefit from specialising in goods with the lowest opportunity cost — not necessarily the lowest absolute cost"
+          gdp_components: "GDP = C + I + G + (X - M)"
+          quantity_theory_of_money: "MV = PQ (money supply × velocity = price level × output)"
+          phillips_curve: "Short-run inverse relationship between inflation and unemployment"
+          multiplier_effect: "Change in GDP = initial change × 1/(1-MPC) = initial change × 1/MPS"
+        common_errors:
+          - "Comparative advantage confused with absolute advantage"
+          - "GDP components listed incorrectly or incompletely"
+          - "Multiplier formula inverted or incorrectly computed"
+          - "Phillips curve described as a long-run relationship (it is short-run)"
+          - "Demand described as the desire for a good (it requires both desire and ability to pay)"
+        severity: "CRITICAL for fundamental model errors; WARNING for nuance issues"
+        action: "REJECT for fundamental errors; FLAG for nuance"
+
+      - id: "FC-G-004"
+        name: "Computer science accuracy"
+        rule: |
+          Verify that programming concepts, algorithms, and computational claims are correct.
+        reference_facts:
+          big_o_notation:
+            O_1: "Constant time — does not grow with input size"
+            O_log_n: "Logarithmic — binary search"
+            O_n: "Linear — simple loop through n items"
+            O_n_log_n: "Linearithmic — merge sort, heapsort"
+            O_n_squared: "Quadratic — bubble sort, selection sort (worst case)"
+            O_2_n: "Exponential — brute-force recursive problems"
+          sorting_algorithm_complexities:
+            bubble_sort: "O(n²) average and worst case"
+            merge_sort: "O(n log n) always"
+            quick_sort: "O(n log n) average; O(n²) worst case"
+            binary_search: "O(log n) — requires sorted array"
+          data_structure_operations:
+            array_access: "O(1)"
+            linked_list_access: "O(n)"
+            hash_table_search: "O(1) average"
+            binary_search_tree_search: "O(log n) balanced; O(n) worst case"
+          boolean_logic:
+            and_gate: "Output true only when ALL inputs true"
+            or_gate: "Output true when AT LEAST ONE input true"
+            not_gate: "Inverts the input"
+            xor_gate: "Output true when inputs DIFFER"
+            de_morgan_1: "NOT(A AND B) = (NOT A) OR (NOT B)"
+            de_morgan_2: "NOT(A OR B) = (NOT A) AND (NOT B)"
+        common_errors:
+          - "Binary search stated as O(n) instead of O(log n)"
+          - "Merge sort stated as O(n²) instead of O(n log n)"
+          - "Array access stated as O(n) instead of O(1)"
+          - "De Morgan's law inverted"
+          - "Recursion described as always more efficient than iteration (it is not)"
+          - "Stack described as FIFO instead of LIFO"
+          - "Queue described as LIFO instead of FIFO"
+        severity: "CRITICAL for complexity errors and data structure errors; WARNING for nuance"
+        action: "REJECT for critical; FLAG for nuance"
+
+  epistemological_appropriateness:
+    description: |
+      In non-STEM subjects, the confidence level of a claim must match
+      its actual evidential status. Presenting an interpretation as established
+      fact is itself an accuracy error — of a different kind.
+    checks:
+      - id: "FC-G-005"
+        name: "Interpretation presented as fact"
+        rule: |
+          Flag any claim that:
+          1. Is presented as established historical fact but is actually a contested interpretation
+          2. Uses certainty language ("X caused Y") for a claim that historians or
+             economists actively dispute
+          3. Presents one side of a scholarly debate as the definitive view
+        qualification_language_required:
+          high_certainty: "established fact — no qualification needed"
+            examples:
+              - "World War I began in 1914"
+              - "The Berlin Wall was built in 1961"
+              - "GDP measures total output of an economy in a given period"
+          moderate_certainty: "mainstream view — light qualification appropriate"
+            language: ["most historians argue", "the dominant interpretation holds", "evidence suggests"]
+            examples:
+              - "The long-term causes of World War I"
+              - "Whether the New Deal ended the Depression"
+              - "The primary driver of the Industrial Revolution"
+          low_certainty: "genuinely contested — strong qualification required"
+            language: ["historians debate", "one influential view holds", "some economists argue", "evidence on this is mixed"]
+            examples:
+              - "Whether appeasement was the right policy in 1938"
+              - "Whether free trade benefits all parties equally"
+              - "The relative weight of causes for the French Revolution"
+        severity: "WARNING"
+        action: "FLAG — request addition of appropriate qualification language"
+
+      - id: "FC-G-006"
+        name: "Anachronism detection"
+        rule: |
+          Flag any claim that projects modern concepts, values, or categories
+          back onto historical periods without acknowledging the anachronism.
+        examples_to_flag:
+          - "Medieval peasants were unhappy with capitalism (capitalism as a system did not exist)"
+          - "Roman generals were concerned about human rights violations"
+          - "Ancient Greek athletes competed for national pride (nation-states did not exist)"
+        note: "Anachronism in narration — not in the analysis of anachronism as a historical concept"
+        severity: "WARNING"
+        action: "FLAG — request rewrite with period-appropriate language"
+
+      - id: "FC-G-007"
+        name: "Causal overclaiming"
+        rule: |
+          Flag claims that assert direct causation where the relationship is:
+          - Correlational only
+          - Multi-causal (presented as single-cause)
+          - Based on post hoc reasoning
+        examples:
+          overclaimed:
+            - "The assassination of Franz Ferdinand caused World War I"
+            - "The printing press caused the Reformation"
+            - "Raising interest rates will definitely reduce inflation"
+          appropriately_qualified:
+            - "The assassination of Franz Ferdinand triggered a chain of events that led to World War I — though the underlying causes had been building for decades"
+            - "The printing press was a significant enabling factor in the spread of Reformation ideas"
+            - "Raising interest rates is intended to reduce inflationary pressure — though the relationship is not mechanical"
+        severity: "WARNING"
+        action: "FLAG — request qualification of causal language"
+
+  literary_accuracy:
+    checks:
+      - id: "FC-G-008"
+        name: "Literary attribution accuracy"
+        rule: |
+          Verify that literary works are correctly attributed.
+          Flag wrong author, wrong title, wrong period, wrong nationality.
+        common_errors:
+          - "1984 attributed to Aldous Huxley (author: George Orwell)"
+          - "Brave New World attributed to George Orwell (author: Aldous Huxley)"
+          - "Hamlet described as a comedy (it is a tragedy)"
+          - "Jane Austen described as a Victorian writer (she was Regency/Georgian)"
+          - "Kafka described as a French author (he wrote in German; was Czech/Austro-Hungarian)"
+        severity: "CRITICAL"
+        action: "REJECT — literary misattribution is a fundamental factual error"
+
+      - id: "FC-G-009"
+        name: "Literary term accuracy"
+        rule: |
+          Verify that literary and rhetorical terms are used correctly.
+        reference_definitions:
+          metaphor: "Direct comparison stating one thing IS another (not using 'like' or 'as')"
+          simile: "Comparison using 'like' or 'as'"
+          irony: "Stating the opposite of what is meant; or incongruity between expectation and result"
+          alliteration: "Repetition of initial consonant sounds in closely placed words"
+          onomatopoeia: "Word that phonetically imitates the sound it describes"
+          personification: "Attributing human characteristics to non-human entities"
+          foreshadowing: "Hints or clues about what will happen later in the narrative"
+          juxtaposition: "Placing contrasting elements side by side for effect"
+          dramatic_irony: "Audience knows something the character does not"
+        common_errors:
+          - "Metaphor described as using 'like' or 'as' (that is simile)"
+          - "Alliteration defined as repetition of any sound (it specifically refers to initial consonants)"
+          - "Irony used loosely to mean 'coincidence' or 'unfortunate'"
+        severity: "WARNING for minor misuse; CRITICAL for fundamental definition error"
+        action: "FLAG or REJECT depending on severity"
+
+  language_learning_accuracy:
+    checks:
+      - id: "FC-G-010"
+        name: "Grammar rule accuracy"
+        rule: |
+          Verify that stated grammar rules are correct for the target language.
+          Do not flag stylistic choices or dialect variation as errors.
+          Do flag: wrong conjugation patterns, false rules, incorrect exceptions.
+        scope: "English as target language (primary); flag if other languages appear"
+        common_errors:
+          - "Split infinitives described as grammatically incorrect (they are acceptable in modern English)"
+          - "'I' always used before 'me' as a rule (incorrect — 'give it to John and me' is correct)"
+          - "Ending sentences with prepositions described as wrong (accepted in modern English)"
+          - "Passive voice described as always incorrect (it has appropriate uses)"
+        severity: "WARNING"
+        action: "FLAG — outdated grammar prescriptivism misleads language learners"
+
+  content_safety_checks:
+    checks:
+      - id: "FC-G-011"
+        name: "Age-appropriate content filter"
+        rule: |
+          All content is intended for school-age students (14–18 years).
+          Flag content that:
+          - Contains graphic violence beyond what is educationally necessary
+          - Presents extremist ideology without appropriate critical framing
+          - Glorifies or normalises harmful historical events without ethical context
+          - Contains explicit content of any kind
+        context_guidance: |
+          Discussing the Holocaust, genocide, slavery, or other atrocities is appropriate
+          and necessary — but must be framed with appropriate historical and ethical context,
+          not presented in a way that dehumanises victims or glorifies perpetrators.
+          Describing the mechanics of chemical weapons for historical context (WWI) is acceptable;
+          providing synthesis instructions is not.
+        severity: "CRITICAL"
+        action: "REJECT — content safety violation requires human review"
+
+confidence_scoring:
+  rubric:
+    note: |
+      In general subjects, the confidence score reflects both factual accuracy
+      AND epistemological appropriateness. A historically accurate but
+      overclaimed interpretation will still score below 0.90.
+    bands:
+      "0.90 - 1.00":
+        label: "HIGH CONFIDENCE — PASS"
+        criteria: |
+          No factual errors. Contested claims appropriately qualified.
+          No anachronism. No causal overclaiming. Safe content. Correct attributions.
+        action: "fact_check_passed = true"
+
+      "0.70 - 0.89":
+        label: "MODERATE CONFIDENCE — PASS WITH FLAG"
+        criteria: |
+          No critical factual errors. Some qualification language could be stronger.
+          Minor terminology imprecision. Level-appropriate content.
+        action: "fact_check_passed = true; log warnings for content review"
+
+      "0.50 - 0.69":
+        label: "LOW CONFIDENCE — RETRY"
+        criteria: |
+          One potential factual error OR multiple interpretation-as-fact violations
+          OR causal overclaiming throughout.
+        action: "fact_check_passed = false; retry with correction hints"
+
+      "0.00 - 0.49":
+        label: "FAIL — REJECT"
+        criteria: |
+          Confirmed factual error (wrong date, wrong attribution, wrong formula).
+          Safety violation. Literary misattribution. Algorithm complexity error.
+        action: "fact_check_passed = false; escalate to human review"
+
+  score_deductions:
+    wrong_historical_date: -0.40
+    wrong_geographic_fact: -0.35
+    wrong_literary_attribution: -0.45
+    wrong_economic_model: -0.40
+    wrong_algorithm_complexity: -0.35
+    wrong_literary_term_definition: -0.25
+    interpretation_presented_as_fact: -0.15
+    causal_overclaiming: -0.12
+    anachronism: -0.15
+    missing_qualification_on_contested_claim: -0.08
+    content_safety_violation: -1.00
+    outdated_grammar_prescriptivism: -0.10
+
+output_format:
+  schema: |
+    {
+      "fact_check_passed": boolean,
+      "confidence_score": float (0.0-1.0),
+      "epistemological_quality": "APPROPRIATE|OVERCLAIMED|UNDERCLAIMED",
+      "issues": [
+        {
+          "check_id": "FC-G-001",
+          "severity": "CRITICAL|WARNING|INFO",
+          "scene_index": integer or null,
+          "description": "What was found",
+          "incorrect_content": "Exact problematic text",
+          "correction": "Corrected version or suggested qualification",
+          "source": "Reference basis for the correction"
+        }
+      ],
+      "safety_cleared": boolean,
+      "retry_hint": "Specific correction instruction",
+      "validated_at": "ISO 8601 timestamp"
+    }
+
+  retry_hint_templates:
+    wrong_date: |
+      "The date stated for [event] is incorrect. The correct date is [correct date].
+       Please regenerate with the accurate date."
+    interpretation_as_fact: |
+      "The claim '[claim]' is a contested interpretation presented as established fact.
+       Please add qualification language: 'historians argue', 'evidence suggests', or
+       'the dominant interpretation holds'. Do not present this as certain."
+    algorithm_complexity: |
+      "The time complexity of [algorithm] is stated as [wrong complexity].
+       The correct complexity is [correct complexity]. Please regenerate with the
+       accurate Big-O notation."
+    literary_misattribution: |
+      "[Work] is incorrectly attributed to [wrong author].
+       The correct author is [correct author]. Please correct before regenerating."
+    safety_flag: |
+      "Content flagged for safety review. The passage '[passage']' requires
+       editorial review before it can be included in student-facing content.
+       Do not regenerate — escalate to human review queue."
