@@ -1,138 +1,156 @@
 /**
  * use-studio-store.ts
- * Zustand store for the video studio editor.
- * Owns: current project, scene list, playback state, editor UI state.
- * Does NOT own: render progress (use-render-store.ts), subscription (use-subscription-store.ts).
+ * Video player, scene selection, subtitle display, and studio UI panel state.
+ * The most interaction-heavy store — updated on every animation frame
+ * during playback (currentTimeSeconds).
  */
 
 import { create } from "zustand";
 import { devtools, subscribeWithSelector } from "zustand/middleware";
-import type { Project, Scene, SceneSummary } from "@/types";
+import type { Scene, SubtitleCue, RendererType } from "@/types";
 
 // -------------------------------------------------------------------------- //
-// Types                                                                         //
+// Valid playback rates                                                          //
 // -------------------------------------------------------------------------- //
 
-/** Playback state for the studio video player. */
-export type PlaybackState = {
-  isPlaying:       boolean;
-  currentTime:     number;   // seconds
-  duration:        number;   // seconds (0 until loaded)
-  volume:          number;   // 0.0–1.0
-  isMuted:         boolean;
-  isFullscreen:    boolean;
-  playbackRate:    number;   // 0.5 | 0.75 | 1.0 | 1.25 | 1.5 | 2.0
-  showSubtitles:   boolean;
-  activeSceneIndex: number;  // 0-based; -1 if none
-};
+export const PLAYBACK_RATES = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0] as const;
+export type PlaybackRate = (typeof PLAYBACK_RATES)[number];
 
-/** Studio editor panel visibility and layout state. */
-export type StudioLayout = {
-  scriptSidebarOpen:   boolean;
-  assetPanelOpen:      boolean;
-  sceneInspectorOpen:  boolean;
-  timelineExpanded:    boolean;
-  activePanel: "script" | "assets" | "inspector" | null;
-};
+// -------------------------------------------------------------------------- //
+// State + Actions types                                                         //
+// -------------------------------------------------------------------------- //
 
-/** Studio store state shape. */
-export type StudioState = {
-  // Project data
-  project:        Project | null;
-  scenes:         Scene[];
-  sceneSummaries: SceneSummary[];
-  selectedSceneIndex: number | null;  // null = no scene selected
+type QualityOption = { label: string; index: number };
 
-  // Playback
-  playback: PlaybackState;
+type StudioState = {
+  // Video player
+  isPlaying:            boolean;
+  currentTimeSeconds:   number;
+  durationSeconds:      number;
+  volume:               number;          // 0.0–1.0
+  isMuted:              boolean;
+  playbackRate:         PlaybackRate;
+  isFullscreen:         boolean;
+  isBuffering:          boolean;
+  hasError:             boolean;
+  errorMessage:         string | null;
 
-  // Layout
-  layout: StudioLayout;
+  // Quality
+  currentQualityLabel:  string;
+  availableQualities:   QualityOption[];
 
-  // Loading / error state
-  isLoadingProject: boolean;
-  isLoadingScenes:  boolean;
-  projectError:     string | null;
+  // Subtitles
+  subtitlesEnabled:     boolean;
+  currentCue:           SubtitleCue | null;
+  subtitleFontSize:     number;           // px
+
+  // Scene navigation
+  currentSceneIndex:    number;           // 0-based; scene currently playing
+  scenes:               Scene[];
+  selectedSceneIndex:   number | null;    // Scene selected in the inspector
+
+  // Studio UI panels
+  scriptPanelOpen:      boolean;
+  assetPanelOpen:       boolean;
+  inspectorPanelOpen:   boolean;
+  timelineExpanded:     boolean;
+  activePanel:          "script" | "assets" | "inspector" | null;
 
   // Auto-save
   isDirty:      boolean;
-  lastSavedAt:  number | null;  // unix ms
+  lastSavedAt:  number | null;            // unix ms
 };
 
-/** Studio store actions. */
-export type StudioActions = {
-  // Project
-  setProject:         (project: Project | null) => void;
-  setScenes:          (scenes: Scene[]) => void;
-  setSceneSummaries:  (summaries: SceneSummary[]) => void;
-  updateScene:        (sceneIndex: number, patch: Partial<Scene>) => void;
-  selectScene:        (sceneIndex: number | null) => void;
-  setProjectError:    (error: string | null) => void;
-  setLoadingProject:  (loading: boolean) => void;
-  setLoadingScenes:   (loading: boolean) => void;
+type StudioActions = {
+  // Player: playback
+  setPlaying:       (playing: boolean) => void;
+  setCurrentTime:   (seconds: number) => void;
+  setDuration:      (seconds: number) => void;
+  seekTo:           (seconds: number) => void;
 
-  // Playback
-  setPlaying:         (playing: boolean) => void;
-  setCurrentTime:     (time: number) => void;
-  setDuration:        (duration: number) => void;
-  setVolume:          (volume: number) => void;
-  setMuted:           (muted: boolean) => void;
-  setFullscreen:      (fullscreen: boolean) => void;
-  setPlaybackRate:    (rate: number) => void;
-  toggleSubtitles:    () => void;
-  setActiveScene:     (sceneIndex: number) => void;
+  // Player: audio
+  setVolume:        (volume: number) => void;
+  toggleMute:       () => void;
+  setMuted:         (muted: boolean) => void;
 
-  // Layout
-  toggleScriptSidebar:  () => void;
+  // Player: other
+  setPlaybackRate:  (rate: PlaybackRate) => void;
+  setFullscreen:    (fs: boolean) => void;
+  setBuffering:     (buffering: boolean) => void;
+  setPlayerError:   (message: string | null) => void;
+
+  // Quality
+  setCurrentQuality:      (label: string) => void;
+  setAvailableQualities:  (qualities: QualityOption[]) => void;
+
+  // Subtitles
+  toggleSubtitles:      () => void;
+  setCurrentCue:        (cue: SubtitleCue | null) => void;
+  setSubtitleFontSize:  (size: number) => void;
+
+  // Scene navigation
+  setCurrentSceneIndex:  (index: number) => void;
+  setScenes:             (scenes: Scene[]) => void;
+  selectScene:           (index: number | null) => void;
+  /** Navigate to a scene — sets both currentSceneIndex and selectedSceneIndex. */
+  goToScene:             (index: number) => void;
+
+  // Panels
+  toggleScriptPanel:    () => void;
   toggleAssetPanel:     () => void;
-  toggleSceneInspector: () => void;
+  toggleInspectorPanel: () => void;
   toggleTimeline:       () => void;
-  setActivePanel:       (panel: StudioLayout["activePanel"]) => void;
+  setActivePanel:       (panel: StudioState["activePanel"]) => void;
 
   // Auto-save
   markDirty:   () => void;
   markSaved:   () => void;
 
   // Reset
-  resetStudio: () => void;
+  reset:             () => void;
+  resetPlayer:       () => void;
 };
 
 // -------------------------------------------------------------------------- //
 // Initial state                                                                 //
 // -------------------------------------------------------------------------- //
 
-const INITIAL_PLAYBACK: PlaybackState = {
-  isPlaying:        false,
-  currentTime:      0,
-  duration:         0,
-  volume:           1.0,
-  isMuted:          false,
-  isFullscreen:     false,
-  playbackRate:     1.0,
-  showSubtitles:    true,
-  activeSceneIndex: -1,
-};
-
-const INITIAL_LAYOUT: StudioLayout = {
-  scriptSidebarOpen:   true,
-  assetPanelOpen:      false,
-  sceneInspectorOpen:  false,
-  timelineExpanded:    true,
-  activePanel:         "script",
-};
-
 const INITIAL_STATE: StudioState = {
-  project:             null,
-  scenes:              [],
-  sceneSummaries:      [],
-  selectedSceneIndex:  null,
-  playback:            INITIAL_PLAYBACK,
-  layout:              INITIAL_LAYOUT,
-  isLoadingProject:    false,
-  isLoadingScenes:     false,
-  projectError:        null,
-  isDirty:             false,
-  lastSavedAt:         null,
+  isPlaying:            false,
+  currentTimeSeconds:   0,
+  durationSeconds:      0,
+  volume:               1.0,
+  isMuted:              false,
+  playbackRate:         1.0,
+  isFullscreen:         false,
+  isBuffering:          false,
+  hasError:             false,
+  errorMessage:         null,
+  currentQualityLabel:  "Auto",
+  availableQualities:   [],
+  subtitlesEnabled:     true,
+  currentCue:           null,
+  subtitleFontSize:     20,
+  currentSceneIndex:    0,
+  scenes:               [],
+  selectedSceneIndex:   null,
+  scriptPanelOpen:      true,
+  assetPanelOpen:       false,
+  inspectorPanelOpen:   false,
+  timelineExpanded:     true,
+  activePanel:          "script",
+  isDirty:              false,
+  lastSavedAt:          null,
+};
+
+const PLAYER_RESET: Partial<StudioState> = {
+  isPlaying:          false,
+  currentTimeSeconds: 0,
+  durationSeconds:    0,
+  isBuffering:        false,
+  hasError:           false,
+  errorMessage:       null,
+  currentCue:         null,
 };
 
 // -------------------------------------------------------------------------- //
@@ -145,186 +163,164 @@ export const useStudioStore = create<StudioState & StudioActions>()(
       ...INITIAL_STATE,
 
       // ------------------------------------------------------------------- //
-      // Project actions                                                        //
-      // ------------------------------------------------------------------- //
-
-      setProject: (project) =>
-        set({ project, projectError: null }, false, "setProject"),
-
-      setScenes: (scenes) =>
-        set({ scenes }, false, "setScenes"),
-
-      setSceneSummaries: (sceneSummaries) =>
-        set({ sceneSummaries }, false, "setSceneSummaries"),
-
-      updateScene: (sceneIndex, patch) =>
-        set(
-          (s) => ({
-            scenes: s.scenes.map((scene) =>
-              scene.sceneIndex === sceneIndex
-                ? { ...scene, ...patch }
-                : scene
-            ),
-            isDirty: true,
-          }),
-          false,
-          "updateScene"
-        ),
-
-      selectScene: (sceneIndex) =>
-        set({ selectedSceneIndex: sceneIndex }, false, "selectScene"),
-
-      setProjectError: (projectError) =>
-        set({ projectError }, false, "setProjectError"),
-
-      setLoadingProject: (isLoadingProject) =>
-        set({ isLoadingProject }, false, "setLoadingProject"),
-
-      setLoadingScenes: (isLoadingScenes) =>
-        set({ isLoadingScenes }, false, "setLoadingScenes"),
-
-      // ------------------------------------------------------------------- //
-      // Playback actions                                                       //
+      // Playback                                                               //
       // ------------------------------------------------------------------- //
 
       setPlaying: (isPlaying) =>
+        set({ isPlaying }, false, "setPlaying"),
+
+      setCurrentTime: (currentTimeSeconds) =>
+        set({ currentTimeSeconds }, false, "setCurrentTime"),
+
+      setDuration: (durationSeconds) =>
+        set({ durationSeconds }, false, "setDuration"),
+
+      seekTo: (seconds) =>
         set(
-          (s) => ({ playback: { ...s.playback, isPlaying } }),
+          (s) => ({
+            currentTimeSeconds: Math.max(
+              0,
+              Math.min(seconds, s.durationSeconds)
+            ),
+          }),
           false,
-          "setPlaying"
+          "seekTo"
         ),
 
-      setCurrentTime: (currentTime) =>
-        set(
-          (s) => ({ playback: { ...s.playback, currentTime } }),
-          false,
-          "setCurrentTime"
-        ),
-
-      setDuration: (duration) =>
-        set(
-          (s) => ({ playback: { ...s.playback, duration } }),
-          false,
-          "setDuration"
-        ),
+      // ------------------------------------------------------------------- //
+      // Audio                                                                  //
+      // ------------------------------------------------------------------- //
 
       setVolume: (volume) =>
         set(
-          (s) => ({
-            playback: {
-              ...s.playback,
-              volume: Math.min(1, Math.max(0, volume)),
-              isMuted: volume === 0,
-            },
-          }),
+          { volume: Math.min(1, Math.max(0, volume)), isMuted: volume === 0 },
           false,
           "setVolume"
         ),
 
-      setMuted: (isMuted) =>
-        set(
-          (s) => ({ playback: { ...s.playback, isMuted } }),
-          false,
-          "setMuted"
-        ),
+      toggleMute: () =>
+        set((s) => ({ isMuted: !s.isMuted }), false, "toggleMute"),
 
-      setFullscreen: (isFullscreen) =>
-        set(
-          (s) => ({ playback: { ...s.playback, isFullscreen } }),
-          false,
-          "setFullscreen"
-        ),
+      setMuted: (isMuted) =>
+        set({ isMuted }, false, "setMuted"),
+
+      // ------------------------------------------------------------------- //
+      // Other player controls                                                  //
+      // ------------------------------------------------------------------- //
 
       setPlaybackRate: (playbackRate) =>
+        set({ playbackRate }, false, "setPlaybackRate"),
+
+      setFullscreen: (isFullscreen) =>
+        set({ isFullscreen }, false, "setFullscreen"),
+
+      setBuffering: (isBuffering) =>
+        set({ isBuffering }, false, "setBuffering"),
+
+      setPlayerError: (message) =>
         set(
-          (s) => ({ playback: { ...s.playback, playbackRate } }),
+          { hasError: message !== null, errorMessage: message },
           false,
-          "setPlaybackRate"
+          "setPlayerError"
         ),
+
+      // ------------------------------------------------------------------- //
+      // Quality                                                                //
+      // ------------------------------------------------------------------- //
+
+      setCurrentQuality: (currentQualityLabel) =>
+        set({ currentQualityLabel }, false, "setCurrentQuality"),
+
+      setAvailableQualities: (availableQualities) =>
+        set({ availableQualities }, false, "setAvailableQualities"),
+
+      // ------------------------------------------------------------------- //
+      // Subtitles                                                              //
+      // ------------------------------------------------------------------- //
 
       toggleSubtitles: () =>
         set(
-          (s) => ({
-            playback: {
-              ...s.playback,
-              showSubtitles: !s.playback.showSubtitles,
-            },
-          }),
+          (s) => ({ subtitlesEnabled: !s.subtitlesEnabled }),
           false,
           "toggleSubtitles"
         ),
 
-      setActiveScene: (activeSceneIndex) =>
+      setCurrentCue: (currentCue) =>
+        set({ currentCue }, false, "setCurrentCue"),
+
+      setSubtitleFontSize: (subtitleFontSize) =>
         set(
-          (s) => ({ playback: { ...s.playback, activeSceneIndex } }),
+          { subtitleFontSize: Math.min(40, Math.max(12, subtitleFontSize)) },
           false,
-          "setActiveScene"
+          "setSubtitleFontSize"
         ),
 
       // ------------------------------------------------------------------- //
-      // Layout actions                                                          //
+      // Scene navigation                                                       //
       // ------------------------------------------------------------------- //
 
-      toggleScriptSidebar: () =>
+      setCurrentSceneIndex: (currentSceneIndex) =>
+        set({ currentSceneIndex }, false, "setCurrentSceneIndex"),
+
+      setScenes: (scenes) =>
+        set({ scenes }, false, "setScenes"),
+
+      selectScene: (selectedSceneIndex) =>
+        set({ selectedSceneIndex }, false, "selectScene"),
+
+      goToScene: (index) =>
+        set(
+          { currentSceneIndex: index, selectedSceneIndex: index },
+          false,
+          "goToScene"
+        ),
+
+      // ------------------------------------------------------------------- //
+      // Panels                                                                 //
+      // ------------------------------------------------------------------- //
+
+      toggleScriptPanel: () =>
         set(
           (s) => ({
-            layout: {
-              ...s.layout,
-              scriptSidebarOpen: !s.layout.scriptSidebarOpen,
-              activePanel: !s.layout.scriptSidebarOpen ? "script" : null,
-            },
+            scriptPanelOpen: !s.scriptPanelOpen,
+            activePanel:     !s.scriptPanelOpen ? "script" : s.activePanel,
           }),
           false,
-          "toggleScriptSidebar"
+          "toggleScriptPanel"
         ),
 
       toggleAssetPanel: () =>
         set(
           (s) => ({
-            layout: {
-              ...s.layout,
-              assetPanelOpen: !s.layout.assetPanelOpen,
-              activePanel: !s.layout.assetPanelOpen ? "assets" : s.layout.activePanel,
-            },
+            assetPanelOpen: !s.assetPanelOpen,
+            activePanel:    !s.assetPanelOpen ? "assets" : s.activePanel,
           }),
           false,
           "toggleAssetPanel"
         ),
 
-      toggleSceneInspector: () =>
+      toggleInspectorPanel: () =>
         set(
           (s) => ({
-            layout: {
-              ...s.layout,
-              sceneInspectorOpen: !s.layout.sceneInspectorOpen,
-              activePanel: !s.layout.sceneInspectorOpen ? "inspector" : s.layout.activePanel,
-            },
+            inspectorPanelOpen: !s.inspectorPanelOpen,
+            activePanel:        !s.inspectorPanelOpen ? "inspector" : s.activePanel,
           }),
           false,
-          "toggleSceneInspector"
+          "toggleInspectorPanel"
         ),
 
       toggleTimeline: () =>
         set(
-          (s) => ({
-            layout: {
-              ...s.layout,
-              timelineExpanded: !s.layout.timelineExpanded,
-            },
-          }),
+          (s) => ({ timelineExpanded: !s.timelineExpanded }),
           false,
           "toggleTimeline"
         ),
 
       setActivePanel: (activePanel) =>
-        set(
-          (s) => ({ layout: { ...s.layout, activePanel } }),
-          false,
-          "setActivePanel"
-        ),
+        set({ activePanel }, false, "setActivePanel"),
 
       // ------------------------------------------------------------------- //
-      // Auto-save actions                                                      //
+      // Auto-save                                                              //
       // ------------------------------------------------------------------- //
 
       markDirty: () =>
@@ -334,39 +330,80 @@ export const useStudioStore = create<StudioState & StudioActions>()(
         set({ isDirty: false, lastSavedAt: Date.now() }, false, "markSaved"),
 
       // ------------------------------------------------------------------- //
-      // Reset                                                                   //
+      // Reset                                                                  //
       // ------------------------------------------------------------------- //
 
-      resetStudio: () =>
-        set(INITIAL_STATE, false, "resetStudio"),
+      reset: () => set(INITIAL_STATE, false, "reset"),
+
+      resetPlayer: () =>
+        set(PLAYER_RESET, false, "resetPlayer"),
     })),
     { name: "EduVideo:Studio" }
   )
 );
 
 // -------------------------------------------------------------------------- //
-// Selectors (memoised — use these instead of inline selectors)                 //
+// Selectors                                                                     //
 // -------------------------------------------------------------------------- //
 
-/** Current project ID, or null. */
-export const selectProjectId = (s: StudioState) => s.project?.id ?? null;
+type S = StudioState & StudioActions;
 
-/** Currently selected scene object, or null. */
-export const selectSelectedScene = (s: StudioState): Scene | null => {
-  if (s.selectedSceneIndex === null) return null;
-  return s.scenes.find((sc) => sc.sceneIndex === s.selectedSceneIndex) ?? null;
-};
+/** Playback state for the video player controls bar. */
+export const selectPlayback = (s: S) => ({
+  isPlaying:          s.isPlaying,
+  currentTimeSeconds: s.currentTimeSeconds,
+  durationSeconds:    s.durationSeconds,
+  playbackRate:       s.playbackRate,
+  isFullscreen:       s.isFullscreen,
+  isBuffering:        s.isBuffering,
+});
 
-/** All scenes sorted by sceneIndex. */
-export const selectSortedScenes = (s: StudioState): Scene[] =>
+/** Audio state. */
+export const selectAudio = (s: S) => ({
+  volume:  s.volume,
+  isMuted: s.isMuted,
+});
+
+/** Subtitle state for the overlay component. */
+export const selectSubtitles = (s: S) => ({
+  enabled:  s.subtitlesEnabled,
+  cue:      s.currentCue,
+  fontSize: s.subtitleFontSize,
+});
+
+/** Currently playing scene object, or null if index is out of range. */
+export const selectCurrentScene = (s: S): Scene | null =>
+  s.scenes[s.currentSceneIndex] ?? null;
+
+/** Scene selected in the inspector panel. */
+export const selectSelectedScene = (s: S): Scene | null =>
+  s.selectedSceneIndex !== null ? (s.scenes[s.selectedSceneIndex] ?? null) : null;
+
+/** All panel visibility flags. */
+export const selectPanels = (s: S) => ({
+  scriptPanelOpen:    s.scriptPanelOpen,
+  assetPanelOpen:     s.assetPanelOpen,
+  inspectorPanelOpen: s.inspectorPanelOpen,
+  timelineExpanded:   s.timelineExpanded,
+  activePanel:        s.activePanel,
+});
+
+/** Quality selector data. */
+export const selectQuality = (s: S) => ({
+  current:   s.currentQualityLabel,
+  available: s.availableQualities,
+});
+
+/** True if the player has a playable video loaded. */
+export const selectPlayerReady = (s: S): boolean =>
+  s.durationSeconds > 0 && !s.hasError;
+
+/** Scenes array sorted by sceneIndex. */
+export const selectSortedScenes = (s: S): Scene[] =>
   [...s.scenes].sort((a, b) => a.sceneIndex - b.sceneIndex);
 
-/** True if the project has a playable video. */
-export const selectIsDelivered = (s: StudioState): boolean =>
-  s.project?.status === "done" && s.project.videoUrl !== null;
-
-/** Array of per-scene durations in order. */
-export const selectSceneDurations = (s: StudioState): number[] =>
-  [...s.scenes]
-    .sort((a, b) => a.sceneIndex - b.sceneIndex)
-    .map((sc) => sc.durationSeconds ?? 0);
+/** Auto-save state. */
+export const selectAutoSave = (s: S) => ({
+  isDirty:     s.isDirty,
+  lastSavedAt: s.lastSavedAt,
+});
