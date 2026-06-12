@@ -2,106 +2,115 @@
 
 /**
  * query-provider.tsx
- * TanStack Query v5 provider with production-grade configuration.
- * Wraps the entire app — place in root layout.tsx.
- *
- * Configuration decisions:
- *   - staleTime: 30s — project status changes frequently during processing
- *   - gcTime: 5min — keep completed project data in memory
- *   - retry: custom — don't retry 4xx, retry 5xx up to 3 times
- *   - refetchOnWindowFocus: true — pick up status changes when returning to tab
+ * TanStack Query client configuration and provider.
+ * Tuned for educational video content access patterns.
  */
 
-import React from "react";
+import { useState, type ReactNode } from "react";
 import {
   QueryClient,
   QueryClientProvider,
   type QueryClientConfig,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { ApiError } from "@/lib/api/client";
+import type { ApiError } from "@/lib/api/client";
+
+// -------------------------------------------------------------------------- //
+// Stale time constants                                                          //
+// -------------------------------------------------------------------------- //
+
+/**
+ * Per-query-type stale times.
+ * Apply via staleTime option in individual useQuery calls.
+ */
+export const QUERY_STALE_TIMES = {
+  /** Project status — changes rapidly during rendering. */
+  projectStatus: 3_000,
+  /** Project list — changes on create / cancel. */
+  projectList: 2 * 60 * 1_000,
+  /** Quota — must reflect recent charges promptly. */
+  quota: 30_000,
+  /** Subscription — changes rarely. */
+  subscription: 5 * 60 * 1_000,
+  /** Invoices — historical, rarely changes. */
+  invoices: 15 * 60 * 1_000,
+  /** Review queue — admin needs fresh data. */
+  reviewQueue: 15_000,
+} as const;
 
 // -------------------------------------------------------------------------- //
 // QueryClient factory                                                           //
 // -------------------------------------------------------------------------- //
 
-function createQueryClient(): QueryClient {
+function makeQueryClient(): QueryClient {
   const config: QueryClientConfig = {
     defaultOptions: {
       queries: {
-        staleTime:            30_000,   // 30 s — data considered fresh
-        gcTime:               5 * 60 * 1000, // 5 min — keep in cache after unmount
-        refetchOnWindowFocus: true,
-        refetchOnReconnect:   true,
+        staleTime:            5 * 60 * 1_000,  // 5 min default
+        gcTime:               30 * 60 * 1_000, // 30 min cache after unmount
+        refetchOnWindowFocus: false,
+        refetchOnReconnect:   false,
         retry: (failureCount, error) => {
+          const err = error as ApiError;
           // Never retry 4xx — these are definitive answers
-          if (error instanceof ApiError && error.statusCode < 500) return false;
-          // Retry 5xx up to 3 times
-          return failureCount < 3;
+          if (typeof err?.statusCode === "number" && err.statusCode >= 400 && err.statusCode < 500) {
+            return false;
+          }
+          return failureCount < 2;
         },
-        retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10_000),
+        retryDelay: (attempt) => Math.min(1_000 * 2 ** attempt, 30_000),
       },
       mutations: {
-        retry: false,   // Never auto-retry mutations — user should be informed
-        onError: (error) => {
-          // Mutations propagate errors to the calling hook — no global handler needed
-          if (process.env.NODE_ENV === "development") {
-            console.error("[QueryClient mutation error]", error);
-          }
-        },
+        retry: false,
       },
     },
   };
   return new QueryClient(config);
 }
 
-// Singleton for server components and SSR hydration
-let browserQueryClient: QueryClient | undefined;
+// -------------------------------------------------------------------------- //
+// Singleton reference (client-side only)                                       //
+// -------------------------------------------------------------------------- //
 
-function getQueryClient(): QueryClient {
-  if (typeof window === "undefined") {
-    // Server: always create a new client (never share between requests)
-    return createQueryClient();
-  }
-  if (!browserQueryClient) {
-    browserQueryClient = createQueryClient();
-  }
-  return browserQueryClient;
+let _queryClientRef: QueryClient | null = null;
+
+/** Register the QueryClient instance for imperative use outside React. */
+export function setQueryClientRef(client: QueryClient): void {
+  _queryClientRef = client;
+}
+
+/**
+ * Get the QueryClient for imperative cache invalidation in services.
+ * Returns null during SSR — always prefer useQueryClient() inside components.
+ */
+export function getQueryClient(): QueryClient | null {
+  return _queryClientRef;
 }
 
 // -------------------------------------------------------------------------- //
-// Provider component                                                             //
+// Provider                                                                      //
 // -------------------------------------------------------------------------- //
-
-type QueryProviderProps = {
-  children: React.ReactNode;
-};
 
 /**
  * TanStack Query provider.
- * Must wrap the root layout. Includes devtools in development.
+ * Creates a new QueryClient per session (not module-level singleton)
+ * to prevent state sharing between SSR requests.
  *
- * @example
- *   // app/layout.tsx
- *   export default function RootLayout({ children }) {
- *     return (
- *       <html>
- *         <body>
- *           <QueryProvider>{children}</QueryProvider>
- *         </body>
- *       </html>
- *     );
- *   }
+ * Includes ReactQueryDevtools in development builds.
  */
-export function QueryProvider({ children }: QueryProviderProps): React.ReactElement {
-  const queryClient = getQueryClient();
+export function QueryProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => {
+    const client = makeQueryClient();
+    setQueryClientRef(client);
+    return client;
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
       {children}
       {process.env.NODE_ENV === "development" && (
-        <ReactQueryDevtools initialIsOpen={false} />
+        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
       )}
     </QueryClientProvider>
   );
-}
+  }
