@@ -2,232 +2,180 @@
 
 /**
  * use-render-progress.ts
- * Hook that drives the render progress UI.
- * Polls project status AND subscribes to WebSocket events —
- * the two sources are reconciled into the render store.
- *
- * Polling is used as a reliable fallback when WebSocket drops.
- * WebSocket provides real-time updates when available.
+ * Tracks render pipeline progress via HTTP polling + WebSocket override.
+ * The most stateful hook — manages the full active-rendering lifecycle.
  */
 
 import { useEffect, useRef, useCallback } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getProjectStatus } from "@/lib/api/project-api";
-import { getWebSocketUrl } from "@/lib/api/render-api";
-import { useRenderStore } from "@/store/use-render-store";
-import { useStudioStore } from "@/store/use-studio-store";
-import type { ProjectStatus, WebSocketEvent } from "@/types";
+import {
+  startRenderPolling,
+  refreshProjectStatus,
+  stopRenderPolling,
+} from "@/services/render-service";
+import {
+  useRenderStore,
+  selectRenderProgress,
+  selectRenderError,
+  selectRenderResults,
+  selectIsRenderComplete,
+  selectIsVideoReady,
+  selectElapsedSeconds,
+} from "@/store";
+import { toast } from "@/providers";
+import type { ProjectStatus } from "@/types";
 
 // -------------------------------------------------------------------------- //
-// Constants                                                                     //
+// useRenderProgress                                                            //
 // -------------------------------------------------------------------------- //
 
-/** Active statuses that should trigger polling. */
-const ACTIVE_STATUSES: ProjectStatus[] = [
-  "queued",
-  "orchestrating",
-  "rendering",
-];
-
-/** Poll interval while project is active (ms). */
-const POLL_INTERVAL_MS = 3_000;
-
-/** Stop polling once project reaches one of these statuses. */
-const TERMINAL_STATUSES: ProjectStatus[] = [
-  "done", "failed", "cancelled",
-];
-
-// -------------------------------------------------------------------------- //
-// Hook types                                                                     //
-// -------------------------------------------------------------------------- //
-
-export type RenderProgressHookReturn = {
-  /** Overall render progress 0–100. */
-  overallPercent: number;
-  /** Current pipeline stage label. */
-  stage: string | null;
-  /** Human-readable progress message. */
-  message: string;
-  /** True if WebSocket is actively receiving events. */
-  isLive: boolean;
-  /** True if project has completed (done or failed). */
-  isTerminal: boolean;
-  /** True if project failed. */
-  isFailed: boolean;
-  /** Error message if failed. */
-  errorMessage: string | null;
+type UseRenderProgressOptions = {
+  /** Auto-start polling when projectId is provided (default: true). */
+  autoStart?:      boolean;
+  /** Called on every status transition. */
+  onStatusChange?: (status: ProjectStatus) => void;
+  /** Called when video is ready for playback. */
+  onVideoReady?:   (videoUrl: string) => void;
+  /** Called on fatal render error. */
+  onError?:        (message: string) => void;
 };
 
-// -------------------------------------------------------------------------- //
-// Hook                                                                           //
-// -------------------------------------------------------------------------- //
-
 /**
- * Manages render progress for an active project.
- * Combines WebSocket real-time updates with polling fallback.
+ * Track rendering progress for an active project.
  *
- * @param projectId - UUID of the project to track (null = inactive)
+ * Strategy:
+ *   1. Start HTTP polling via render-service (every 3 s)
+ *   2. Page visibility API pauses polling while tab is hidden; catches up on return
+ *   3. Terminal status (done/failed/cancelled) stops polling automatically
+ *   4. Results fetched automatically when status = "done"
+ *
+ * @param projectId - UUID of project to track, or null to skip
+ * @param options   - Callbacks and autoStart flag
  *
  * @example
- *   const { overallPercent, stage, isLive } = useRenderProgress(projectId);
+ *   const {
+ *     status, percent, message, isComplete,
+ *     isVideoReady, videoUrl, qualityScore,
+ *     error, elapsed, retry,
+ *   } = useRenderProgress(projectId);
  */
 export function useRenderProgress(
-  projectId: string | null
-): RenderProgressHookReturn {
-  const wsRef             = useRef<WebSocket | null>(null);
-  const retriesRef        = useRef(0);
-  const MAX_WS_RETRIES    = 5;
-
+  projectId: string | null,
+  options: UseRenderProgressOptions = {}
+) {
   const {
-    overallPercent,
-    stage,
-    currentMessage,
-    wsStatus,
-    renderError,
-    setWsStatus,
-    setWsJobId,
-    applyWebSocketEvent,
-    initSceneProgress,
-    resetRenderState,
-  } = useRenderStore();
+    autoStart     = true,
+    onStatusChange,
+    onVideoReady,
+    onError,
+  } = options;
 
-  const { setProject, setLoadingProject } = useStudioStore();
+  const progress     = useRenderStore(selectRenderProgress);
+  const renderError  = useRenderStore(selectRenderError);
+  const results      = useRenderStore(selectRenderResults);
+  const isComplete   = useRenderStore(selectIsRenderComplete);
+  const isVideoReady = useRenderStore(selectIsVideoReady);
+  const elapsed      = useRenderStore(selectElapsedSeconds);
+
+  const prevStatusRef  = useRef<ProjectStatus | null>(null);
+  const hasStartedRef  = useRef(false);
+
+  const TERMINAL = new Set<ProjectStatus>(["done", "failed", "cancelled"]);
 
   // ---------------------------------------------------------------- //
-  // Status polling (fallback + initial load)                          //
+  // Start polling                                                      //
   // ---------------------------------------------------------------- //
 
-  const projectQuery = useQuery({
-    queryKey:  ["project-status", projectId],
-    queryFn:   () => getProjectStatus(projectId!),
-    enabled:   Boolean(projectId),
-    refetchInterval: (query) => {
-      const status = query.state.data?.status;
-      if (!status) return POLL_INTERVAL_MS;
-      if (TERMINAL_STATUSES.includes(status)) return false;
-      if (wsStatus === "connected") return false; // WS handles updates
-      return POLL_INTERVAL_MS;
-    },
-    staleTime: 0, // Always re-fetch for status
-  });
-
-  // Sync poll results into studio store
   useEffect(() => {
-    const data = projectQuery.data;
-    if (!data) return;
+    if (!projectId || !autoStart)        return;
+    if (hasStartedRef.current)           return;
+    if (progress.status && TERMINAL.has(progress.status)) return;
 
-    // Update project status in studio store
-    setProject((prev) =>
-      prev ? { ...prev, status: data.status, videoUrl: data.videoUrl ?? prev.videoUrl } : null
-    );
+    hasStartedRef.current = true;
 
-    // When project transitions to rendering, initialise per-scene progress
-    if (data.status === "rendering") {
-      const sceneCount = useStudioStore.getState().scenes.length;
-      if (sceneCount > 0) {
-        initSceneProgress(sceneCount);
+    startRenderPolling(projectId).then((result) => {
+      if (!result.success) {
+        onError?.(result.error);
       }
+    });
+
+    return () => {
+      stopRenderPolling();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, autoStart]);
+
+  // ---------------------------------------------------------------- //
+  // Status-change callbacks                                            //
+  // ---------------------------------------------------------------- //
+
+  useEffect(() => {
+    if (!progress.status) return;
+    if (progress.status === prevStatusRef.current) return;
+
+    prevStatusRef.current = progress.status;
+    onStatusChange?.(progress.status);
+
+    if (progress.status === "failed" && renderError.error) {
+      onError?.(renderError.error);
+      toast.error("Video generation failed", { description: renderError.error });
     }
-  }, [projectQuery.data, setProject, initSceneProgress]);
+  }, [progress.status, renderError.error, onStatusChange, onError]);
 
   // ---------------------------------------------------------------- //
-  // WebSocket connection                                               //
+  // Video-ready callback                                               //
   // ---------------------------------------------------------------- //
 
-  const connectWs = useCallback(() => {
+  useEffect(() => {
+    if (isVideoReady && results.deliveryResult?.publicVideoUrl) {
+      onVideoReady?.(results.deliveryResult.publicVideoUrl);
+    }
+  }, [isVideoReady, results.deliveryResult, onVideoReady]);
+
+  // ---------------------------------------------------------------- //
+  // Page visibility — catch up after tab switch                       //
+  // ---------------------------------------------------------------- //
+
+  useEffect(() => {
     if (!projectId) return;
 
-    const url = getWebSocketUrl(projectId);
-    setWsStatus("connecting");
-    setWsJobId(projectId);
-
-    const ws = new WebSocket(url);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      retriesRef.current = 0;
-      setWsStatus("connected");
-    };
-
-    ws.onmessage = (evt) => {
-      try {
-        const event = JSON.parse(evt.data as string) as WebSocketEvent;
-        applyWebSocketEvent(event);
-      } catch {
-        // Ignore malformed frames
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible" && !isComplete) {
+        refreshProjectStatus(projectId).catch(console.error);
       }
     };
 
-    ws.onclose = (evt) => {
-      setWsStatus("disconnected");
-      // Reconnect on unexpected close while project is active
-      const currentStatus = projectQuery.data?.status;
-      const isActive = currentStatus && ACTIVE_STATUSES.includes(currentStatus);
-      if (!evt.wasClean && isActive && retriesRef.current < MAX_WS_RETRIES) {
-        const delay = 1_000 * Math.pow(2, retriesRef.current);
-        retriesRef.current++;
-        setTimeout(connectWs, delay);
-      }
-    };
-
-    ws.onerror = () => setWsStatus("error");
-  }, [
-    projectId,
-    setWsStatus,
-    setWsJobId,
-    applyWebSocketEvent,
-    projectQuery.data?.status,
-  ]);
-
-  // Open WS when projectId changes and project is in an active state
-  useEffect(() => {
-    const status = projectQuery.data?.status;
-    const shouldConnect = Boolean(
-      projectId && status && ACTIVE_STATUSES.includes(status)
-    );
-
-    if (shouldConnect) {
-      connectWs();
-    }
-
-    return () => {
-      wsRef.current?.close(1000, "Hook cleanup");
-      wsRef.current = null;
-    };
-  }, [projectId, projectQuery.data?.status]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Close WS when project reaches terminal state
-  useEffect(() => {
-    const status = projectQuery.data?.status;
-    if (status && TERMINAL_STATUSES.includes(status)) {
-      wsRef.current?.close(1000, "Project completed");
-      wsRef.current = null;
-      setWsStatus("disconnected");
-    }
-  }, [projectQuery.data?.status, setWsStatus]);
-
-  // Reset render state when projectId changes
-  useEffect(() => {
-    return () => {
-      resetRenderState();
-    };
-  }, [projectId, resetRenderState]);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [projectId, isComplete]);
 
   // ---------------------------------------------------------------- //
-  // Derived values                                                     //
+  // Retry                                                              //
   // ---------------------------------------------------------------- //
 
-  const status     = projectQuery.data?.status;
-  const isTerminal = Boolean(status && TERMINAL_STATUSES.includes(status));
-  const isFailed   = status === "failed";
+  const retry = useCallback(() => {
+    if (!projectId) return;
+    hasStartedRef.current = false;
+    useRenderStore.getState().resetForNewProject(projectId);
+    startRenderPolling(projectId).catch(console.error);
+  }, [projectId]);
 
   return {
-    overallPercent,
-    stage,
-    message:      currentMessage || projectQuery.data?.status ?? "",
-    isLive:       wsStatus === "connected",
-    isTerminal,
-    isFailed,
-    errorMessage: renderError ?? projectQuery.data?.errorMessage ?? null,
+    status:          progress.status,
+    percent:         progress.percent,
+    message:         progress.message,
+    queuePosition:   progress.queuePosition,
+    isPolling:       progress.isPolling,
+    isComplete,
+    isVideoReady,
+    elapsed,
+    videoUrl:        results.deliveryResult?.publicVideoUrl    ?? null,
+    thumbnailUrl:    results.deliveryResult?.publicThumbnailUrl ?? null,
+    qualityScore:    results.qualityReport?.overallScore        ?? null,
+    qualityPassed:   results.qualityReport?.passed              ?? null,
+    renderingResult: results.renderingResult,
+    deliveryResult:  results.deliveryResult,
+    error:           renderError.error,
+    isFatalError:    renderError.isFatal,
+    retry,
   };
-    }
+        }
