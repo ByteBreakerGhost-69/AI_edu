@@ -3,91 +3,100 @@
 /**
  * use-websocket.ts
  * Low-level WebSocket hook for direct connection management.
- * Used by components that need WebSocket outside the studio context,
- * or for testing purposes.
+ * Use for WebSocket connections outside the studio context,
+ * or for testing and admin real-time features.
  *
- * For studio use, prefer useWebSocketContext() from websocket-provider.tsx.
+ * For studio render tracking, prefer useRenderProgress() which
+ * combines polling + the realtime-provider context automatically.
  */
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import type { WebSocketEvent } from "@/types";
 
 // -------------------------------------------------------------------------- //
-// Types                                                                         //
+// Types                                                                        //
 // -------------------------------------------------------------------------- //
 
-export type WebSocketHookOptions = {
+export type WsReadyState = 0 | 1 | 2 | 3;
+
+export type UseWebSocketOptions = {
   /** Called when connection opens. */
-  onOpen?:    () => void;
-  /** Called on every parsed message event. */
-  onMessage?: (event: WebSocketEvent) => void;
-  /** Called on connection error. */
-  onError?:   (error: Event) => void;
+  onOpen?:         () => void;
+  /** Called on every parsed WebSocket event. */
+  onMessage?:      (event: WebSocketEvent) => void;
+  /** Called on connection error (before close). */
+  onError?:        (event: Event) => void;
   /** Called when connection closes. */
-  onClose?:   (event: CloseEvent) => void;
+  onClose?:        (event: CloseEvent) => void;
   /** Auto-reconnect on unexpected close (default: true). */
-  autoReconnect?: boolean;
+  autoReconnect?:  boolean;
   /** Max reconnect attempts (default: 5). */
-  maxRetries?: number;
+  maxRetries?:     number;
 };
 
-export type WebSocketHookReturn = {
-  readyState:  number;
+export type UseWebSocketReturn = {
+  readyState:  WsReadyState;
   isConnected: boolean;
   disconnect:  () => void;
   reconnect:   () => void;
-  send:        (data: string | object) => void;
+  /** Send a string or serialisable object. No-op if not connected. */
+  send:        (data: string | Record<string, unknown>) => void;
 };
 
-// -------------------------------------------------------------------------- //
-// Hook                                                                          //
-// -------------------------------------------------------------------------- //
-
-const DEFAULT_MAX_RETRIES      = 5;
+const MAX_RETRIES_DEFAULT      = 5;
 const BASE_RECONNECT_DELAY_MS  = 1_000;
 
+// -------------------------------------------------------------------------- //
+// useWebSocket                                                                //
+// -------------------------------------------------------------------------- //
+
 /**
- * Generic WebSocket hook with auto-reconnect and message parsing.
+ * Generic WebSocket hook with auto-reconnect and typed event parsing.
  *
- * @param url - WebSocket URL (null = no connection)
- * @param options - Callbacks and reconnect config
- * @returns Connection state and control functions
+ * @param url     - WebSocket URL (null = no connection)
+ * @param options - Callbacks and reconnect configuration
+ * @returns Connection state and imperative controls
  *
  * @example
- *   const { isConnected, disconnect } = useWebSocket(wsUrl, {
- *     onMessage: (event) => console.log(event),
+ *   const { isConnected, send } = useWebSocket(wsUrl, {
+ *     onMessage: (event) => applyEvent(event),
  *     autoReconnect: true,
  *   });
  */
 export function useWebSocket(
-  url: string | null,
-  options: WebSocketHookOptions = {}
-): WebSocketHookReturn {
+  url:     string | null,
+  options: UseWebSocketOptions = {}
+): UseWebSocketReturn {
   const {
     onOpen,
     onMessage,
     onError,
     onClose,
     autoReconnect = true,
-    maxRetries    = DEFAULT_MAX_RETRIES,
+    maxRetries    = MAX_RETRIES_DEFAULT,
   } = options;
+
+  const [readyState, setReadyState] = useState<WsReadyState>(WebSocket.CLOSED as WsReadyState);
 
   const wsRef             = useRef<WebSocket | null>(null);
   const retriesRef        = useRef(0);
   const shouldConnectRef  = useRef(true);
+  const urlRef            = useRef(url);
 
-  const [readyState, setReadyState] = useState<number>(WebSocket.CLOSED);
+  // Keep url ref fresh so reconnect callback sees latest URL
+  useEffect(() => { urlRef.current = url; }, [url]);
 
   const connect = useCallback(() => {
-    if (!url || !shouldConnectRef.current) return;
+    const wsUrl = urlRef.current;
+    if (!wsUrl || !shouldConnectRef.current) return;
 
-    setReadyState(WebSocket.CONNECTING);
-    const ws = new WebSocket(url);
+    setReadyState(WebSocket.CONNECTING as WsReadyState);
+    const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
     ws.onopen = () => {
       retriesRef.current = 0;
-      setReadyState(WebSocket.OPEN);
+      setReadyState(WebSocket.OPEN as WsReadyState);
       onOpen?.();
     };
 
@@ -96,7 +105,7 @@ export function useWebSocket(
         const parsed = JSON.parse(evt.data as string) as WebSocketEvent;
         onMessage?.(parsed);
       } catch {
-        // Skip unparseable frames (e.g. pong responses)
+        // Skip unparseable frames (pong responses, plain-text pings)
       }
     };
 
@@ -105,7 +114,7 @@ export function useWebSocket(
     };
 
     ws.onclose = (evt) => {
-      setReadyState(WebSocket.CLOSED);
+      setReadyState(WebSocket.CLOSED as WsReadyState);
       onClose?.(evt);
 
       if (
@@ -119,10 +128,17 @@ export function useWebSocket(
         setTimeout(connect, delay);
       }
     };
-  }, [url, onOpen, onMessage, onError, onClose, autoReconnect, maxRetries]);
+  }, [onOpen, onMessage, onError, onClose, autoReconnect, maxRetries]);
 
+  // Connect / disconnect when url changes
   useEffect(() => {
-    if (!url) return;
+    if (!url) {
+      wsRef.current?.close(1000, "URL removed");
+      wsRef.current = null;
+      setReadyState(WebSocket.CLOSED as WsReadyState);
+      return;
+    }
+
     shouldConnectRef.current = true;
     retriesRef.current = 0;
     connect();
@@ -132,13 +148,14 @@ export function useWebSocket(
       wsRef.current?.close(1000, "Component unmounted");
       wsRef.current = null;
     };
-  }, [url]); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]);
 
   const disconnect = useCallback(() => {
     shouldConnectRef.current = false;
     wsRef.current?.close(1000, "Deliberate disconnect");
     wsRef.current = null;
-    setReadyState(WebSocket.CLOSED);
+    setReadyState(WebSocket.CLOSED as WsReadyState);
   }, []);
 
   const reconnect = useCallback(() => {
@@ -148,12 +165,11 @@ export function useWebSocket(
     setTimeout(connect, 100);
   }, [disconnect, connect]);
 
-  const send = useCallback((data: string | object) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
-        typeof data === "string" ? data : JSON.stringify(data)
-      );
-    }
+  const send = useCallback((data: string | Record<string, unknown>) => {
+    if (wsRef.current?.readyState !== WebSocket.OPEN) return;
+    wsRef.current.send(
+      typeof data === "string" ? data : JSON.stringify(data)
+    );
   }, []);
 
   return {
@@ -163,4 +179,4 @@ export function useWebSocket(
     reconnect,
     send,
   };
-}
+        }
